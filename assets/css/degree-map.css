@@ -64,11 +64,11 @@
 
 
 /* ── SEMESTER COLUMNS ────────────────────────────────────────── */
-.sem-col    { width: 210px; flex-shrink: 0; display: flex; flex-direction: column; padding: 0 8px; }
+.sem-col    { width: 176px; flex-shrink: 0; display: flex; flex-direction: column; padding: 0 6px; }
 .sem-header { text-align: center; margin-bottom: .6rem; padding: .4rem .3rem; border-bottom: 2px solid var(--gold); }
-.sem-year   { font-size: .69rem; text-transform: uppercase; letter-spacing: .14em; color: var(--gold); opacity: .7; }
-.sem-name   { font-family: var(--font-display); font-size: 1rem; color: var(--white); margin: .05rem 0; }
-.sem-total  { font-family: var(--font-mono); font-size: .71rem; color: var(--light-gray); opacity: .6; }
+.sem-year   { font-size: .58rem; text-transform: uppercase; letter-spacing: .14em; color: var(--gold); opacity: .7; }
+.sem-name   { font-family: var(--font-display); font-size: .85rem; color: var(--white); margin: .05rem 0; }
+.sem-total  { font-family: var(--font-mono); font-size: .6rem; color: var(--light-gray); opacity: .6; }
 .sem-cards  { display: flex; flex-direction: column; gap: .45rem; flex: 1; }
 
 
@@ -78,11 +78,11 @@
   background: var(--parchment);
   border: 1.5px solid var(--parchment-d);
   border-radius: 6px;
-  padding: .6rem .65rem .5rem;
+  padding: .5rem .55rem .4rem;
   cursor: pointer;
   transition: opacity .2s, border-color .2s, box-shadow .2s, transform .15s;
   will-change: opacity, border-color;
-  min-height: 68px;
+  min-height: 58px;
 }
 .course-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.35); border-color: var(--gold); z-index: 2; }
 .course-card.is-placeholder { background: transparent; border: 1.5px dashed rgba(245,184,10,.35); }
@@ -91,15 +91,15 @@
 
 .credit-badge {
   position: absolute; top: .3rem; right: .35rem;
-  font-family: var(--font-mono); font-size: .71rem;
+  font-family: var(--font-mono); font-size: .6rem;
   color: var(--brown); background: rgba(92,48,0,.12);
   border-radius: 3px; padding: .05rem .28rem; font-weight: 500;
 }
 .is-placeholder .credit-badge { color: var(--gold); background: rgba(245,184,10,.12); }
-.card-code  { font-family: var(--font-mono); font-size: .77rem; font-weight: 500; color: var(--brown); line-height: 1; padding-right: 1.8rem; }
-.card-title { font-size: .86rem; font-weight: 600; color: var(--dark-brown); line-height: 1.25; margin-top: .18rem; padding-right: 1rem; }
+.card-code  { font-family: var(--font-mono); font-size: .65rem; font-weight: 500; color: var(--brown); line-height: 1; padding-right: 1.8rem; }
+.card-title { font-size: .72rem; font-weight: 600; color: var(--dark-brown); line-height: 1.25; margin-top: .18rem; padding-right: 1rem; }
 .card-tags  { display: flex; flex-wrap: wrap; gap: .22rem; margin-top: .3rem; }
-.card-tag   { font-size: .64rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .1rem .35rem; border-radius: 100px; color: white; line-height: 1.4; }
+.card-tag   { font-size: .54rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .1rem .35rem; border-radius: 100px; color: white; line-height: 1.4; }
 
 
 /* ── CARD STATES ─────────────────────────────────────────────── */
@@ -220,25 +220,3 @@
   font-family: var(--font-mono); font-size: .7rem; color: var(--light-gray);
   min-width: 3rem; text-align: center;
 }
-
-
-/* ── CHAIN MODE (in-place rearrangement) ────────────────────── */
-#flowchart.chain-mode .sem-col       { display: none; }
-#flowchart.chain-mode .chain-col     { display: flex; }
-
-.chain-col {
-  display: none;
-  flex-direction: column;
-  width: 210px; flex-shrink: 0; padding: 0 8px;
-}
-.chain-col .sem-header { text-align: center; margin-bottom: .6rem; padding: .4rem .3rem; border-bottom: 2px solid var(--gold); }
-
-.course-card.chain-active {
-  transform: scale(1.06);
-  z-index: 10;
-  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-}
-
-.chain-arrow-ancestor  { stroke: var(--teal);       stroke-width: 2.5; fill: none; }
-.chain-arrow-descendant { stroke: var(--light-blue); stroke-width: 2.5; fill: none; }
-.chain-arrow-coreq     { stroke: var(--orange);     stroke-width: 2.5; fill: none; stroke-dasharray: 5,3; }
