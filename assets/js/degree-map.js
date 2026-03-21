@@ -238,18 +238,19 @@ function drawArrows() {
   const mr = mainArea.getBoundingClientRect();
   const sl = mainArea.scrollLeft;
   const st = mainArea.scrollTop;
+  const z  = zoomLevel;
 
   function cardPos(id) {
     const el = document.getElementById("card-" + id);
     if (!el) return null;
     const r = el.getBoundingClientRect();
     return {
-      cx: r.left - mr.left + sl + r.width  / 2,
-      cy: r.top  - mr.top  + st + r.height / 2,
-      rx: r.right  - mr.left + sl,
-      lx: r.left   - mr.left + sl,
-      ty: r.top    - mr.top  + st,
-      by: r.bottom - mr.top  + st,
+      cx: (r.left - mr.left + sl + r.width  / 2) / z,
+      cy: (r.top  - mr.top  + st + r.height / 2) / z,
+      rx: (r.right  - mr.left + sl) / z,
+      lx: (r.left   - mr.left + sl) / z,
+      ty: (r.top    - mr.top  + st) / z,
+      by: (r.bottom - mr.top  + st) / z,
     };
   }
 
@@ -453,18 +454,13 @@ let zoomLevel = 1.3;
 const ZOOM_MIN = 0.5, ZOOM_MAX = 2.0, ZOOM_STEP = 0.1;
 
 function applyZoom() {
-  const fc      = document.getElementById("flowchart");
-  const wrapper = document.getElementById("flowchart-wrapper");
-  fc.style.transform = `scale(${zoomLevel})`;
-  requestAnimationFrame(() => {
-    wrapper.style.width  = (fc.scrollWidth  * zoomLevel) + "px";
-    wrapper.style.height = (fc.scrollHeight * zoomLevel) + "px";
-  });
+  const fc = document.getElementById("flowchart");
+  fc.style.zoom = zoomLevel;
   document.getElementById("zoom-level").textContent = Math.round(zoomLevel * 100) + "%";
 }
 
-function zoomIn()  { zoomLevel = Math.min(ZOOM_MAX, +(zoomLevel + ZOOM_STEP).toFixed(1)); applyZoom(); }
-function zoomOut() { zoomLevel = Math.max(ZOOM_MIN, +(zoomLevel - ZOOM_STEP).toFixed(1)); applyZoom(); }
+function zoomIn()  { zoomLevel = Math.min(ZOOM_MAX, +(zoomLevel + ZOOM_STEP).toFixed(1)); applyZoom(); if (STATE.selected) { drawArrows(); highlightArrows(STATE.selected); } }
+function zoomOut() { zoomLevel = Math.max(ZOOM_MIN, +(zoomLevel - ZOOM_STEP).toFixed(1)); applyZoom(); if (STATE.selected) { drawArrows(); highlightArrows(STATE.selected); } }
 
 
 // ╔══════════════════════════════════════════════════════════════╗

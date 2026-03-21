@@ -92,38 +92,21 @@
 
 <main id="main-area">
   <div id="flowchart-wrapper">
-    <div id="flowchart">
-      <svg id="arrow-svg">
-        <defs>
-          <!-- Prereq arrow markers -->
-          <marker id="mPre"   markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="rgba(92,48,0,.65)"/></marker>
-          <marker id="mPreHi" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#006354"/></marker>
-          <marker id="mUnHi"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#6BC9C9"/></marker>
-          <!-- Coreq arrow markers -->
-          <marker id="mCo"    markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="rgba(199,105,23,.65)"/></marker>
-          <marker id="mCoHi"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#C76917"/></marker>
-        </defs>
-      </svg>
-    </div>
-  </div>
-</main>
-
-<div id="chain-overlay" class="chain-overlay hidden">
-  <div class="chain-overlay-header">
-    <span id="chain-title">Prerequisite &amp; Requirement Chain</span>
-    <button id="chain-close" onclick="closeChainOverlay()">&times;</button>
-  </div>
-  <div class="chain-overlay-body" id="chain-body">
-    <svg id="chain-svg" class="chain-svg">
+  <div id="flowchart">
+    <svg id="arrow-svg">
       <defs>
-        <marker id="cmPre"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#006354"/></marker>
-        <marker id="cmUn"   markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#6BC9C9"/></marker>
-        <marker id="cmCo"   markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#C76917"/></marker>
+        <!-- Prereq arrow markers -->
+        <marker id="mPre"   markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="rgba(92,48,0,.65)"/></marker>
+        <marker id="mPreHi" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#006354"/></marker>
+        <marker id="mUnHi"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#6BC9C9"/></marker>
+        <!-- Coreq arrow markers -->
+        <marker id="mCo"    markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="rgba(199,105,23,.65)"/></marker>
+        <marker id="mCoHi"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#C76917"/></marker>
       </defs>
     </svg>
-    <div id="chain-columns" class="chain-columns"></div>
   </div>
-</div>
+  </div>
+</main>
 
 <div id="legend">
   <h4>Legend</h4>
