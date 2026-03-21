@@ -97,7 +97,6 @@ function render() {
   });
 
   if (STATE.tag && STATE.tag !== "all") filterByTag(STATE.tag, null, true);
-  setTimeout(drawArrows, 80);
 }
 
 function makeCard(course) {
@@ -175,6 +174,7 @@ function selectCourse(id) {
     else                         el.classList.add("state-dimmed");
   });
 
+  drawArrows();
   highlightArrows(id, prereqs, coreqs, unlocks);
   openPanel(course, prereqs, coreqs, unlocks);
 }
@@ -184,10 +184,7 @@ function clearSelection() {
   document.querySelectorAll(".course-card").forEach(el =>
     el.classList.remove("state-selected","state-prereq","state-coreq","state-unlocked","state-dimmed")
   );
-  document.querySelectorAll("#arrow-svg path").forEach(p => {
-    p.classList.remove("hi-prereq","hi-unlocked","hi-coreq","fade");
-    p.setAttribute("marker-end", p.dataset.type === "prereq" ? "url(#mPre)" : "url(#mCo)");
-  });
+  document.getElementById("arrow-svg").querySelectorAll("path").forEach(p => p.remove());
   document.getElementById("detail-panel").classList.remove("open");
   if (STATE.tag && STATE.tag !== "all") filterByTag(STATE.tag, null, true);
 }
@@ -441,19 +438,19 @@ function setTrack(track, btn) {
 let resizeTimer;
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(drawArrows, 150);
+  if (STATE.selected) resizeTimer = setTimeout(drawArrows, 150);
 });
 document.getElementById("main-area").addEventListener("scroll", () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(drawArrows, 60);
+  if (STATE.selected) resizeTimer = setTimeout(drawArrows, 60);
 });
 
 
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  ZOOM CONTROLS                                                ║
 // ╚══════════════════════════════════════════════════════════════╝
-let zoomLevel = 1.0;
-const ZOOM_MIN = 0.5, ZOOM_MAX = 1.5, ZOOM_STEP = 0.1;
+let zoomLevel = 1.3;
+const ZOOM_MIN = 0.5, ZOOM_MAX = 2.0, ZOOM_STEP = 0.1;
 
 function applyZoom() {
   const fc      = document.getElementById("flowchart");
@@ -468,6 +465,20 @@ function applyZoom() {
 
 function zoomIn()  { zoomLevel = Math.min(ZOOM_MAX, +(zoomLevel + ZOOM_STEP).toFixed(1)); applyZoom(); }
 function zoomOut() { zoomLevel = Math.max(ZOOM_MIN, +(zoomLevel - ZOOM_STEP).toFixed(1)); applyZoom(); }
+
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  CLICK-OFF & KEYBOARD                                         ║
+// ╚══════════════════════════════════════════════════════════════╝
+document.getElementById("main-area").addEventListener("click", (ev) => {
+  if (ev.target.closest(".course-card")) return;
+  if (ev.target.closest("#arrow-svg")) return;
+  if (STATE.selected) clearSelection();
+});
+
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape" && STATE.selected) clearSelection();
+});
 
 
 // ── INIT ──────────────────────────────────────────────────────
