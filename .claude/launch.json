@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "jekyll-dev",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "C:\\Ruby30-x64\\bin\\bundle.cmd", "exec", "jekyll", "serve", "--config", "_config.yml,_config.dev.yml"],
+      "port": 4000
+    }
+  ]
+}

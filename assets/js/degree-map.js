@@ -21,6 +21,31 @@ for (const c of Object.values(COURSES)) {
   }
 }
 
+// ── RECURSIVE CHAIN HELPERS ──────────────────────────────────
+function getAllAncestors(id, prog, visited = new Set()) {
+  const course = COURSES[id];
+  if (!course) return visited;
+  for (const pid of [...(course.prereqs || []), ...(course.coreqs || [])]) {
+    if (visited.has(pid)) continue;
+    const pc = COURSES[pid];
+    if (!pc || !pc.semesters || !pc.semesters[prog]) continue;
+    visited.add(pid);
+    getAllAncestors(pid, prog, visited);
+  }
+  return visited;
+}
+
+function getAllDescendants(id, prog, visited = new Set()) {
+  for (const uid of (UNLOCKS[id] || [])) {
+    if (visited.has(uid)) continue;
+    const uc = COURSES[uid];
+    if (!uc || !uc.semesters || !uc.semesters[prog]) continue;
+    visited.add(uid);
+    getAllDescendants(uid, prog, visited);
+  }
+  return visited;
+}
+
 
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  APPLICATION STATE                                           ║
@@ -97,7 +122,6 @@ function render() {
   });
 
   if (STATE.tag && STATE.tag !== "all") filterByTag(STATE.tag, null, true);
-  setTimeout(drawArrows, 80);
 }
 
 function makeCard(course) {
@@ -175,8 +199,8 @@ function selectCourse(id) {
     else                         el.classList.add("state-dimmed");
   });
 
-  highlightArrows(id, prereqs, coreqs, unlocks);
   openPanel(course, prereqs, coreqs, unlocks);
+  openChainOverlay(id);
 }
 
 function clearSelection() {
@@ -189,6 +213,7 @@ function clearSelection() {
     p.setAttribute("marker-end", p.dataset.type === "prereq" ? "url(#mPre)" : "url(#mCo)");
   });
   document.getElementById("detail-panel").classList.remove("open");
+  document.getElementById("chain-overlay").classList.add("hidden");
   if (STATE.tag && STATE.tag !== "all") filterByTag(STATE.tag, null, true);
 }
 
@@ -417,6 +442,7 @@ function setProgram(prog, btn) {
   STATE.selected = null;
   STATE.tag      = null;
   document.getElementById("detail-panel").classList.remove("open");
+  document.getElementById("chain-overlay").classList.add("hidden");
   document.querySelectorAll(".prog-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   document.getElementById("track-selector").classList.toggle("visible", prog === "BE");
@@ -429,10 +455,216 @@ function setTrack(track, btn) {
   STATE.track    = track;
   STATE.selected = null;
   document.getElementById("detail-panel").classList.remove("open");
+  document.getElementById("chain-overlay").classList.add("hidden");
   document.querySelectorAll(".track-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   render();
 }
+
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  CHAIN OVERLAY                                                ║
+// ╚══════════════════════════════════════════════════════════════╝
+function openChainOverlay(id) {
+  const prog = currentProg();
+  const ancestors   = getAllAncestors(id, prog);
+  const descendants = getAllDescendants(id, prog);
+  const chainSet    = new Set([...ancestors, id, ...descendants]);
+  const chainIds    = [...chainSet];
+
+  // Group by semester
+  const semGroups = {};
+  for (const cid of chainIds) {
+    const c = COURSES[cid];
+    if (!c || !c.semesters || !c.semesters[prog]) continue;
+    const s = c.semesters[prog];
+    if (!semGroups[s]) semGroups[s] = [];
+    semGroups[s].push(cid);
+  }
+
+  const sortedSems = Object.keys(semGroups).map(Number).sort((a, b) => a - b);
+
+  // Update title
+  const course = COURSES[id];
+  document.getElementById("chain-title").textContent =
+    `${course.code} — Prerequisite & Requirement Chain`;
+
+  // Build columns
+  const cols = document.getElementById("chain-columns");
+  cols.innerHTML = "";
+
+  for (const s of sortedSems) {
+    const semInfo = SEMESTERS.find(x => x.s === s);
+    const col = document.createElement("div");
+    col.className = "chain-sem-col";
+    col.innerHTML = `<div class="chain-sem-header">${semInfo ? semInfo.season : ""}  Sem ${s}<small>${semInfo ? semInfo.year : ""}</small></div>`;
+
+    for (const cid of semGroups[s]) {
+      const c = COURSES[cid];
+      const card = document.createElement("div");
+      card.className = "chain-card";
+      card.id = "chain-" + cid;
+      card.dataset.id = cid;
+
+      if (cid === id)                card.classList.add("chain-selected");
+      else if (ancestors.has(cid))   card.classList.add("chain-ancestor");
+      else if (descendants.has(cid)) card.classList.add("chain-descendant");
+
+      card.innerHTML = `
+        <div class="chain-card-code">${c.code}</div>
+        <div class="chain-card-title">${c.title}</div>
+        <div class="chain-card-credits">${c.credits} cr</div>`;
+
+      card.onclick = (ev) => {
+        ev.stopPropagation();
+        closeChainOverlay();
+        selectCourse(cid);
+      };
+
+      col.appendChild(card);
+    }
+    cols.appendChild(col);
+  }
+
+  // Show overlay then draw arrows
+  document.getElementById("chain-overlay").classList.remove("hidden");
+  requestAnimationFrame(() => requestAnimationFrame(() => drawChainArrows(chainSet, ancestors, id, prog)));
+}
+
+function drawChainArrows(chainSet, ancestors, selId, prog) {
+  const svg  = document.getElementById("chain-svg");
+  const body = document.getElementById("chain-body");
+  svg.querySelectorAll("path").forEach(p => p.remove());
+
+  const br = body.getBoundingClientRect();
+  const sl = body.scrollLeft;
+  const st = body.scrollTop;
+
+  // Size SVG to full scrollable area
+  svg.style.width  = body.scrollWidth + "px";
+  svg.style.height = body.scrollHeight + "px";
+
+  function chainCardPos(cid) {
+    const el = document.getElementById("chain-" + cid);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return {
+      cx: r.left - br.left + sl + r.width  / 2,
+      cy: r.top  - br.top  + st + r.height / 2,
+      rx: r.right  - br.left + sl,
+      lx: r.left   - br.left + sl,
+      ty: r.top    - br.top  + st,
+      by: r.bottom - br.top  + st,
+    };
+  }
+
+  const drawn = new Set();
+
+  for (const cid of chainSet) {
+    const c = COURSES[cid];
+    if (!c) continue;
+    const toPos = chainCardPos(cid);
+    if (!toPos) continue;
+
+    for (const pid of (c.prereqs || [])) {
+      if (!chainSet.has(pid)) continue;
+      const key = pid + "->" + cid;
+      if (drawn.has(key)) continue;
+      drawn.add(key);
+      const fromPos = chainCardPos(pid);
+      if (!fromPos) continue;
+
+      const isAncestorEdge = ancestors.has(pid) && (ancestors.has(cid) || cid === selId);
+      svg.appendChild(makeChainPath(fromPos, toPos, false, isAncestorEdge));
+    }
+
+    for (const co of (c.coreqs || [])) {
+      if (!chainSet.has(co)) continue;
+      const key = "co:" + [co, cid].sort().join("-");
+      if (drawn.has(key)) continue;
+      drawn.add(key);
+      const fromPos = chainCardPos(co);
+      if (!fromPos) continue;
+      svg.appendChild(makeChainPath(fromPos, toPos, true, false));
+    }
+  }
+}
+
+function makeChainPath(from, to, isCoreq, isAncestor) {
+  const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+  if (isCoreq)          p.classList.add("chain-arrow-coreq");
+  else if (isAncestor)  p.classList.add("chain-arrow-ancestor");
+  else                  p.classList.add("chain-arrow-descendant");
+
+  const SAME_COL_THRESHOLD = 100;
+  const sameCol = Math.abs(from.cx - to.cx) < SAME_COL_THRESHOLD;
+  let d;
+
+  if (sameCol) {
+    const bulge = Math.max(from.rx, to.rx) + 38;
+    d = `M ${from.rx} ${from.cy} C ${bulge} ${from.cy} ${bulge} ${to.cy} ${to.rx} ${to.cy}`;
+  } else if (from.cx < to.cx) {
+    const dx = to.cx - from.cx;
+    const c1x = from.rx + dx * 0.4;
+    const c2x = to.lx   - dx * 0.4;
+    d = `M ${from.rx} ${from.cy} C ${c1x} ${from.cy} ${c2x} ${to.cy} ${to.lx} ${to.cy}`;
+  } else {
+    const dx = from.cx - to.cx;
+    const c1x = from.lx - dx * 0.4;
+    const c2x = to.rx   + dx * 0.4;
+    d = `M ${from.lx} ${from.cy} C ${c1x} ${from.cy} ${c2x} ${to.cy} ${to.rx} ${to.cy}`;
+  }
+
+  p.setAttribute("d", d);
+
+  if (isCoreq)          p.setAttribute("marker-end", "url(#cmCo)");
+  else if (isAncestor)  p.setAttribute("marker-end", "url(#cmPre)");
+  else                  p.setAttribute("marker-end", "url(#cmUn)");
+
+  return p;
+}
+
+function closeChainOverlay() {
+  document.getElementById("chain-overlay").classList.add("hidden");
+  clearSelection();
+}
+
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  ZOOM CONTROLS                                                ║
+// ╚══════════════════════════════════════════════════════════════╝
+let zoomLevel = 1.0;
+const ZOOM_MIN = 0.5, ZOOM_MAX = 1.5, ZOOM_STEP = 0.1;
+
+function applyZoom() {
+  const fc      = document.getElementById("flowchart");
+  const wrapper = document.getElementById("flowchart-wrapper");
+  fc.style.transform = `scale(${zoomLevel})`;
+  // Update wrapper size so scroll container respects scaled dimensions
+  requestAnimationFrame(() => {
+    wrapper.style.width  = (fc.scrollWidth  * zoomLevel) + "px";
+    wrapper.style.height = (fc.scrollHeight * zoomLevel) + "px";
+  });
+  document.getElementById("zoom-level").textContent = Math.round(zoomLevel * 100) + "%";
+}
+
+function zoomIn()  { zoomLevel = Math.min(ZOOM_MAX, +(zoomLevel + ZOOM_STEP).toFixed(1)); applyZoom(); }
+function zoomOut() { zoomLevel = Math.max(ZOOM_MIN, +(zoomLevel - ZOOM_STEP).toFixed(1)); applyZoom(); }
+
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  CLICK-OFF & KEYBOARD                                         ║
+// ╚══════════════════════════════════════════════════════════════╝
+document.getElementById("main-area").addEventListener("click", (ev) => {
+  if (ev.target.closest(".course-card")) return;
+  if (ev.target.closest("#arrow-svg")) return;
+  if (STATE.selected) clearSelection();
+});
+
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape" && STATE.selected) clearSelection();
+});
 
 
 // ╔══════════════════════════════════════════════════════════════╗
@@ -441,14 +673,15 @@ function setTrack(track, btn) {
 let resizeTimer;
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(drawArrows, 150);
+  if (STATE.selected) resizeTimer = setTimeout(drawArrows, 150);
 });
 document.getElementById("main-area").addEventListener("scroll", () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(drawArrows, 60);
+  if (STATE.selected) resizeTimer = setTimeout(drawArrows, 60);
 });
 
 
 // ── INIT ──────────────────────────────────────────────────────
 buildTagBar();
 render();
+applyZoom();

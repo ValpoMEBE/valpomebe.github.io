@@ -489,6 +489,7 @@
   semesters:
     ME: 5
     BE_Biomech: 5
+    BE_Bioelec: 5
     BE_Biomed: 5
   desc: "Mathematical modeling of dynamic systems, numerical methods, simulation, and introduction to control concepts."
 
@@ -564,21 +565,6 @@
     - "ME 374, ME 405"
     - "ME 452–ME 457, ME 467"
 
-# BE Semester 5 — Bioelectrical
-- id: BE_ListA_BE
-  code: "List A Elective"
-  title: "List A Elective (choose 1)"
-  credits: 3
-  tags: [systems]
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Bioelec: 5
-  desc: "Bioelectrical Track — choose one course from List A."
-  eligible:
-    - "ME 355 – System Modeling & Numerical Methods (3 cr)"
-    - "ECE 360 – Signals & Systems (3 cr)"
 
 - id: ECE_221
   code: "ECE 221"
