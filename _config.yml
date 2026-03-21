@@ -1,0 +1,40 @@
+title: "ValpoMEBE"
+description: "Mechanical Engineering & Bioengineering at Valparaiso University"
+url: "https://valpomebe.github.io"
+baseurl: ""
+
+# Build settings
+theme: null
+markdown: kramdown
+highlighter: rouge
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Include _pages folder in build
+include:
+  - _pages
+
+# Exclude from build
+exclude:
+  - ReferenceDocuments
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - MEBE_DegreeMap.html
+  - node_modules
+  - vendor
+
+# Plugins (GitHub Pages safe)
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Default layouts
+defaults:
+  - scope:
+      path: "_pages"
+    values:
+      layout: "page"

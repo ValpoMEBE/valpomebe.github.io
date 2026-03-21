@@ -1,0 +1,1214 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  COURSE DATA — ME / BE Degree Map                           ║
+# ║                                                              ║
+# ║  This is the primary file to edit when updating curriculum.  ║
+# ║                                                              ║
+# ║  Fields:                                                     ║
+# ║    id           — unique key (used for prereq references)    ║
+# ║    code         — display course code (e.g., "ME 209")       ║
+# ║    title        — full course name                           ║
+# ║    credits      — credit hours (number)                      ║
+# ║    tags         — list of tag keys (see _data/tags.yml)      ║
+# ║    prereqs      — list of course ids that must come before   ║
+# ║    coreqs       — list of course ids taken concurrently      ║
+# ║    semesters    — which semester per program:                 ║
+# ║                     ME, BE_Biomech, BE_Bioelec, BE_Biomed    ║
+# ║    isPlaceholder— true for elective/placeholder cards        ║
+# ║    eligible     — list of eligible courses (for placeholders)║
+# ║    desc         — description shown in detail panel          ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 1 — FALL (Semester 1) — All Programs
+# ════════════════════════════════════════════════════════
+
+- id: VUE_101
+  code: "VUE 101"
+  title: "Exploring Values"
+  credits: 4
+  tags: []
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 1
+    BE_Biomech: 1
+    BE_Bioelec: 1
+    BE_Biomed: 1
+  desc: "Valparaiso University Experience: Exploring Values. Introduction to liberal education, the university, and vocational discernment."
+
+- id: GE_100
+  code: "GE 100"
+  title: "Fundamentals of Engineering"
+  credits: 2
+  tags: [design]
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 1
+    BE_Biomech: 1
+    BE_Bioelec: 1
+    BE_Biomed: 1
+  desc: "Introduction to the engineering profession, design process, and basic engineering tools. Includes GE 100L (0 cr lab, listed separately in catalog)."
+
+- id: XS_101
+  code: "XS 101"
+  title: "Wellness & Stress"
+  credits: 1
+  tags: []
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 1
+    BE_Biomech: 1
+    BE_Bioelec: 1
+    BE_Biomed: 1
+  desc: "Introduction to wellness strategies and stress management."
+
+- id: MATH_131
+  code: "MATH 131"
+  title: "Calculus I"
+  credits: 4
+  tags: [math]
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 1
+    BE_Biomech: 1
+    BE_Bioelec: 1
+    BE_Biomed: 1
+  desc: "Limits, derivatives, and integrals of functions of one variable."
+
+- id: PHYS_141
+  code: "PHYS 141"
+  title: "Newtonian Mechanics"
+  credits: 4
+  tags: [physics]
+  prereqs: []
+  coreqs: [MATH_131]
+  semesters:
+    ME: 1
+    BE_Biomech: 1
+    BE_Bioelec: 1
+    BE_Biomed: 1
+  desc: "Classical mechanics: kinematics, Newton's laws, energy, momentum. Includes PHYS 141L (1 cr lab)."
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 1 — SPRING (Semester 2) — All Programs
+# ════════════════════════════════════════════════════════
+
+- id: VUE_102
+  code: "VUE 102"
+  title: "Finding Your Voice"
+  credits: 4
+  tags: []
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: "Valparaiso University Experience: Finding Your Voice. Continuation of the VUE sequence."
+
+- id: GE_109
+  code: "GE 109"
+  title: "Mechanics–Statics"
+  credits: 3
+  tags: [mechanics]
+  prereqs: [PHYS_141, MATH_131]
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: "Equilibrium of particles and rigid bodies, trusses, frames, distributed loads, centroids, and moments of inertia."
+
+- id: MATH_132
+  code: "MATH 132"
+  title: "Calculus II"
+  credits: 4
+  tags: [math]
+  prereqs: [MATH_131]
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: "Techniques and applications of integration, sequences and series."
+
+- id: ME_102
+  code: "ME 102"
+  title: "Computer Aided Design"
+  credits: 1
+  tags: [design, computing]
+  prereqs: [GE_100]
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: "Introduction to 3D solid modeling using CAD software for engineering design and documentation."
+
+- id: ME_125
+  code: "ME 125"
+  title: "Computer Programming"
+  credits: 1
+  tags: [computing]
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: "Introduction to programming for mechanical engineers and bioengineers using MATLAB or Python."
+
+- id: PHYS_142
+  code: "PHYS 142"
+  title: "Electricity, Magnetism & Waves"
+  credits: 3
+  tags: [physics]
+  prereqs: [PHYS_141]
+  coreqs: [MATH_132]
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: "Electrostatics, circuits, magnetism, optics, and waves."
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 2 — FALL (Semester 3)
+# ════════════════════════════════════════════════════════
+
+- id: MATH_253
+  code: "MATH 253"
+  title: "Calculus III"
+  credits: 4
+  tags: [math]
+  prereqs: [MATH_132]
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 3
+    BE_Bioelec: 3
+    BE_Biomed: 3
+  desc: "Multivariable calculus: partial derivatives, multiple integrals, and vector calculus."
+
+- id: ECE_281
+  code: "ECE 281"
+  title: "Fundamentals of Electrical Engr."
+  credits: 2.5
+  tags: [electrical]
+  prereqs: [PHYS_142]
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 3
+    BE_Bioelec: 3
+    BE_Biomed: 3
+  desc: "Circuit analysis, AC/DC circuits, operational amplifiers, and introductory electronics."
+
+- id: ME_209
+  code: "ME 209"
+  title: "Mechanics–Dynamics"
+  credits: 3
+  tags: [mechanics]
+  prereqs: [GE_109, MATH_132, ME_125]
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 3
+    BE_Bioelec: 3
+    BE_Biomed: 3
+  desc: "Kinematics and kinetics of particles and rigid bodies; work-energy and impulse-momentum methods."
+
+- id: ME_201
+  code: "ME 201"
+  title: "Technical Writing (WIC)"
+  credits: 1
+  tags: []
+  prereqs: [VUE_102]
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: "Writing Intensive Course: technical communication for mechanical and bioengineers."
+
+# ME-Only Semester 3
+- id: ME_251
+  code: "ME 251"
+  title: "Intro to Manufacturing"
+  credits: 1
+  tags: [design]
+  prereqs: [ME_102]
+  coreqs: []
+  semesters:
+    ME: 3
+  desc: "Overview of manufacturing processes: casting, forming, machining, welding, and polymer processing."
+
+- id: CHEM_115
+  code: "CHEM 115"
+  title: "Essentials of Chemistry"
+  credits: 4
+  tags: [materials]
+  prereqs: [MATH_131]
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 3
+    BE_Bioelec: 3
+  desc: "Atomic structure, bonding, stoichiometry, thermochemistry, and solutions."
+
+# BE-Only Semester 3
+- id: BIO_151
+  code: "BIO 151"
+  title: "Anatomy & Physiology I"
+  credits: 4
+  tags: [biology]
+  prereqs: []
+  coreqs: []
+  semesters:
+    BE_Biomech: 3
+    BE_Bioelec: 3
+    BE_Biomed: 3
+  desc: "Structure and function of the human body — cells, tissues, and organ systems, Part I."
+
+- id: CHEM_121
+  code: "CHEM 121"
+  title: "General Chemistry I"
+  credits: 4
+  tags: [materials]
+  prereqs: []
+  coreqs: []
+  semesters:
+    BE_Biomed: 3
+  desc: "Atomic structure, bonding, stoichiometry, thermochemistry, and equilibrium."
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 2 — SPRING (Semester 4)
+# ════════════════════════════════════════════════════════
+
+- id: MATH_260
+  code: "MATH 260"
+  title: "Linear Systems & Matrices"
+  credits: 1
+  tags: [math]
+  prereqs: [MATH_132]
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: "Vectors, matrices, linear systems, eigenvalues, and eigenvectors."
+
+- id: MATH_270
+  code: "MATH 270"
+  title: "Ordinary Differential Equations"
+  credits: 3
+  tags: [math]
+  prereqs: [MATH_132]
+  coreqs: [MATH_260]
+  semesters:
+    ME: 4
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: "First and higher-order ODEs, systems of ODEs, Laplace transforms, and engineering applications."
+
+- id: ME_261
+  code: "ME 261"
+  title: "Analog Circuits Lab"
+  credits: 0.5
+  tags: [electrical, lab]
+  prereqs: []
+  coreqs: [ECE_281]
+  semesters:
+    ME: 4
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: "Laboratory experiments in analog circuits, amplifiers, and instrumentation."
+
+- id: STAT_240
+  code: "STAT 240"
+  title: "Statistical Analysis"
+  credits: 3
+  tags: [math]
+  prereqs: [MATH_131]
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: "Descriptive statistics, probability, hypothesis testing, regression, and experimental design."
+
+# ME Semester 4
+- id: ME_215
+  code: "ME 215"
+  title: "Mechanics of Materials"
+  credits: 3
+  tags: [mechanics, materials]
+  prereqs: [GE_109]
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 4
+  desc: "Stress, strain, deformation, axial loads, torsion, bending, shear, buckling, and failure criteria."
+
+- id: ME_270
+  code: "ME 270"
+  title: "Thermodynamics I"
+  credits: 3
+  tags: [thermalFluids]
+  prereqs: [MATH_132, PHYS_141]
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 6
+  desc: "First and second laws of thermodynamics, properties of pure substances, power and refrigeration cycles."
+
+- id: ME_252
+  code: "ME 252"
+  title: "Materials Science"
+  credits: 2.5
+  tags: [materials]
+  prereqs: [CHEM_115]
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 6
+    BE_Bioelec: 6
+    BE_Biomed: 6
+  desc: "Crystal structure, defects, mechanical/thermal/electrical properties of metals, polymers, ceramics, and composites."
+
+# BE Semester 4
+- id: BIO_152
+  code: "BIO 152"
+  title: "Anatomy & Physiology II"
+  credits: 4
+  tags: [biology]
+  prereqs: [BIO_151]
+  coreqs: []
+  semesters:
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: "Continuation of BIO 151 — additional organ systems and physiological mechanisms."
+
+- id: BE_210
+  code: "BE 210"
+  title: "Bioengineering Design Process"
+  credits: 1
+  tags: [design]
+  prereqs: [GE_100]
+  coreqs: []
+  semesters:
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: "Introduction to bioengineering design: problem identification, human factors, regulatory considerations, and iterative design."
+
+- id: CHEM_122
+  code: "CHEM 122"
+  title: "General Chemistry II"
+  credits: 4
+  tags: [materials]
+  prereqs: [CHEM_121]
+  coreqs: []
+  semesters:
+    BE_Biomed: 4
+  desc: "Acids/bases, electrochemistry, kinetics, nuclear chemistry, and descriptive inorganic chemistry."
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 3 — FALL (Semester 5)
+# ════════════════════════════════════════════════════════
+
+- id: BE_317
+  code: "BE/ME 317"
+  title: "Sustainable Engineering"
+  credits: 2
+  tags: []
+  prereqs: [ME_201]
+  coreqs: []
+  semesters:
+    ME: 5
+    BE_Biomech: 5
+    BE_Bioelec: 5
+    BE_Biomed: 5
+  desc: "Environmental impact of engineering, lifecycle analysis, and sustainable design principles."
+
+- id: ME_333
+  code: "ME 333"
+  title: "Mechanical Measurements Lab"
+  credits: 4
+  tags: [lab]
+  prereqs: [PHYS_142, ME_201]
+  coreqs: [ME_125, ME_261, STAT_240]
+  semesters:
+    ME: 5
+    BE_Biomech: 5
+    BE_Bioelec: 5
+    BE_Biomed: 5
+  desc: "Experimental methods, instrumentation, data acquisition, and uncertainty analysis. Includes ME 333L (0 cr)."
+
+- id: ME_352
+  code: "ME 352"
+  title: "Materials Science & Mechanics Lab"
+  credits: 0.5
+  tags: [materials, lab]
+  prereqs: [ME_201]
+  coreqs: [ME_252]
+  semesters:
+    ME: 5
+    BE_Biomech: 7
+    BE_Bioelec: 7
+    BE_Biomed: 7
+  desc: "Laboratory experiments in materials testing, mechanical behavior, and failure analysis."
+
+# ME Semester 5
+- id: ME_355
+  code: "ME 355"
+  title: "System Modeling & Numerical Methods"
+  credits: 3
+  tags: [systems, computing]
+  prereqs: [ME_125, MATH_260, MATH_270, ECE_281]
+  coreqs: [ME_209]
+  semesters:
+    ME: 5
+    BE_Biomech: 5
+    BE_Biomed: 5
+  desc: "Mathematical modeling of dynamic systems, numerical methods, simulation, and introduction to control concepts."
+
+- id: ME_363
+  code: "ME 363"
+  title: "Machine Design I"
+  credits: 3
+  tags: [design, mechanics]
+  prereqs: [ME_102, ME_125, ME_215]
+  coreqs: []
+  semesters:
+    ME: 5
+  desc: "Fatigue analysis, failure theories, and design of machine elements: shafts, bearings, gears, and fasteners."
+
+- id: ME_373
+  code: "ME 373"
+  title: "Fluid Mechanics"
+  credits: 3
+  tags: [thermalFluids]
+  prereqs: [ME_209]
+  coreqs: []
+  semesters:
+    ME: 5
+    BE_Biomech: 7
+  desc: "Fluid statics, kinematics, Bernoulli equation, pipe flow, dimensional analysis, and boundary layers."
+
+# BE Semester 5 — shared
+- id: GE_311
+  code: "GE 311"
+  title: "Financial Decisions"
+  credits: 1.5
+  tags: []
+  prereqs: [MATH_132]
+  coreqs: []
+  semesters:
+    ME: 6
+    BE_Biomech: 5
+    BE_Bioelec: 6
+    BE_Biomed: 5
+  desc: "Engineering economics, time value of money, cost-benefit analysis, and project evaluation."
+
+- id: GE_312
+  code: "GE 312"
+  title: "Ethical Decisions"
+  credits: 1.5
+  tags: []
+  prereqs: []
+  coreqs: [ME_201]
+  semesters:
+    ME: 6
+    BE_Biomech: 5
+    BE_Bioelec: 6
+    BE_Biomed: 5
+  desc: "Engineering ethics, professional responsibility, and societal impact of engineering decisions."
+
+# BE Semester 5 — Biomechanical elective
+- id: BE_ELEC_S5_BM
+  code: "BE Elective"
+  title: "BE Technical Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 5
+  desc: "Technical elective — Biomechanical track. 6 total BE elective credits required."
+  eligible:
+    - "BE 200 – Intro to Bioengineering"
+    - "BE 468 – Advanced Bioengineering"
+    - "ME 253, ME 353"
+    - "ME 361–ME 369"
+    - "ME 374, ME 405"
+    - "ME 452–ME 457, ME 467"
+
+# BE Semester 5 — Bioelectrical
+- id: BE_ListA_BE
+  code: "List A Elective"
+  title: "List A Elective (choose 1)"
+  credits: 3
+  tags: [systems]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Bioelec: 5
+  desc: "Bioelectrical Track — choose one course from List A."
+  eligible:
+    - "ME 355 – System Modeling & Numerical Methods (3 cr)"
+    - "ECE 360 – Signals & Systems (3 cr)"
+
+- id: ECE_221
+  code: "ECE 221"
+  title: "Digital Logic Design"
+  credits: 3
+  tags: [electrical, computing]
+  prereqs: [ECE_281]
+  coreqs: []
+  semesters:
+    BE_Bioelec: 5
+  desc: "Boolean algebra, logic gates, combinational and sequential circuits, memory, and microprocessors."
+
+- id: ECE_251
+  code: "ECE 251"
+  title: "Engineering Programming I"
+  credits: 3
+  tags: [computing, electrical]
+  prereqs: [ME_125]
+  coreqs: []
+  semesters:
+    BE_Bioelec: 5
+  desc: "Structured programming for engineering: algorithms, data structures, and ECE applications."
+
+- id: ECE_360
+  code: "ECE 360"
+  title: "Signals & Systems"
+  credits: 3
+  tags: [electrical, systems]
+  prereqs: [ECE_281]
+  coreqs: []
+  semesters:
+    BE_Bioelec: 5
+  desc: "Continuous and discrete-time signals, Fourier analysis, sampling, filtering, and system response."
+
+# BE Semester 5 — Biomedical
+- id: BE_ELEC_S5_BD
+  code: "BE Elective"
+  title: "BE Technical Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomed: 5
+  desc: "Biomedical track elective — semester 5. 6 total BE elective credits required."
+  eligible:
+    - "BE 200 – Intro to Bioengineering"
+    - "BE 468 – Advanced Bioengineering"
+    - "ME 355 – System Modeling"
+    - "ME 361–ME 369"
+    - "Other approved BE electives"
+
+- id: CHEM_221
+  code: "CHEM 221"
+  title: "Organic Chemistry I"
+  credits: 4
+  tags: [materials]
+  prereqs: [CHEM_122]
+  coreqs: []
+  semesters:
+    BE_Biomed: 5
+  desc: "Structure, bonding, stereochemistry, and reactions of carbon compounds."
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 3 — SPRING (Semester 6)
+# ════════════════════════════════════════════════════════
+
+# ME Semester 6
+- id: ME_351
+  code: "ME 351"
+  title: "Manufacturing Processes"
+  credits: 3
+  tags: [design]
+  prereqs: [ME_125, ME_215, ME_252]
+  coreqs: [ME_251]
+  semesters:
+    ME: 6
+  desc: "Advanced manufacturing: machining operations, tolerances, surface finish, process planning, and quality control."
+
+- id: ME_354
+  code: "ME 354"
+  title: "Mechanical Systems Lab"
+  credits: 0.5
+  tags: [mechanics, lab]
+  prereqs: [ME_261]
+  coreqs: [ME_364]
+  semesters:
+    ME: 6
+  desc: "Laboratory experiments in mechanical systems, vibrations, and machine component testing."
+
+- id: ME_364
+  code: "ME 364"
+  title: "Vibrations"
+  credits: 2
+  tags: [mechanics, systems]
+  prereqs: [ME_209, ME_125, ME_215, MATH_260, MATH_270]
+  coreqs: []
+  semesters:
+    ME: 6
+  desc: "Free and forced vibrations of single and multi-DOF systems, resonance, and vibration control."
+
+- id: ME_372
+  code: "ME 372"
+  title: "Heat Power Lab"
+  credits: 0.5
+  tags: [thermalFluids, lab]
+  prereqs: [ME_333, ME_270, ME_373]
+  coreqs: [ME_376]
+  semesters:
+    ME: 6
+  desc: "Laboratory experiments in thermodynamics and heat transfer systems."
+
+- id: ME_376
+  code: "ME 376"
+  title: "Heat Transfer"
+  credits: 3
+  tags: [thermalFluids]
+  prereqs: [ME_270]
+  coreqs: []
+  semesters:
+    ME: 6
+    BE_Biomech: 8
+  desc: "Conduction, convection, and radiation heat transfer; heat exchangers."
+
+- id: ME_ELEC_1
+  code: "ME Elective"
+  title: "ME Technical Elective 1"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 6
+  desc: "12 total credits required from the ME Technical Elective list."
+  eligible:
+    - "ME 361 – Machine Design II"
+    - "ME 365–ME 369 – Advanced ME Topics"
+    - "ME 377 – Advanced Heat Transfer"
+    - "ME 453 – Combustion Engineering"
+    - "ME 455 – Computational Fluid Dynamics"
+    - "ME 456 – Advanced Thermodynamics"
+    - "ME 457 – Renewable Energy Systems"
+    - "ME 467 – Advanced Control Systems"
+    - "BE 200, BE 320, BE 340, BE 369, BE 468"
+    - "ME 490 – Special Topics / ME 499 – Independent Study"
+
+- id: THEO_GE
+  code: "THEO/REL"
+  title: "Theology / Religion Course"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 6
+    BE_Biomech: 6
+    BE_Bioelec: 6
+    BE_Biomed: 6
+  desc: "REL 100 (ME) or THEO 100/200 (BE). Satisfies the theology/religion general education requirement."
+  eligible:
+    - "REL 100 – Religion and Society"
+    - "THEO 100 – The Christian Tradition (Intro)"
+    - "THEO 200 – The Christian Tradition (Advanced)"
+
+# BE Semester 6 — Core
+- id: BE_320
+  code: "BE 320"
+  title: "Bioengineering Technologies Lab"
+  credits: 1
+  tags: [biology, lab]
+  prereqs: [ME_201, ME_333]
+  coreqs: []
+  semesters:
+    BE_Biomech: 6
+    BE_Bioelec: 6
+    BE_Biomed: 6
+  desc: "Laboratory experiments in bioengineering technologies including biosensors and imaging."
+
+- id: BE_340
+  code: "BE 340"
+  title: "Bioelectricity"
+  credits: 3
+  tags: [electrical, biology]
+  prereqs: [ME_125, ECE_281, MATH_270]
+  coreqs: []
+  semesters:
+    BE_Biomech: 6
+    BE_Bioelec: 6
+    BE_Biomed: 6
+  desc: "Electrical phenomena in biological systems: membrane potentials, neural signals, cardiac signals, and bioelectrical instrumentation."
+
+- id: BE_369
+  code: "BE 369"
+  title: "Biomechanics"
+  credits: 3
+  tags: [mechanics, biology]
+  prereqs: [ME_125, ME_209, MATH_260]
+  coreqs: []
+  semesters:
+    BE_Biomech: 6
+    BE_Bioelec: 6
+    BE_Biomed: 6
+  desc: "Mechanical analysis of biological tissues and systems: bone, muscle, joints, and fluid flow in the body."
+
+# BE Semester 6 — Track-specific electives
+- id: BE_ELEC_S6_BM
+  code: "BE Elective"
+  title: "BE Technical Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 6
+  desc: "Technical elective — Biomechanical track semester 6."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 253, ME 353"
+    - "ME 361–ME 369"
+    - "ME 374, ME 405"
+
+- id: BE_ELEC_S6_BE
+  code: "BE Elective"
+  title: "BE Technical Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Bioelec: 6
+  desc: "Technical elective — Bioelectrical track semester 6."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 253, ME 353"
+    - "ME 361–ME 369"
+    - "ME 374, ME 405"
+
+- id: BE_ListA_BD_S6
+  code: "BE/ME Elective"
+  title: "BE/ME Elective (List A)"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomed: 6
+  desc: "Biomedical track — List A elective (ME 270 or approved BE elective)."
+  eligible:
+    - "ME 270 – Thermodynamics I (3 cr)"
+    - "BE 200 – Intro to Bioengineering"
+    - "BE 468 – Advanced Bioengineering"
+    - "Other approved electives"
+
+# Biomedical Track — Semester 6
+- id: CHEM_222
+  code: "CHEM 222"
+  title: "Organic Chemistry II"
+  credits: 4
+  tags: [materials]
+  prereqs: [CHEM_221]
+  coreqs: []
+  semesters:
+    BE_Biomed: 6
+  desc: "Carbonyl chemistry, aromatic compounds, amines, and biomolecules."
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 4 — FALL (Semester 7)
+# ════════════════════════════════════════════════════════
+
+- id: GE_497
+  code: "GE 497"
+  title: "Senior Design Project I"
+  credits: 3
+  tags: [design]
+  prereqs: [GE_311, GE_312]
+  coreqs: []
+  semesters:
+    ME: 7
+    BE_Biomech: 7
+    BE_Bioelec: 7
+    BE_Biomed: 7
+  desc: "Capstone design: team-based engineering project, problem definition, design process, and prototyping. ME students should have completed ME 363; BE students should have completed BE 415."
+
+# ME Semester 7
+- id: ME_442
+  code: "ME 442"
+  title: "Automatic Control"
+  credits: 3
+  tags: [systems, electrical]
+  prereqs: [MATH_260, MATH_270]
+  coreqs: [ME_333, ME_355]
+  semesters:
+    ME: 7
+    BE_Biomech: 7
+  desc: "Feedback control systems, transfer functions, root locus, frequency response, stability, and PID control."
+
+- id: ME_ELEC_2
+  code: "ME Elective"
+  title: "ME Technical Elective 2"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 7
+  desc: "12 total credits required from the ME Technical Elective list."
+  eligible:
+    - "ME 361 – Machine Design II"
+    - "ME 365–ME 369, ME 377, ME 453–ME 457, ME 467"
+    - "ME 475–ME 477 – Capstone Research"
+    - "BE 200, BE 320, BE 340, BE 369, BE 468"
+    - "ME 490 – Special Topics / ME 499 – Independent Study"
+
+- id: ME_PROF
+  code: "Prof. Elective"
+  title: "Professional Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 7
+  desc: "3 credits selected in consultation with advisor to support career goals."
+  eligible:
+    - "Advisor-approved elective from the College of Engineering list"
+    - "Other choices available by petition to MEBE Dept."
+
+- id: ME_HUM_1
+  code: "Hum/SS/RS"
+  title: "Humanities / Social Sci. Elective 1"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 7
+  desc: "6 total credits from approved Humanities, Social Sciences, or Religious Studies courses."
+  eligible:
+    - "Any approved Humanities course"
+    - "Any approved Social Science course"
+    - "Any approved Religious Studies course"
+
+# BE Semester 7 — Core
+- id: BE_415
+  code: "BE 415"
+  title: "Biomaterials"
+  credits: 3
+  tags: [materials, biology]
+  prereqs: [CHEM_115]
+  coreqs: []
+  semesters:
+    BE_Biomech: 7
+    BE_Bioelec: 7
+    BE_Biomed: 7
+  desc: "Structure-property relationships of biomaterials, biocompatibility, implants, and tissue engineering scaffolds."
+
+- id: BE_HUM_1
+  code: "Hum/SS/Theo"
+  title: "Humanities / SS / Theo. Elective 1"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 7
+    BE_Bioelec: 7
+    BE_Biomed: 7
+  desc: "6 total credits from approved Humanities, Social Sciences, or Religious Studies courses."
+  eligible:
+    - "Any approved Humanities course"
+    - "Any approved Social Science course"
+    - "Any approved Religious Studies course"
+
+# BE Semester 7 — Track-specific
+- id: BE_ELEC_S7_BM
+  code: "BE Elective"
+  title: "BE Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 7
+  desc: "Senior-year technical elective — Biomechanical track."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 361–ME 369, ME 453–ME 467"
+    - "BE 490, ME 490, BE 499, ME 499"
+
+- id: ECE_322
+  code: "ECE 322"
+  title: "Embedded Microcontrollers"
+  credits: 3
+  tags: [electrical, systems]
+  prereqs: [ECE_221, ECE_251]
+  coreqs: []
+  semesters:
+    BE_Bioelec: 7
+  desc: "Microcontroller architecture, assembly/C programming, I/O interfacing, and real-time systems."
+
+- id: BE_ELEC_S7_BE
+  code: "BE Elective"
+  title: "BE Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Bioelec: 7
+  desc: "Senior-year technical elective — Bioelectrical track."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 361–ME 369, ME 453–ME 467"
+    - "BE 490, ME 490, BE 499, ME 499"
+
+- id: BE_ELEC_S7_BD
+  code: "BE Elective"
+  title: "BE Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomed: 7
+  desc: "Senior-year technical elective — Biomedical track."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 361–ME 369, ME 453–ME 467"
+    - "BE 490, ME 490, BE 499, ME 499"
+
+
+# ════════════════════════════════════════════════════════
+# YEAR 4 — SPRING (Semester 8)
+# ════════════════════════════════════════════════════════
+
+- id: GE_498
+  code: "GE 498"
+  title: "Senior Design Project II"
+  credits: 3
+  tags: [design]
+  prereqs: [GE_497]
+  coreqs: []
+  semesters:
+    ME: 8
+    BE_Biomech: 8
+    BE_Bioelec: 8
+    BE_Biomed: 8
+  desc: "Capstone design: project completion, testing, documentation, and final presentation."
+
+# ME Semester 8
+- id: ME_ELEC_3
+  code: "ME Elective"
+  title: "ME Technical Elective 3"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: "12 total credits required from the ME Technical Elective list."
+  eligible:
+    - "ME 361–ME 369, ME 377"
+    - "ME 453–ME 457, ME 467"
+    - "ME 475–ME 477"
+    - "BE 200, BE 320, BE 340, BE 369, BE 468"
+    - "ME 490 / ME 499"
+
+- id: ME_ELEC_4
+  code: "ME Elective"
+  title: "ME Technical Elective 4"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: "12 total credits required from the ME Technical Elective list."
+  eligible:
+    - "ME 361–ME 369, ME 377"
+    - "ME 453–ME 457, ME 467"
+    - "ME 475–ME 477"
+    - "BE 200, BE 320, BE 340, BE 369, BE 468"
+    - "ME 490 / ME 499"
+
+- id: ME_HUM_2
+  code: "Hum/SS/RS"
+  title: "Humanities / Social Sci. Elective 2"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: "6 total credits from approved Humanities, Social Sciences, or Religious Studies courses."
+  eligible:
+    - "Any approved Humanities course"
+    - "Any approved Social Science course"
+    - "Any approved Religious Studies course"
+
+- id: ME_WL
+  code: "WL / Diversity"
+  title: "World Language / Diversity Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: "3 credits from a world language at 102+ level or from the approved cultural diversity list."
+  eligible:
+    - "Any World Language at 102 level or above"
+    - "Any approved Cultural Diversity course"
+
+# BE Semester 8 — all tracks
+- id: BE_ELEC_S8_1
+  code: "BE Elective"
+  title: "BE Technical Elective 1"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 8
+    BE_Bioelec: 8
+    BE_Biomed: 8
+  desc: "Senior-year elective — slot 1."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 361–ME 369, ME 453–ME 467"
+    - "BE 490, ME 490, BE 499, ME 499"
+
+- id: BE_ELEC_S8_2
+  code: "BE Elective"
+  title: "BE Technical Elective 2"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 8
+    BE_Bioelec: 8
+    BE_Biomed: 8
+  desc: "Senior-year elective — slot 2."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 361–ME 369, ME 453–ME 467"
+    - "BE 490, ME 490, BE 499, ME 499"
+
+- id: BE_ELEC_S8_3
+  code: "BE Elective"
+  title: "BE Technical Elective 3"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 8
+    BE_Bioelec: 8
+    BE_Biomed: 8
+  desc: "Senior-year elective — slot 3."
+  eligible:
+    - "BE 200, BE 468"
+    - "ME 361–ME 369, ME 453–ME 467"
+    - "BE 490, ME 490, BE 499, ME 499"
+
+- id: BE_HUM_2
+  code: "Hum/SS/Theo"
+  title: "Humanities / SS / Theo. Elective 2"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 8
+    BE_Bioelec: 8
+    BE_Biomed: 8
+  desc: "6 total credits from approved Humanities, Social Sciences, or Religious Studies courses."
+  eligible:
+    - "Any approved Humanities course"
+    - "Any approved Social Science course"
+    - "Any approved Religious Studies course"
+
+- id: BE_WL
+  code: "WL / Diversity"
+  title: "World Language / Diversity Elective"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    BE_Biomech: 8
+    BE_Bioelec: 8
+    BE_Biomed: 8
+  desc: "3 credits from a world language at 102+ level or from the approved cultural diversity list."
+  eligible:
+    - "Any World Language at 102 level or above"
+    - "Any approved Cultural Diversity course"
+
+# BE Bioelectrical — Semester 8
+- id: ECE_452
+  code: "ECE 452"
+  title: "Digital Signal Processing"
+  credits: 3
+  tags: [electrical, systems]
+  prereqs: [ECE_360]
+  coreqs: []
+  semesters:
+    BE_Bioelec: 8
+  desc: "Discrete-time systems, DFT, FFT, FIR/IIR filter design, and biomedical signal processing."
