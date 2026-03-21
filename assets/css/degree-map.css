@@ -222,85 +222,22 @@
 }
 
 
-/* ── CHAIN OVERLAY ──────────────────────────────────────────── */
-.chain-overlay {
-  position: fixed;
-  top: 5vh; left: 3vw; right: 3vw; bottom: 5vh;
-  background: rgba(51, 26, 0, 0.97);
-  border: 2px solid var(--gold);
-  border-radius: 10px;
-  z-index: 500;
-  display: flex;
+/* ── CHAIN MODE (in-place rearrangement) ────────────────────── */
+#flowchart.chain-mode .sem-col       { display: none; }
+#flowchart.chain-mode .chain-col     { display: flex; }
+
+.chain-col {
+  display: none;
   flex-direction: column;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  width: 210px; flex-shrink: 0; padding: 0 8px;
 }
-.chain-overlay.hidden { display: none; }
+.chain-col .sem-header { text-align: center; margin-bottom: .6rem; padding: .4rem .3rem; border-bottom: 2px solid var(--gold); }
 
-.chain-overlay-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: .75rem 1.25rem;
-  border-bottom: 1px solid rgba(245,184,10,.3);
-  flex-shrink: 0;
+.course-card.chain-active {
+  transform: scale(1.06);
+  z-index: 10;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
-#chain-title {
-  font-family: var(--font-display);
-  font-size: 1.05rem; color: var(--gold);
-}
-#chain-close {
-  background: rgba(255,255,255,.1); border: none;
-  width: 28px; height: 28px; border-radius: 50%;
-  font-size: 1.1rem; color: var(--light-gray); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .18s;
-}
-#chain-close:hover { background: var(--gold); color: var(--dark-brown); }
-
-.chain-overlay-body {
-  flex: 1; overflow: auto; position: relative; padding: 1.5rem;
-}
-.chain-columns {
-  display: flex; gap: .75rem; min-width: max-content; position: relative;
-}
-.chain-svg {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none; overflow: visible;
-}
-
-.chain-sem-col { min-width: 170px; }
-.chain-sem-header {
-  text-align: center; font-family: var(--font-display);
-  font-size: .78rem; color: var(--gold);
-  border-bottom: 1.5px solid rgba(245,184,10,.3);
-  padding-bottom: .35rem; margin-bottom: .6rem;
-}
-.chain-sem-header small {
-  display: block; font-family: var(--font-mono); font-size: .6rem;
-  color: var(--light-gray); opacity: .6; margin-top: .1rem;
-}
-
-.chain-card {
-  background: var(--parchment); border-radius: 6px;
-  padding: .5rem .6rem; margin-bottom: .5rem;
-  cursor: pointer; transition: all .18s;
-}
-.chain-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.35); }
-.chain-card-code {
-  font-family: var(--font-mono); font-size: .7rem; font-weight: 500;
-  color: var(--brown); line-height: 1;
-}
-.chain-card-title {
-  font-size: .75rem; font-weight: 600; color: var(--dark-brown);
-  line-height: 1.25; margin-top: .15rem;
-}
-.chain-card-credits {
-  font-family: var(--font-mono); font-size: .58rem; color: var(--light-gray);
-  margin-top: .2rem;
-}
-
-.chain-card.chain-ancestor  { border: 2px solid var(--teal); box-shadow: 0 0 0 1px var(--teal), 0 2px 8px rgba(0,99,84,.2); }
-.chain-card.chain-selected  { border: 2px solid var(--yellow); box-shadow: 0 0 0 2px var(--yellow), 0 4px 16px rgba(255,227,0,.3); }
-.chain-card.chain-descendant { border: 2px solid var(--light-blue); box-shadow: 0 0 0 1px var(--light-blue), 0 2px 8px rgba(107,201,201,.2); }
 
 .chain-arrow-ancestor  { stroke: var(--teal);       stroke-width: 2.5; fill: none; }
 .chain-arrow-descendant { stroke: var(--light-blue); stroke-width: 2.5; fill: none; }

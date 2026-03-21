@@ -200,7 +200,7 @@ function selectCourse(id) {
   });
 
   openPanel(course, prereqs, coreqs, unlocks);
-  openChainOverlay(id);
+  enterChainMode(id);
 }
 
 function clearSelection() {
@@ -213,7 +213,7 @@ function clearSelection() {
     p.setAttribute("marker-end", p.dataset.type === "prereq" ? "url(#mPre)" : "url(#mCo)");
   });
   document.getElementById("detail-panel").classList.remove("open");
-  document.getElementById("chain-overlay").classList.add("hidden");
+  exitChainMode();
   if (STATE.tag && STATE.tag !== "all") filterByTag(STATE.tag, null, true);
 }
 
@@ -442,7 +442,7 @@ function setProgram(prog, btn) {
   STATE.selected = null;
   STATE.tag      = null;
   document.getElementById("detail-panel").classList.remove("open");
-  document.getElementById("chain-overlay").classList.add("hidden");
+  exitChainMode();
   document.querySelectorAll(".prog-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   document.getElementById("track-selector").classList.toggle("visible", prog === "BE");
@@ -455,7 +455,7 @@ function setTrack(track, btn) {
   STATE.track    = track;
   STATE.selected = null;
   document.getElementById("detail-panel").classList.remove("open");
-  document.getElementById("chain-overlay").classList.add("hidden");
+  exitChainMode();
   document.querySelectorAll(".track-btn").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   render();
@@ -463,18 +463,17 @@ function setTrack(track, btn) {
 
 
 // ╔══════════════════════════════════════════════════════════════╗
-// ║  CHAIN OVERLAY                                                ║
+// ║  CHAIN MODE (in-place rearrangement)                          ║
 // ╚══════════════════════════════════════════════════════════════╝
-function openChainOverlay(id) {
+function enterChainMode(id) {
   const prog = currentProg();
   const ancestors   = getAllAncestors(id, prog);
   const descendants = getAllDescendants(id, prog);
   const chainSet    = new Set([...ancestors, id, ...descendants]);
-  const chainIds    = [...chainSet];
 
-  // Group by semester
+  // Group chain courses by semester
   const semGroups = {};
-  for (const cid of chainIds) {
+  for (const cid of chainSet) {
     const c = COURSES[cid];
     if (!c || !c.semesters || !c.semesters[prog]) continue;
     const s = c.semesters[prog];
@@ -483,78 +482,80 @@ function openChainOverlay(id) {
   }
 
   const sortedSems = Object.keys(semGroups).map(Number).sort((a, b) => a - b);
+  const fc = document.getElementById("flowchart");
 
-  // Update title
-  const course = COURSES[id];
-  document.getElementById("chain-title").textContent =
-    `${course.code} — Prerequisite & Requirement Chain`;
+  // Hide normal semester columns, enter chain mode
+  fc.classList.add("chain-mode");
 
-  // Build columns
-  const cols = document.getElementById("chain-columns");
-  cols.innerHTML = "";
-
+  // Build chain columns with only chain courses
   for (const s of sortedSems) {
     const semInfo = SEMESTERS.find(x => x.s === s);
+    const courses = semGroups[s];
+    const totalCr = courses.reduce((sum, cid) => sum + (COURSES[cid] ? COURSES[cid].credits : 0), 0);
+
     const col = document.createElement("div");
-    col.className = "chain-sem-col";
-    col.innerHTML = `<div class="chain-sem-header">${semInfo ? semInfo.season : ""}  Sem ${s}<small>${semInfo ? semInfo.year : ""}</small></div>`;
+    col.className = "chain-col";
+    col.innerHTML = `
+      <div class="sem-header">
+        <div class="sem-year">${semInfo ? semInfo.year : ""}</div>
+        <div class="sem-name">${semInfo ? semInfo.season : ""} &middot; Sem ${s}</div>
+        <div class="sem-total">${totalCr.toFixed(1)} cr</div>
+      </div>`;
 
-    for (const cid of semGroups[s]) {
+    const cardsEl = document.createElement("div");
+    cardsEl.className = "sem-cards";
+
+    for (const cid of courses) {
       const c = COURSES[cid];
-      const card = document.createElement("div");
-      card.className = "chain-card";
-      card.id = "chain-" + cid;
-      card.dataset.id = cid;
+      if (!c) continue;
+      const card = makeCard(c);
+      card.classList.add("chain-active");
 
-      if (cid === id)                card.classList.add("chain-selected");
-      else if (ancestors.has(cid))   card.classList.add("chain-ancestor");
-      else if (descendants.has(cid)) card.classList.add("chain-descendant");
+      if (cid === id)                card.classList.add("state-selected");
+      else if (ancestors.has(cid))   card.classList.add("state-prereq");
+      else if (descendants.has(cid)) card.classList.add("state-unlocked");
 
-      card.innerHTML = `
-        <div class="chain-card-code">${c.code}</div>
-        <div class="chain-card-title">${c.title}</div>
-        <div class="chain-card-credits">${c.credits} cr</div>`;
-
-      card.onclick = (ev) => {
-        ev.stopPropagation();
-        closeChainOverlay();
-        selectCourse(cid);
-      };
-
-      col.appendChild(card);
+      cardsEl.appendChild(card);
     }
-    cols.appendChild(col);
+
+    col.appendChild(cardsEl);
+    fc.appendChild(col);
   }
 
-  // Show overlay then draw arrows
-  document.getElementById("chain-overlay").classList.remove("hidden");
-  requestAnimationFrame(() => requestAnimationFrame(() => drawChainArrows(chainSet, ancestors, id, prog)));
+  // Draw chain arrows after layout settles
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    drawChainArrows(chainSet, ancestors, id, prog);
+  }));
+}
+
+function exitChainMode() {
+  const fc = document.getElementById("flowchart");
+  if (!fc.classList.contains("chain-mode")) return;
+  fc.classList.remove("chain-mode");
+  fc.querySelectorAll(".chain-col").forEach(el => el.remove());
+  document.getElementById("arrow-svg").querySelectorAll("path").forEach(p => p.remove());
 }
 
 function drawChainArrows(chainSet, ancestors, selId, prog) {
-  const svg  = document.getElementById("chain-svg");
-  const body = document.getElementById("chain-body");
+  const svg = document.getElementById("arrow-svg");
   svg.querySelectorAll("path").forEach(p => p.remove());
 
-  const br = body.getBoundingClientRect();
-  const sl = body.scrollLeft;
-  const st = body.scrollTop;
-
-  // Size SVG to full scrollable area
-  svg.style.width  = body.scrollWidth + "px";
-  svg.style.height = body.scrollHeight + "px";
+  const mainArea = document.getElementById("main-area");
+  const mr = mainArea.getBoundingClientRect();
+  const sl = mainArea.scrollLeft;
+  const st = mainArea.scrollTop;
 
   function chainCardPos(cid) {
-    const el = document.getElementById("chain-" + cid);
+    const el = document.querySelector(`.chain-col [data-id="${cid}"]`);
     if (!el) return null;
     const r = el.getBoundingClientRect();
     return {
-      cx: r.left - br.left + sl + r.width  / 2,
-      cy: r.top  - br.top  + st + r.height / 2,
-      rx: r.right  - br.left + sl,
-      lx: r.left   - br.left + sl,
-      ty: r.top    - br.top  + st,
-      by: r.bottom - br.top  + st,
+      cx: r.left - mr.left + sl + r.width  / 2,
+      cy: r.top  - mr.top  + st + r.height / 2,
+      rx: r.right  - mr.left + sl,
+      lx: r.left   - mr.left + sl,
+      ty: r.top    - mr.top  + st,
+      by: r.bottom - mr.top  + st,
     };
   }
 
@@ -573,7 +574,6 @@ function drawChainArrows(chainSet, ancestors, selId, prog) {
       drawn.add(key);
       const fromPos = chainCardPos(pid);
       if (!fromPos) continue;
-
       const isAncestorEdge = ancestors.has(pid) && (ancestors.has(cid) || cid === selId);
       svg.appendChild(makeChainPath(fromPos, toPos, false, isAncestorEdge));
     }
@@ -617,17 +617,8 @@ function makeChainPath(from, to, isCoreq, isAncestor) {
   }
 
   p.setAttribute("d", d);
-
-  if (isCoreq)          p.setAttribute("marker-end", "url(#cmCo)");
-  else if (isAncestor)  p.setAttribute("marker-end", "url(#cmPre)");
-  else                  p.setAttribute("marker-end", "url(#cmUn)");
-
+  p.setAttribute("marker-end", isCoreq ? "url(#mCoHi)" : isAncestor ? "url(#mPreHi)" : "url(#mUnHi)");
   return p;
-}
-
-function closeChainOverlay() {
-  document.getElementById("chain-overlay").classList.add("hidden");
-  clearSelection();
 }
 
 
