@@ -6,7 +6,7 @@
 /* ── PROGRAM / TRACK CONTROLS ──────────────────────────────────── */
 .program-controls {
   display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
-  margin-bottom: 0;
+  margin-bottom: 0; padding-left: .75rem;
 }
 .prog-label {
   font-size: .7rem; color: var(--light-gray);
@@ -131,7 +131,7 @@
 .arrow-prereq.hi-prereq  { stroke: var(--teal);       stroke-width: 3; opacity: 1; }
 .arrow-prereq.hi-unlocked{ stroke: var(--light-blue); stroke-width: 3; opacity: 1; }
 .arrow-coreq.hi-coreq    { stroke: var(--orange);     stroke-width: 3; opacity: 1; stroke-dasharray: 5,3; }
-.arrow-prereq.fade, .arrow-coreq.fade { opacity: .06; }
+.arrow-prereq.fade, .arrow-coreq.fade { display: none; }
 
 
 /* ── LEGEND ──────────────────────────────────────────────────── */

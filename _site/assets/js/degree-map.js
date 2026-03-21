@@ -234,10 +234,8 @@ function drawArrows() {
   svg.querySelectorAll("path").forEach(p => p.remove());
 
   const prog = currentProg();
-  const mainArea = document.getElementById("main-area");
-  const mr = mainArea.getBoundingClientRect();
-  const sl = mainArea.scrollLeft;
-  const st = mainArea.scrollTop;
+  const fc = document.getElementById("flowchart");
+  const fcRect = fc.getBoundingClientRect();
   const z  = zoomLevel;
 
   function cardPos(id) {
@@ -245,12 +243,12 @@ function drawArrows() {
     if (!el) return null;
     const r = el.getBoundingClientRect();
     return {
-      cx: (r.left - mr.left + sl + r.width  / 2) / z,
-      cy: (r.top  - mr.top  + st + r.height / 2) / z,
-      rx: (r.right  - mr.left + sl) / z,
-      lx: (r.left   - mr.left + sl) / z,
-      ty: (r.top    - mr.top  + st) / z,
-      by: (r.bottom - mr.top  + st) / z,
+      cx: (r.left - fcRect.left + r.width  / 2) / z,
+      cy: (r.top  - fcRect.top  + r.height / 2) / z,
+      rx: (r.right  - fcRect.left) / z,
+      lx: (r.left   - fcRect.left) / z,
+      ty: (r.top    - fcRect.top)  / z,
+      by: (r.bottom - fcRect.top)  / z,
     };
   }
 
@@ -346,7 +344,8 @@ function highlightArrows(selId, prereqs, coreqs, unlocks) {
         p.classList.add("fade");        p.setAttribute("marker-end","url(#mPre)");
       }
     } else {
-      if ((f === selId && coreqs.has(t)) || (t === selId && coreqs.has(f))) {
+      if ((f === selId && (coreqs.has(t) || unlocks.has(t))) ||
+          (t === selId && (coreqs.has(f) || prereqs.has(f)))) {
         p.classList.add("hi-coreq");   p.setAttribute("marker-end","url(#mCoHi)");
       } else {
         p.classList.add("fade");        p.setAttribute("marker-end","url(#mCo)");
@@ -456,7 +455,7 @@ const ZOOM_MIN = 0.5, ZOOM_MAX = 2.0, ZOOM_STEP = 0.1;
 function applyZoom() {
   const fc = document.getElementById("flowchart");
   fc.style.zoom = zoomLevel;
-  document.getElementById("zoom-level").textContent = Math.round(zoomLevel * 100) + "%";
+  document.getElementById("zoom-level").textContent = Math.round((zoomLevel / 1.3) * 100) + "%";
 }
 
 function zoomIn()  { zoomLevel = Math.min(ZOOM_MAX, +(zoomLevel + ZOOM_STEP).toFixed(1)); applyZoom(); if (STATE.selected) { drawArrows(); highlightArrows(STATE.selected); } }
