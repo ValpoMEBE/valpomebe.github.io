@@ -363,6 +363,10 @@
   border-color: var(--orange);
   background: linear-gradient(135deg, #fef3e0 0%, var(--parchment) 100%);
 }
+.elective-group-card.group-ip {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #fdf8e8 0%, var(--parchment) 100%);
+}
 .elective-group-card.group-empty {
   opacity: .5; border-style: dashed;
 }
@@ -388,6 +392,7 @@
 }
 .group-filled  .group-progress-bar { background: var(--teal); }
 .group-partial .group-progress-bar { background: var(--orange); }
+.group-ip      .group-progress-bar { background: var(--gold); }
 .group-empty   .group-progress-bar { background: transparent; }
 .group-courses {
   display: flex; flex-direction: column; gap: .2rem;

@@ -92,9 +92,18 @@ function parseTranscriptLines(lines) {
     // Skip summary-type entries like "TR UND", "GE UND", "ME UND"
     if (num === 'UND') continue;
 
-    // Extract grade
-    const gradeMatch = rest.match(GRADE_RE);
-    const grade = gradeMatch ? gradeMatch[1] : '';
+    // Extract grade — use the LAST grade token before the numeric columns
+    // to avoid matching grade-like letters inside course titles (e.g. "Trigonometry and F")
+    // IP courses have no numeric columns at all, so no grade to extract
+    const numColIdx = rest.search(/\d+\.\d{2}/);
+    let gradeMatch = null;
+    let grade = '';
+    if (numColIdx > 0) {
+      const gradeArea = rest.slice(0, numColIdx);
+      const gradeMatches = [...gradeArea.matchAll(new RegExp(GRADE_RE, 'g'))];
+      gradeMatch = gradeMatches.length > 0 ? gradeMatches[gradeMatches.length - 1] : null;
+      grade = gradeMatch ? gradeMatch[1] : '';
+    }
 
     // Check for repeat flag (R after grade)
     const isRepeat = gradeMatch

@@ -47,11 +47,30 @@ const ELECTIVE_GROUPS = {
       blanketDepts: [], checkWorldLang: false,
     },
     {
+      key: 'me_prof',
+      label: 'Prof. Elective',
+      ids: ['ME_PROF'],
+      approvedLists: ['professional_electives'],
+      blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'],
+      checkWorldLang: false,
+      maxCourses: 1,
+    },
+    {
+      key: 'me_wl',
+      label: 'WL / Diversity',
+      ids: ['ME_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: [],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
       key: 'me_humssrs',
       label: 'Hum / SS / RS',
       ids: ['ME_HUM_1', 'ME_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
+      maxCourses: 2,
     },
   ],
   BE_Biomech: [
@@ -63,11 +82,21 @@ const ELECTIVE_GROUPS = {
       blanketDepts: [],
     },
     {
+      key: 'be_wl',
+      label: 'WL / Diversity',
+      ids: ['BE_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: [],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
       key: 'be_humsstheo',
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
+      maxCourses: 2,
     },
   ],
   BE_Bioelec: [
@@ -79,11 +108,21 @@ const ELECTIVE_GROUPS = {
       blanketDepts: [],
     },
     {
+      key: 'be_wl',
+      label: 'WL / Diversity',
+      ids: ['BE_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: [],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
       key: 'be_humsstheo',
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
+      maxCourses: 2,
     },
   ],
   BE_Biomed: [
@@ -95,11 +134,21 @@ const ELECTIVE_GROUPS = {
       blanketDepts: [],
     },
     {
+      key: 'be_wl',
+      label: 'WL / Diversity',
+      ids: ['BE_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: [],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
       key: 'be_humsstheo',
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
+      maxCourses: 2,
     },
   ],
 };
@@ -230,13 +279,15 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     const filledCourses = [];
     let creditsFilled = 0;
 
-    // Compute totalCredits and earliest semester from courses that exist in this program
+    // Compute totalCredits and semester from courses that exist in this program
     let earliestSem = 99;
+    let latestSem = 0;
     let totalCredits = 0;
     for (const id of g.ids) {
       const course = COURSES[id];
       if (course && course.semesters && course.semesters[program]) {
         earliestSem = Math.min(earliestSem, course.semesters[program]);
+        latestSem = Math.max(latestSem, course.semesters[program]);
         totalCredits += course.credits || 0;
       }
     }
@@ -261,8 +312,11 @@ function computeAudit(matched, program, codeIndex, unmatched) {
         candidates.push({ code: u.code, grade: u.active.grade, credits: u.active.credits || 0, source: 'unmatched', ref: u });
       }
     }
-    // Sort: courses qualifying for fewer slots fill first (most specific → least)
-    candidates.sort((a, b) => countEligibleSlots(a.code, groups, program) - countEligibleSlots(b.code, groups, program));
+    // Sort: 0-credit courses last, then by cross-eligibility (most specific → least)
+    candidates.sort((a, b) =>
+      (a.credits > 0 ? 0 : 1) - (b.credits > 0 ? 0 : 1) ||
+      countEligibleSlots(a.code, groups, program) - countEligibleSlots(b.code, groups, program)
+    );
 
     for (const c of candidates) {
       if (usedForGroups.has(c.code)) continue; // may have been claimed by earlier iteration
@@ -270,10 +324,13 @@ function computeAudit(matched, program, codeIndex, unmatched) {
       creditsFilled += c.credits;
       usedForGroups.add(c.code);
       if (c.source === 'unmatched') completedIds.add('unmatched:' + c.code);
+      if (g.maxCourses && filledCourses.length >= g.maxCourses) break;
       if (creditsFilled >= totalCredits) break;
     }
 
+    const allIP = filledCourses.length > 0 && filledCourses.every(c => !c.grade);
     const groupStatus = creditsFilled >= totalCredits ? 'filled'
+                       : allIP ? 'ip'
                        : creditsFilled > 0 ? 'partial' : 'empty';
 
     groupCards.push({
@@ -284,7 +341,7 @@ function computeAudit(matched, program, codeIndex, unmatched) {
       creditsFilled,
       filledCourses,
       groupStatus,
-      semester: earliestSem,
+      semester: g.ids.length > 1 ? latestSem : earliestSem,
     });
   }
 
@@ -362,9 +419,6 @@ function tryFillElective(placeholder, matched, completedIds, codeIndex) {
 // ── Slot mappings for single-placeholder fills ─────────────────
 const SLOT_MAPPING = {
   'THEO_GE': { lists: ['theology'], blanketDepts: [], checkWorldLang: false },
-  'ME_PROF': { lists: ['professional_electives'], blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'], checkWorldLang: false },
-  'ME_WL':   { lists: ['world_languages', 'cultural_diversity'], blanketDepts: [], checkWorldLang: true },
-  'BE_WL':   { lists: ['world_languages', 'cultural_diversity'], blanketDepts: [], checkWorldLang: true },
 };
 
 // ── Cross-eligibility: count how many groups + single slots a course qualifies for ──
