@@ -32,6 +32,15 @@
 
   <!-- Semester grid -->
   <div id="audit-area" class="audit-area">
+    <svg id="audit-arrow-svg">
+      <defs>
+        <marker id="aPre"   markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="rgba(92,48,0,.65)"/></marker>
+        <marker id="aPreHi" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#006354"/></marker>
+        <marker id="aUnHi"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#6BC9C9"/></marker>
+        <marker id="aCo"    markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="rgba(199,105,23,.65)"/></marker>
+        <marker id="aCoHi"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="#C76917"/></marker>
+      </defs>
+    </svg>
     <div id="audit-grid" class="audit-grid"></div>
   </div>
 
@@ -42,4 +51,21 @@
   </div>
 
   <button class="reset-btn" onclick="resetAudit()">Upload Another Transcript</button>
+</div>
+
+<!-- Detail panel (bottom popup) -->
+<div id="audit-detail-panel">
+  <button id="audit-panel-close" onclick="clearAuditSelection()">&#x2715;</button>
+  <div id="audit-panel-code"></div>
+  <div id="audit-panel-title"></div>
+  <div id="audit-panel-meta">
+    <span class="audit-panel-credits" id="audit-panel-credits"></span>
+  </div>
+  <div id="audit-panel-desc"></div>
+  <div class="audit-panel-relations">
+    <div class="audit-rel-group prereqs"> <h5>&#9654; Prerequisites</h5>  <div id="audit-panel-prereqs"></div></div>
+    <div class="audit-rel-group coreqs">  <h5>&#8634; Co-requisites</h5> <div id="audit-panel-coreqs"></div></div>
+    <div class="audit-rel-group unlocked"><h5>&#8599; Unlocks</h5>        <div id="audit-panel-unlocked"></div></div>
+  </div>
+  <div id="audit-panel-eligible"></div>
 </div>

@@ -29,14 +29,15 @@ const CODE_ALIASES = {
 };
 
 // ── Elective group definitions ─────────────────────────────────
-// Each group maps placeholder IDs → a combined card with tally
+// Each group maps placeholder IDs → a combined card with tally.
+// totalCredits is computed at runtime from the courses that exist
+// in the active program, so it stays correct automatically.
 const ELECTIVE_GROUPS = {
   ME: [
     {
       key: 'me_elec',
       label: 'ME Electives',
       ids: ['ME_ELEC_1', 'ME_ELEC_2', 'ME_ELEC_3', 'ME_ELEC_4'],
-      totalCredits: 12,
       approvedLists: ['me_electives'],
       blanketDepts: [], checkWorldLang: false,
     },
@@ -44,7 +45,6 @@ const ELECTIVE_GROUPS = {
       key: 'me_humssrs',
       label: 'Hum / SS / RS',
       ids: ['ME_HUM_1', 'ME_HUM_2'],
-      totalCredits: 6,
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
     },
@@ -53,8 +53,7 @@ const ELECTIVE_GROUPS = {
     {
       key: 'be_elec',
       label: 'BE Electives',
-      ids: ['BE_ELEC_S5_BM', 'BE_ELEC_S6_BM', 'BE_ELEC_S7_BM', 'BE_ELEC_S8_1', 'BE_ELEC_S8_2', 'BE_ELEC_S8_3'],
-      totalCredits: 18,
+      ids: ['BE_ELEC_S5_BM', 'BE_ELEC_S8_1'],
       approvedLists: ['be_electives'],
       blanketDepts: [],
     },
@@ -62,7 +61,6 @@ const ELECTIVE_GROUPS = {
       key: 'be_humsstheo',
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
-      totalCredits: 6,
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
     },
@@ -71,8 +69,7 @@ const ELECTIVE_GROUPS = {
     {
       key: 'be_elec',
       label: 'BE Electives',
-      ids: ['BE_ELEC_S5_BD', 'BE_ELEC_S6_BE', 'BE_ELEC_S7_BE', 'BE_ELEC_S8_1', 'BE_ELEC_S8_2', 'BE_ELEC_S8_3'],
-      totalCredits: 18,
+      ids: ['BE_ELEC_S7_BE', 'BE_ELEC_S8_1'],
       approvedLists: ['be_electives'],
       blanketDepts: [],
     },
@@ -80,7 +77,6 @@ const ELECTIVE_GROUPS = {
       key: 'be_humsstheo',
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
-      totalCredits: 6,
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
     },
@@ -89,8 +85,7 @@ const ELECTIVE_GROUPS = {
     {
       key: 'be_elec',
       label: 'BE Electives',
-      ids: ['BE_ELEC_S5_BD', 'BE_ListA_BD_S6', 'BE_ELEC_S7_BD', 'BE_ELEC_S8_1', 'BE_ELEC_S8_2', 'BE_ELEC_S8_3'],
-      totalCredits: 18,
+      ids: ['BE_ELEC_S7_BD', 'BE_ELEC_S8_1'],
       approvedLists: ['be_electives'],
       blanketDepts: [],
     },
@@ -98,7 +93,6 @@ const ELECTIVE_GROUPS = {
       key: 'be_humsstheo',
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
-      totalCredits: 6,
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
     },
@@ -225,6 +219,17 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     const filledCourses = [];
     let creditsFilled = 0;
 
+    // Compute totalCredits and earliest semester from courses that exist in this program
+    let earliestSem = 99;
+    let totalCredits = 0;
+    for (const id of g.ids) {
+      const course = COURSES[id];
+      if (course && course.semesters && course.semesters[program]) {
+        earliestSem = Math.min(earliestSem, course.semesters[program]);
+        totalCredits += course.credits || 0;
+      }
+    }
+
     // Check matched courses that aren't already used for required slots
     for (const m of matched) {
       if (usedForGroups.has(m.code) || completedIds.has(m.courseId)) continue;
@@ -235,12 +240,12 @@ function computeAudit(matched, program, codeIndex, unmatched) {
         filledCourses.push({ code: m.code, grade: m.active.grade, credits: m.active.credits || 3 });
         creditsFilled += m.active.credits || 3;
         usedForGroups.add(m.code);
-        if (creditsFilled >= g.totalCredits) break;
+        if (creditsFilled >= totalCredits) break;
       }
     }
 
     // Also scan unmatched courses (not in courses.yml but on approved lists)
-    if (creditsFilled < g.totalCredits && unmatched) {
+    if (creditsFilled < totalCredits && unmatched) {
       for (const u of unmatched) {
         if (usedForGroups.has(u.code) || completedIds.has('unmatched:' + u.code)) continue;
         const status = getCourseStatus(u.active.grade);
@@ -250,28 +255,19 @@ function computeAudit(matched, program, codeIndex, unmatched) {
           filledCourses.push({ code: u.code, grade: u.active.grade, credits: u.active.credits || 3 });
           creditsFilled += u.active.credits || 3;
           usedForGroups.add(u.code);
-          if (creditsFilled >= g.totalCredits) break;
+          if (creditsFilled >= totalCredits) break;
         }
       }
     }
 
-    // Determine the earliest semester for this group's placeholders
-    let earliestSem = 99;
-    for (const id of g.ids) {
-      const course = COURSES[id];
-      if (course && course.semesters && course.semesters[program]) {
-        earliestSem = Math.min(earliestSem, course.semesters[program]);
-      }
-    }
-
-    const groupStatus = creditsFilled >= g.totalCredits ? 'filled'
+    const groupStatus = creditsFilled >= totalCredits ? 'filled'
                        : creditsFilled > 0 ? 'partial' : 'empty';
 
     groupCards.push({
       isGroupCard: true,
       key: g.key,
       label: g.label,
-      totalCredits: g.totalCredits,
+      totalCredits,
       creditsFilled,
       filledCourses,
       groupStatus,
@@ -487,6 +483,9 @@ function renderAudit(auditResult, unmatched, summary) {
 function createAuditCard(course) {
   const card = document.createElement('div');
   card.className = 'audit-card status-' + course.status;
+  card.dataset.id = course.id;
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', () => selectAuditCourse(course.id));
 
   // Status icon
   const statusIcon = {
@@ -505,13 +504,6 @@ function createAuditCard(course) {
   // If filled by a different course, show that
   const displayCode = course.filledBy || course.code;
 
-  // Tags
-  const tags = (course.tags || []).map(t => {
-    const tag = TAGS[t];
-    if (!tag) return '';
-    return '<span class="audit-tag" style="background:' + tag.bg + ';color:' + tag.fg + '">' + tag.label + '</span>';
-  }).join('');
-
   card.innerHTML =
     '<div class="audit-card-top">' +
       '<span class="audit-code">' + displayCode + '</span>' +
@@ -521,8 +513,7 @@ function createAuditCard(course) {
     '<div class="audit-card-bottom">' +
       '<span class="audit-credits">' + (course.credits || '?') + ' cr</span>' +
       (statusIcon ? '<span class="audit-status-icon">' + statusIcon + '</span>' : '') +
-    '</div>' +
-    (tags ? '<div class="audit-tags">' + tags + '</div>' : '');
+    '</div>';
 
   return card;
 }
@@ -598,6 +589,217 @@ function renderUnmatched(unmatched) {
 
     list.appendChild(item);
   }
+}
+
+// ── Build unlock index ──────────────────────────────────────────
+const UNLOCKS = {};
+for (const c of Object.values(COURSES)) {
+  if (!UNLOCKS[c.id]) UNLOCKS[c.id] = [];
+  for (const pid of (c.prereqs || [])) {
+    if (!UNLOCKS[pid]) UNLOCKS[pid] = [];
+    if (!UNLOCKS[pid].includes(c.id)) UNLOCKS[pid].push(c.id);
+  }
+  for (const cid of (c.coreqs || [])) {
+    if (!UNLOCKS[cid]) UNLOCKS[cid] = [];
+    if (!UNLOCKS[cid].includes(c.id)) UNLOCKS[cid].push(c.id);
+  }
+}
+
+// ── Course selection & arrows ──────────────────────────────────
+let auditSelected = null;
+
+function selectAuditCourse(id) {
+  if (auditSelected === id) { clearAuditSelection(); return; }
+  auditSelected = id;
+
+  const course = COURSES[id];
+  if (!course) return;
+
+  const prog    = AUDIT_STATE.program;
+  const prereqs = new Set(course.prereqs || []);
+  const coreqs  = new Set(course.coreqs  || []);
+  const unlocks = new Set(
+    (UNLOCKS[id] || []).filter(x => COURSES[x] && COURSES[x].semesters && COURSES[x].semesters[prog])
+  );
+
+  document.querySelectorAll('.audit-card[data-id]').forEach(el => {
+    const cid = el.dataset.id;
+    el.classList.remove('state-selected','state-prereq','state-coreq','state-unlocked','state-dimmed');
+    if      (cid === id)         el.classList.add('state-selected');
+    else if (prereqs.has(cid))   el.classList.add('state-prereq');
+    else if (coreqs.has(cid))    el.classList.add('state-coreq');
+    else if (unlocks.has(cid))   el.classList.add('state-unlocked');
+    else                         el.classList.add('state-dimmed');
+  });
+
+  // Dim group cards too
+  document.querySelectorAll('.elective-group-card').forEach(el => {
+    el.style.opacity = '0.08';
+  });
+
+  drawAuditArrows();
+  highlightAuditArrows(id, prereqs, coreqs, unlocks);
+  openAuditPanel(course, prereqs, coreqs, unlocks);
+}
+
+function clearAuditSelection() {
+  auditSelected = null;
+  document.querySelectorAll('.audit-card[data-id]').forEach(el =>
+    el.classList.remove('state-selected','state-prereq','state-coreq','state-unlocked','state-dimmed')
+  );
+  document.querySelectorAll('.elective-group-card').forEach(el => {
+    el.style.opacity = '';
+  });
+  const svg = document.getElementById('audit-arrow-svg');
+  if (svg) svg.querySelectorAll('path').forEach(p => p.remove());
+  const panel = document.getElementById('audit-detail-panel');
+  if (panel) panel.classList.remove('open');
+}
+
+function openAuditPanel(course, prereqs, coreqs, unlocks) {
+  document.getElementById('audit-panel-code').textContent    = course.code;
+  document.getElementById('audit-panel-title').textContent   = course.title;
+  document.getElementById('audit-panel-credits').textContent = course.credits + ' credits';
+  document.getElementById('audit-panel-desc').textContent    = course.desc || '';
+
+  function renderPills(ids, cssClass, elId) {
+    const el = document.getElementById(elId);
+    el.innerHTML = '';
+    const prog = AUDIT_STATE.program;
+    const arr = [...ids].filter(id => COURSES[id] && COURSES[id].semesters && COURSES[id].semesters[prog]);
+    if (!arr.length) { el.innerHTML = '<span class="audit-none-label">none</span>'; return; }
+    arr.forEach(id => {
+      const rc = COURSES[id];
+      const sp = document.createElement('span');
+      sp.className = 'audit-rel-pill ' + cssClass;
+      sp.textContent = rc.code;
+      sp.title = rc.title;
+      sp.onclick = () => selectAuditCourse(id);
+      el.appendChild(sp);
+    });
+  }
+
+  renderPills(prereqs, 'audit-prereq-pill', 'audit-panel-prereqs');
+  renderPills(coreqs,  'audit-coreq-pill',  'audit-panel-coreqs');
+  renderPills(unlocks, 'audit-unlock-pill',  'audit-panel-unlocked');
+
+  const eligibleEl = document.getElementById('audit-panel-eligible');
+  if (course.isPlaceholder && course.eligible && course.eligible.length) {
+    eligibleEl.innerHTML =
+      '<h5>Eligible Courses</h5>' +
+      '<div class="audit-eligible-list">' +
+        course.eligible.map(e => '<div class="audit-eligible-item">' + e + '</div>').join('') +
+      '</div>';
+  } else {
+    eligibleEl.innerHTML = '';
+  }
+
+  document.getElementById('audit-detail-panel').classList.add('open');
+}
+
+function drawAuditArrows() {
+  const svg = document.getElementById('audit-arrow-svg');
+  if (!svg) return;
+  svg.querySelectorAll('path').forEach(p => p.remove());
+
+  const prog = AUDIT_STATE.program;
+  const area = document.getElementById('audit-area');
+  const areaRect = area.getBoundingClientRect();
+  const z = zoomLevel;
+
+  function cardPos(id) {
+    const el = document.querySelector('.audit-card[data-id="' + id + '"]');
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return {
+      cx: (r.left - areaRect.left + r.width  / 2) / z,
+      cy: (r.top  - areaRect.top  + r.height / 2) / z,
+      rx: (r.right  - areaRect.left) / z,
+      lx: (r.left   - areaRect.left) / z,
+      ty: (r.top    - areaRect.top)  / z,
+      by: (r.bottom - areaRect.top)  / z,
+    };
+  }
+
+  const drawn = new Set();
+
+  for (const course of Object.values(COURSES)) {
+    if (!course.semesters || !course.semesters[prog]) continue;
+    const toPos = cardPos(course.id);
+    if (!toPos) continue;
+
+    for (const pid of (course.prereqs || [])) {
+      if (!COURSES[pid] || !COURSES[pid].semesters || !COURSES[pid].semesters[prog]) continue;
+      const key = pid + '->' + course.id;
+      if (drawn.has(key)) continue;
+      drawn.add(key);
+      const fromPos = cardPos(pid);
+      if (!fromPos) continue;
+      svg.appendChild(makeAuditPath(fromPos, toPos, false, pid, course.id));
+    }
+
+    for (const cid of (course.coreqs || [])) {
+      if (!COURSES[cid] || !COURSES[cid].semesters || !COURSES[cid].semesters[prog]) continue;
+      const key = 'co:' + [cid, course.id].sort().join('-');
+      if (drawn.has(key)) continue;
+      drawn.add(key);
+      const fromPos = cardPos(cid);
+      if (!fromPos) continue;
+      svg.appendChild(makeAuditPath(fromPos, toPos, true, cid, course.id));
+    }
+  }
+}
+
+function makeAuditPath(from, to, isCoreq, fromId, toId) {
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  p.classList.add(isCoreq ? 'arrow-coreq' : 'arrow-prereq');
+  p.dataset.from = fromId;
+  p.dataset.to   = toId;
+  p.dataset.type = isCoreq ? 'coreq' : 'prereq';
+
+  const sameCol = Math.abs(from.cx - to.cx) < 100;
+  let d;
+
+  if (sameCol) {
+    const bulge = Math.max(from.rx, to.rx) + 38;
+    d = 'M ' + from.rx + ' ' + from.cy + ' C ' + bulge + ' ' + from.cy + ' ' + bulge + ' ' + to.cy + ' ' + to.rx + ' ' + to.cy;
+  } else if (from.cx < to.cx) {
+    const dx = to.cx - from.cx;
+    d = 'M ' + from.rx + ' ' + from.cy + ' C ' + (from.rx + dx * 0.4) + ' ' + from.cy + ' ' + (to.lx - dx * 0.4) + ' ' + to.cy + ' ' + to.lx + ' ' + to.cy;
+  } else {
+    const dx = from.cx - to.cx;
+    d = 'M ' + from.lx + ' ' + from.cy + ' C ' + (from.lx - dx * 0.4) + ' ' + from.cy + ' ' + (to.rx + dx * 0.4) + ' ' + to.cy + ' ' + to.rx + ' ' + to.cy;
+  }
+
+  p.setAttribute('d', d);
+  p.setAttribute('marker-end', isCoreq ? 'url(#aCo)' : 'url(#aPre)');
+  return p;
+}
+
+function highlightAuditArrows(selId, prereqs, coreqs, unlocks) {
+  document.querySelectorAll('#audit-arrow-svg path').forEach(p => {
+    const f  = p.dataset.from;
+    const t  = p.dataset.to;
+    const ty = p.dataset.type;
+    p.classList.remove('hi-prereq','hi-unlocked','hi-coreq','fade');
+
+    if (ty === 'prereq') {
+      if (t === selId && prereqs.has(f)) {
+        p.classList.add('hi-prereq');  p.setAttribute('marker-end','url(#aPreHi)');
+      } else if (f === selId && unlocks.has(t)) {
+        p.classList.add('hi-unlocked'); p.setAttribute('marker-end','url(#aUnHi)');
+      } else {
+        p.classList.add('fade');        p.setAttribute('marker-end','url(#aPre)');
+      }
+    } else {
+      if ((f === selId && (coreqs.has(t) || unlocks.has(t))) ||
+          (t === selId && (coreqs.has(f) || prereqs.has(f)))) {
+        p.classList.add('hi-coreq');   p.setAttribute('marker-end','url(#aCoHi)');
+      } else {
+        p.classList.add('fade');        p.setAttribute('marker-end','url(#aCo)');
+      }
+    }
+  });
 }
 
 // ── Zoom controls ──────────────────────────────────────────────
@@ -765,6 +967,15 @@ function resetAudit() {
   AUDIT_STATE.lastCodeIndex = null;
   clearFile();
 }
+
+// ── Click-off & keyboard to clear selection ────────────────────
+document.getElementById('audit-area')?.addEventListener('click', ev => {
+  if (ev.target.closest('.audit-card')) return;
+  if (auditSelected) clearAuditSelection();
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && auditSelected) clearAuditSelection();
+});
 
 // ── Init zoom on load ──────────────────────────────────────────
 applyZoom();

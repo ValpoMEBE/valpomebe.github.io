@@ -377,6 +377,7 @@
   semesters:
     ME: 4
     BE_Biomech: 6
+    BE_Biomed: 7
   desc: "First and second laws of thermodynamics, properties of pure substances, power and refrigeration cycles."
 
 - id: ME_252
@@ -598,25 +599,6 @@
     BE_Bioelec: 5
   desc: "Continuous and discrete-time signals, Fourier analysis, sampling, filtering, and system response."
 
-# BE Semester 5 — Biomedical
-- id: BE_ELEC_S5_BD
-  code: "BE Elective"
-  title: "BE Technical Elective"
-  credits: 3
-  tags: []
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Biomed: 5
-  desc: "Biomedical track elective — semester 5. 6 total BE elective credits required."
-  eligible:
-    - "BE 200 – Intro to Bioengineering"
-    - "BE 468 – Advanced Bioengineering"
-    - "ME 355 – System Modeling"
-    - "ME 361–ME 369"
-    - "Other approved BE electives"
-
 - id: CHEM_221
   code: "CHEM 221"
   title: "Organic Chemistry I"
@@ -772,58 +754,6 @@
     BE_Biomed: 6
   desc: "Mechanical analysis of biological tissues and systems: bone, muscle, joints, and fluid flow in the body."
 
-# BE Semester 6 — Track-specific electives
-- id: BE_ELEC_S6_BM
-  code: "BE Elective"
-  title: "BE Technical Elective"
-  credits: 3
-  tags: []
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Biomech: 6
-  desc: "Technical elective — Biomechanical track semester 6."
-  eligible:
-    - "BE 200, BE 468"
-    - "ME 253, ME 353"
-    - "ME 361–ME 369"
-    - "ME 374, ME 405"
-
-- id: BE_ELEC_S6_BE
-  code: "BE Elective"
-  title: "BE Technical Elective"
-  credits: 3
-  tags: []
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Bioelec: 6
-  desc: "Technical elective — Bioelectrical track semester 6."
-  eligible:
-    - "BE 200, BE 468"
-    - "ME 253, ME 353"
-    - "ME 361–ME 369"
-    - "ME 374, ME 405"
-
-- id: BE_ListA_BD_S6
-  code: "BE/ME Elective"
-  title: "BE/ME Elective (List A)"
-  credits: 3
-  tags: []
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Biomed: 6
-  desc: "Biomedical track — List A elective (ME 270 or approved BE elective)."
-  eligible:
-    - "ME 270 – Thermodynamics I (3 cr)"
-    - "BE 200 – Intro to Bioengineering"
-    - "BE 468 – Advanced Bioengineering"
-    - "Other approved electives"
-
 # Biomedical Track — Semester 6
 - id: CHEM_222
   code: "CHEM 222"
@@ -948,23 +878,6 @@
     - "Any approved Humanities course"
     - "Any approved Social Science course"
     - "Any approved Religious Studies course"
-
-# BE Semester 7 — Track-specific
-- id: BE_ELEC_S7_BM
-  code: "BE Elective"
-  title: "BE Elective"
-  credits: 3
-  tags: []
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Biomech: 7
-  desc: "Senior-year technical elective — Biomechanical track."
-  eligible:
-    - "BE 200, BE 468"
-    - "ME 361–ME 369, ME 453–ME 467"
-    - "BE 490, ME 490, BE 499, ME 499"
 
 - id: ECE_322
   code: "ECE 322"
@@ -1110,42 +1023,6 @@
     BE_Bioelec: 8
     BE_Biomed: 8
   desc: "Senior-year elective — slot 1."
-  eligible:
-    - "BE 200, BE 468"
-    - "ME 361–ME 369, ME 453–ME 467"
-    - "BE 490, ME 490, BE 499, ME 499"
-
-- id: BE_ELEC_S8_2
-  code: "BE Elective"
-  title: "BE Technical Elective 2"
-  credits: 3
-  tags: []
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Biomech: 8
-    BE_Bioelec: 8
-    BE_Biomed: 8
-  desc: "Senior-year elective — slot 2."
-  eligible:
-    - "BE 200, BE 468"
-    - "ME 361–ME 369, ME 453–ME 467"
-    - "BE 490, ME 490, BE 499, ME 499"
-
-- id: BE_ELEC_S8_3
-  code: "BE Elective"
-  title: "BE Technical Elective 3"
-  credits: 3
-  tags: []
-  prereqs: []
-  coreqs: []
-  isPlaceholder: true
-  semesters:
-    BE_Biomech: 8
-    BE_Bioelec: 8
-    BE_Biomed: 8
-  desc: "Senior-year elective — slot 3."
   eligible:
     - "BE 200, BE 468"
     - "ME 361–ME 369, ME 453–ME 467"
