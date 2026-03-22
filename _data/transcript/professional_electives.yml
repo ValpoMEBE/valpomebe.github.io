@@ -1,0 +1,38 @@
+# ME Professional Electives — 3 credits required
+# Source: Undergraduate Catalog 2025-2026, p.1096
+# Many departments have blanket approval (any ACC, any BIO, etc.)
+# Listed here are specific courses; dept-wide approvals handled in JS.
+
+# Specific courses
+- code: "GE 493"
+- code: "ECON 221"
+- code: "ECON 222"
+- code: "ECON 233"
+- code: "ECON 321"
+- code: "ECON 322"
+- code: "ECON 325"
+- code: "ECON 326"
+- code: "ECON 336"
+- code: "ENGL 300"
+- code: "ENGL 310"
+- code: "GEO 101"
+- code: "GEO 102"
+- code: "GEO 104"
+- code: "GEO 301"
+- code: "MET 103"
+- code: "MET 215"
+- code: "MET 216"
+- code: "MET 240"
+
+# Blanket department approvals (handled via dept prefix in JS):
+# ACC: any course
+# ASTR: any course
+# BIO: any course
+# BLAW: any course
+# CHEM: above required level
+# CS: 156+
+# FIN: any course
+# MGT: any course
+# MKT: any course
+# ROTC: any course
+# World Language: language courses only

@@ -1,0 +1,34 @@
+# Approved Social Sciences Courses
+# Source: Undergraduate Catalog 2025-2026, p.1261
+# Any ECON, any POLS, any SOC course also counts (handled in JS)
+
+- code: "CVA 315"
+- code: "CVA 465"
+- code: "ED 206"
+- code: "ENGL 334"
+- code: "ENGL 344"
+- code: "GEO 101"
+- code: "GEO 102"
+- code: "GEO 200"
+- code: "GEO 201"
+- code: "GEO 212"
+- code: "GEO 265"
+- code: "GEO 280"
+- code: "GEO 301"
+- code: "GEO 320"
+- code: "GEO 321"
+- code: "GEO 420"
+- code: "GEO 470"
+- code: "GEO 474"
+- code: "PSJ 201"
+- code: "SOCW 151"
+- code: "SOCW 210"
+- code: "SOCW 220"
+- code: "SOCW 260"
+- code: "WLC 335"
+- code: "PSY 110"
+
+# Blanket department approvals (handled via dept prefix in JS):
+# ECON: any course
+# POLS: any course
+# SOC: any course

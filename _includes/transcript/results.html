@@ -1,0 +1,45 @@
+<div id="results-section" class="results-section" style="display:none;">
+
+  <!-- Summary bar -->
+  <div id="summary-bar" class="summary-bar">
+    <div class="summary-stat">
+      <span class="stat-value" id="stat-completed">0</span>
+      <span class="stat-label">Credits Done</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-value" id="stat-remaining">0</span>
+      <span class="stat-label">Credits Left</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-value" id="stat-gpa">--</span>
+      <span class="stat-label">GPA</span>
+    </div>
+    <div class="summary-stat stat-progress">
+      <span class="stat-value" id="stat-pct">0%</span>
+      <span class="stat-label">Progress</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Zoom controls -->
+  <div class="zoom-controls" id="zoom-controls">
+    <button class="zoom-btn" onclick="zoomOut()" title="Zoom out">&minus;</button>
+    <span class="zoom-level" id="zoom-level">100%</span>
+    <button class="zoom-btn" onclick="zoomIn()" title="Zoom in">&plus;</button>
+  </div>
+
+  <!-- Semester grid -->
+  <div id="audit-area" class="audit-area">
+    <div id="audit-grid" class="audit-grid"></div>
+  </div>
+
+  <!-- Unmatched courses -->
+  <div id="unmatched-section" class="unmatched-section" style="display:none;">
+    <h3 class="unmatched-title">Additional Courses (not in degree map)</h3>
+    <div id="unmatched-list" class="unmatched-list"></div>
+  </div>
+
+  <button class="reset-btn" onclick="resetAudit()">Upload Another Transcript</button>
+</div>

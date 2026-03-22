@@ -1,0 +1,41 @@
+---
+layout: default
+---
+
+{%- comment -%}
+  Transcript Audit Layout
+  Injects YAML data as JSON globals, loads pdf.js + transcript scripts.
+  Used by _pages/transcript.html
+{%- endcomment -%}
+
+<script>
+  // ── Jekyll injects YAML data as JSON at build time ──────────
+  const TAGS_DATA      = {{ site.data.tags | jsonify }};
+  const SEMESTERS      = {{ site.data.semesters | jsonify }};
+  const COURSES_ARRAY  = {{ site.data.courses | jsonify }};
+
+  // Convert arrays to keyed objects
+  const TAGS = {};
+  TAGS_DATA.forEach(t => { TAGS[t.key] = { label: t.label, bg: t.bg, fg: t.fg }; });
+
+  const COURSES = {};
+  COURSES_ARRAY.forEach(c => { COURSES[c.id] = c; });
+
+  // ── Elective approved-course lists ──────────────────────────
+  const ELECTIVE_DATA = {
+    me_electives:            {{ site.data.transcript.me_electives | jsonify }},
+    be_electives:            {{ site.data.transcript.be_electives | jsonify }},
+    humanities:              {{ site.data.transcript.humanities | jsonify }},
+    social_sciences:         {{ site.data.transcript.social_sciences | jsonify }},
+    cultural_diversity:      {{ site.data.transcript.cultural_diversity | jsonify }},
+    world_languages:         {{ site.data.transcript.world_languages | jsonify }},
+    theology:                {{ site.data.transcript.theology | jsonify }},
+    professional_electives:  {{ site.data.transcript.professional_electives | jsonify }},
+  };
+</script>
+
+{{ content }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="{{ '/assets/js/transcript-parser.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/transcript-audit.js' | relative_url }}"></script>

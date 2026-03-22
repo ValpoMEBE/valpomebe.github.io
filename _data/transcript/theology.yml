@@ -1,0 +1,7 @@
+# Theology / Religion Courses
+# For THEO_GE slot (3 credits)
+# Source: courses.yml eligible list + catalog
+
+- code: "REL 100"
+- code: "THEO 100"
+- code: "THEO 200"
