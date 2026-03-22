@@ -8,6 +8,7 @@
   prereqs:
   - GE_100
   coreqs: []
+  offered: Spring
   semesters:
     ME: 2
     BE_Biomech: 2
@@ -22,6 +23,7 @@
   - computing
   prereqs: []
   coreqs: []
+  offered: Spring
   semesters:
     ME: 2
     BE_Biomech: 2
@@ -39,6 +41,7 @@
   - MATH_132
   - ME_125
   coreqs: []
+  offered: Fall
   semesters:
     ME: 3
     BE_Biomech: 3
@@ -53,6 +56,7 @@
   prereqs:
   - VUE_102
   coreqs: []
+  offered: Both
   semesters:
     ME: 3
     BE_Biomech: 4
@@ -68,6 +72,7 @@
   prereqs:
   - ME_102
   coreqs: []
+  offered: Fall
   semesters:
     ME: 3
   desc: 'Overview of manufacturing processes: casting, forming, machining, welding, and polymer processing.'
@@ -81,6 +86,7 @@
   prereqs: []
   coreqs:
   - ECE_281
+  offered: Spring
   semesters:
     ME: 4
     BE_Biomech: 4
@@ -97,6 +103,7 @@
   prereqs:
   - GE_109
   coreqs: []
+  offered: Spring
   semesters:
     ME: 4
     BE_Biomech: 4
@@ -111,6 +118,7 @@
   - MATH_132
   - PHYS_141
   coreqs: []
+  offered: Fall
   semesters:
     ME: 4
     BE_Biomech: 6
@@ -125,6 +133,7 @@
   prereqs:
   - CHEM_115
   coreqs: []
+  offered: Spring
   semesters:
     ME: 4
     BE_Biomech: 6
@@ -144,6 +153,7 @@
   - ME_125
   - ME_261
   - STAT_240
+  offered: Fall
   semesters:
     ME: 5
     BE_Biomech: 5
@@ -161,6 +171,7 @@
   - ME_201
   coreqs:
   - ME_252
+  offered: Fall
   semesters:
     ME: 5
     BE_Biomech: 7
@@ -181,6 +192,7 @@
   - ECE_281
   coreqs:
   - ME_209
+  offered: Fall
   semesters:
     ME: 5
     BE_Biomech: 5
@@ -199,6 +211,7 @@
   - ME_125
   - ME_215
   coreqs: []
+  offered: Fall
   semesters:
     ME: 5
   desc: 'Fatigue analysis, failure theories, and design of machine elements: shafts, bearings, gears, and fasteners.'
@@ -211,6 +224,7 @@
   prereqs:
   - ME_209
   coreqs: []
+  offered: Fall
   semesters:
     ME: 5
     BE_Biomech: 7
@@ -227,6 +241,7 @@
   - ME_252
   coreqs:
   - ME_251
+  offered: Spring
   semesters:
     ME: 6
   desc: 'Advanced manufacturing: machining operations, tolerances, surface finish, process planning, and quality control.'
@@ -241,6 +256,7 @@
   - ME_261
   coreqs:
   - ME_364
+  offered: Spring
   semesters:
     ME: 6
   desc: Laboratory experiments in mechanical systems, vibrations, and machine component testing.
@@ -258,6 +274,7 @@
   - MATH_260
   - MATH_270
   coreqs: []
+  offered: Spring
   semesters:
     ME: 6
   desc: Free and forced vibrations of single and multi-DOF systems, resonance, and vibration control.
@@ -274,6 +291,7 @@
   - ME_373
   coreqs:
   - ME_376
+  offered: Spring
   semesters:
     ME: 6
   desc: Laboratory experiments in thermodynamics and heat transfer systems.
@@ -286,6 +304,7 @@
   prereqs:
   - ME_270
   coreqs: []
+  offered: Spring
   semesters:
     ME: 6
     BE_Biomech: 8
@@ -325,6 +344,7 @@
   coreqs:
   - ME_333
   - ME_355
+  offered: Fall
   semesters:
     ME: 7
     BE_Biomech: 7

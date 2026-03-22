@@ -13,6 +13,7 @@ let AUDIT_STATE = {
   lastMatched: null,
   lastUnmatched: null,
   lastCodeIndex: null,
+  lastEntries: null, // raw parsed entries for CSV export
 };
 
 // ── Course code aliases (transcript → courses.yml id) ──────────
@@ -555,6 +556,18 @@ function renderAudit(auditResult, unmatched, summary) {
   // Apply zoom
   applyZoom();
 
+  // Show "Plan Remaining Semesters" button if there are remaining credits
+  const planBtn = document.getElementById('plan-btn');
+  if (planBtn) {
+    planBtn.style.display = summary.creditsRemaining > 0 ? '' : 'none';
+  }
+
+  // Show "Download CSV" button
+  const csvBtn = document.getElementById('csv-btn');
+  if (csvBtn) {
+    csvBtn.style.display = AUDIT_STATE.lastEntries ? '' : 'none';
+  }
+
   // Unmatched courses (exclude ones used for elective groups)
   const remainingUnmatched = usedForGroups
     ? unmatched.filter(u => !usedForGroups.has(u.code))
@@ -995,10 +1008,10 @@ dropZone.addEventListener('drop', e => {
   e.preventDefault();
   dropZone.classList.remove('drag-over');
   const file = e.dataTransfer.files[0];
-  if (file && file.type === 'application/pdf') {
+  if (file && (file.type === 'application/pdf' || file.name.endsWith('.csv'))) {
     setFile(file);
   } else {
-    showError('Please upload a PDF file.');
+    showError('Please upload a PDF or CSV file.');
   }
 });
 
@@ -1042,13 +1055,20 @@ async function parseTranscript() {
   hideError();
 
   try {
-    // 1. Extract text from PDF
-    const lines = await extractTextFromPDF(AUDIT_STATE.file);
+    let entries;
 
-    // 2. Parse course entries
-    const entries = parseTranscriptLines(lines);
+    if (AUDIT_STATE.file.name.endsWith('.csv')) {
+      // Parse CSV file
+      entries = await parseCSVTranscript(AUDIT_STATE.file);
+    } else {
+      // 1. Extract text from PDF
+      const lines = await extractTextFromPDF(AUDIT_STATE.file);
+      // 2. Parse course entries
+      entries = parseTranscriptLines(lines);
+    }
+
     if (!entries.length) {
-      showError('No courses found in this PDF. Make sure it is a DataVU transcript.');
+      showError('No courses found. Make sure it is a DataVU transcript or valid CSV.');
       parseBtn.disabled = false;
       parseBtn.textContent = 'Parse Transcript';
       return;
@@ -1065,6 +1085,7 @@ async function parseTranscript() {
     AUDIT_STATE.lastMatched = matched;
     AUDIT_STATE.lastUnmatched = unmatched;
     AUDIT_STATE.lastCodeIndex = codeIndex;
+    AUDIT_STATE.lastEntries = entries;
 
     // 5. Compute audit and render
     runAudit(matched, unmatched, codeIndex);
@@ -1093,12 +1114,27 @@ function rerunAudit() {
   runAudit(AUDIT_STATE.lastMatched, AUDIT_STATE.lastUnmatched, AUDIT_STATE.lastCodeIndex);
 }
 
+function downloadCSV() {
+  if (!AUDIT_STATE.lastEntries) return;
+  const csv = exportTranscriptCSV(AUDIT_STATE.lastEntries);
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'transcript.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function resetAudit() {
   document.getElementById('results-section').style.display = 'none';
   document.getElementById('upload-section').style.display = '';
+  const plannerSection = document.getElementById('planner-section');
+  if (plannerSection) plannerSection.style.display = 'none';
   AUDIT_STATE.lastMatched = null;
   AUDIT_STATE.lastUnmatched = null;
   AUDIT_STATE.lastCodeIndex = null;
+  AUDIT_STATE.lastEntries = null;
   clearFile();
 }
 

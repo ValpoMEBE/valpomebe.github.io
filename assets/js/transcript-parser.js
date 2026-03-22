@@ -204,3 +204,90 @@ function getCourseStatus(grade) {
 function isPassingGrade(grade) {
   return grade && grade !== 'W' && grade !== 'F' && grade !== 'U' && grade !== '';
 }
+
+// ── CSV export (anonymized) ──────────────────────────────────
+function exportTranscriptCSV(entries) {
+  const header = 'code,title,grade,credits,isRepeat,endDate';
+  const rows = entries.map(e => {
+    const date = e.endDate
+      ? (e.endDate.getMonth() + 1).toString().padStart(2, '0') + '/' +
+        e.endDate.getDate().toString().padStart(2, '0') + '/' +
+        (e.endDate.getFullYear() - 2000).toString().padStart(2, '0')
+      : '';
+    const title = '"' + (e.title || '').replace(/"/g, '""') + '"';
+    return [e.code, title, e.grade, e.credits, e.isRepeat ? 'R' : '', date].join(',');
+  });
+  return header + '\n' + rows.join('\n');
+}
+
+// ── CSV import ───────────────────────────────────────────────
+async function parseCSVTranscript(file) {
+  const text = await file.text();
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+
+  // Skip header row
+  const header = lines[0].toLowerCase();
+  const startIdx = header.startsWith('code') ? 1 : 0;
+
+  const entries = [];
+  for (let i = startIdx; i < lines.length; i++) {
+    // Parse CSV respecting quoted fields
+    const fields = parseCSVLine(lines[i]);
+    if (fields.length < 4) continue;
+
+    const code = fields[0].trim();
+    const parts = code.match(/^([A-Z]{2,4})\s+(\d{1,4}[A-Z]?)$/i);
+    if (!parts) continue;
+
+    const dept = parts[1].toUpperCase();
+    const num = parts[2];
+    const title = fields[1].trim();
+    const grade = (fields[2] || '').trim();
+    const credits = parseFloat(fields[3]) || 0;
+    const isRepeat = (fields[4] || '').trim() === 'R';
+
+    let endDate = null;
+    const dateStr = (fields[5] || '').trim();
+    if (dateStr) {
+      const dp = dateStr.split('/');
+      if (dp.length === 3) {
+        endDate = new Date(2000 + parseInt(dp[2]), parseInt(dp[0]) - 1, parseInt(dp[1]));
+      }
+    }
+
+    entries.push({ dept, num, code: dept + ' ' + num, title, grade, credits, isRepeat, endDate });
+  }
+
+  return entries;
+}
+
+// Parse a single CSV line, respecting quoted fields
+function parseCSVLine(line) {
+  const fields = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        current += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        fields.push(current);
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+  }
+  fields.push(current);
+  return fields;
+}

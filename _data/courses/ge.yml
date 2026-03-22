@@ -6,6 +6,7 @@
   - design
   prereqs: []
   coreqs: []
+  offered: Fall
   semesters:
     ME: 1
     BE_Biomech: 1
@@ -23,6 +24,7 @@
   - PHYS_141
   - MATH_131
   coreqs: []
+  offered: Spring
   semesters:
     ME: 2
     BE_Biomech: 2
@@ -37,6 +39,7 @@
   prereqs:
   - MATH_132
   coreqs: []
+  offered: Both
   semesters:
     ME: 6
     BE_Biomech: 5
@@ -51,6 +54,7 @@
   prereqs: []
   coreqs:
   - ME_201
+  offered: Both
   semesters:
     ME: 6
     BE_Biomech: 5
@@ -67,6 +71,7 @@
   - GE_311
   - GE_312
   coreqs: []
+  offered: Fall
   semesters:
     ME: 7
     BE_Biomech: 7
@@ -83,6 +88,7 @@
   prereqs:
   - GE_497
   coreqs: []
+  offered: Spring
   semesters:
     ME: 8
     BE_Biomech: 8

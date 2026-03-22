@@ -593,6 +593,47 @@
 }
 .minor-aab-text { color: var(--light-gray); }
 
+/* ── PLAN BUTTON ───────────────────────────────────────────── */
+.plan-btn {
+  display: block; margin: 2rem auto 0;
+  background: var(--teal); border: 1.5px solid var(--teal);
+  color: #fff; padding: .7rem 2rem; border-radius: 6px;
+  font-size: .9rem; font-weight: 600; cursor: pointer;
+  transition: all .18s;
+}
+.plan-btn:hover { background: #007a66; border-color: #007a66; }
+
+/* ── SEMESTER PLANNER ──────────────────────────────────────── */
+.planner-section {
+  padding: 1rem 1.5rem 2rem;
+}
+.planner-header {
+  text-align: center; margin-bottom: 1.5rem;
+}
+.planner-title {
+  color: var(--gold); font-size: 1.5rem; margin: 0 0 .25rem;
+}
+.planner-subtitle {
+  color: var(--light-gray); font-size: .85rem; margin: 0; opacity: .7;
+}
+.planner-section .audit-card.status-remaining {
+  opacity: 1;
+}
+/* Overflow */
+.planner-overflow {
+  margin-top: 2rem; padding: 1rem;
+  background: rgba(0,0,0,.15); border-radius: 8px;
+}
+.planner-overflow-title {
+  color: var(--gold); font-size: 1rem; margin: 0 0 .25rem;
+}
+.planner-overflow-desc {
+  color: var(--parchment); font-size: .8rem; margin: 0 0 1rem;
+}
+.planner-overflow-list {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+}
+
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .upload-section { padding: 0 1rem; }

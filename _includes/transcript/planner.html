@@ -1,0 +1,18 @@
+<!-- Semester Planner — optimizes remaining courses into future semesters -->
+<div id="planner-section" class="planner-section" style="display:none;">
+
+  <div class="planner-header">
+    <h2 class="planner-title">Semester Plan</h2>
+    <p class="planner-subtitle">Optimized schedule for your remaining courses</p>
+  </div>
+
+  <div id="planner-grid" class="audit-grid"></div>
+
+  <div id="planner-overflow" class="planner-overflow" style="display:none;">
+    <h3 class="planner-overflow-title">Could Not Schedule</h3>
+    <p class="planner-overflow-desc">These courses could not fit within 8 semesters given the constraints.</p>
+    <div id="planner-overflow-list" class="planner-overflow-list"></div>
+  </div>
+
+  <button class="reset-btn" onclick="hidePlanner()">Back to Audit</button>
+</div>
