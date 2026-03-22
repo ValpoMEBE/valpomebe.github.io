@@ -12,11 +12,12 @@ const GRADE_POINTS = {
   'D+': 1.3, 'D':  1.0, 'D-': 0.7,
   'F':  0.0
 };
-const NON_GPA_GRADES = ['TR', 'W', 'U', ''];
+const NON_GPA_GRADES = ['TR', 'CR', 'W', 'U', ''];
 const ALL_GRADES = Object.keys(GRADE_POINTS).concat(NON_GPA_GRADES);
 
-// Regex to match a grade token (sorted longest-first so A- matches before A)
-const GRADE_RE = /\b(A-|B\+|B-|C\+|C-|D\+|D-|TR|A|B|C|D|F|W|U)\b/;
+// Regex to match a grade token (longest-first so A- matches before A)
+// Trailing lookahead (?![+\-\w]) prevents matching "B" when "B+" follows
+const GRADE_RE = /\b(A-|B\+|B-|C\+|C-|D\+|D-|TR|CR|A|B|C|D|F|W|U)(?![+\-\w])/;
 
 // ── Configure pdf.js worker ────────────────────────────────────
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -70,8 +71,8 @@ function reconstructLines(items) {
 // Match course lines: starts with dept code (2-4 uppercase) + number (1-4 digits + optional letter)
 const COURSE_LINE_RE = /^([A-Z]{2,4})\s+(\d{1,4}[A-Z]?)\s+(.+)/;
 
-// Lines to skip
-const SKIP_RE = /^(Course Title|Hrs |------|.*Totals:|Cumulative|Page \d|Valparaiso University|^\s*$)/i;
+// Lines to skip (AP lines are exam scores, not real courses)
+const SKIP_RE = /^(Course Title|Hrs |------|.*Totals:|Cumulative|Page \d|Valparaiso University|AP |^\s*$)/i;
 const DATE_RE = /(\d{2}\/\d{2}\/\d{2})-(\d{2}\/\d{2}\/\d{2})/;
 
 function parseTranscriptLines(lines) {
@@ -100,11 +101,16 @@ function parseTranscriptLines(lines) {
       ? /\bR\b/.test(rest.slice(gradeMatch.index + gradeMatch[0].length, gradeMatch.index + gradeMatch[0].length + 4))
       : false;
 
-    // Extract credits (attempted) — first number pattern after grade area
+    // Extract credits — first number is attempted hours, second is completed hours
+    // For TR/CR grades, attempted=0 so use completed (second number) instead
     let credits = 0;
     const numbersInRest = rest.match(/\d+\.\d{2}/g);
     if (numbersInRest && numbersInRest.length >= 1) {
-      credits = parseFloat(numbersInRest[0]);
+      if ((grade === 'TR' || grade === 'CR') && numbersInRest.length >= 2) {
+        credits = parseFloat(numbersInRest[1]); // completed hours
+      } else {
+        credits = parseFloat(numbersInRest[0]); // attempted hours
+      }
     }
 
     // Extract date range
@@ -124,6 +130,8 @@ function parseTranscriptLines(lines) {
       const numIdx = rest.search(/\d+\.\d{2}/);
       title = numIdx > 0 ? rest.slice(0, numIdx).trim() : rest.trim();
     }
+    // Strip date range (e.g. "08/22/25-12/10/25") from title
+    title = title.replace(DATE_RE, '').trim();
 
     entries.push({
       dept,
@@ -177,7 +185,7 @@ function resolveRetakes(entries) {
 // ── Determine course status ────────────────────────────────────
 function getCourseStatus(grade) {
   if (!grade || grade === '') return 'no-grade';
-  if (grade === 'TR') return 'transfer';
+  if (grade === 'TR' || grade === 'CR') return 'transfer';
   if (grade === 'U')  return 'no-grade';
   if (grade === 'F')  return 'failed';
   if (grade === 'D-') return 'completed'; // D- is technically passing

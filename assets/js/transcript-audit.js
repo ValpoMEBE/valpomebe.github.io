@@ -27,6 +27,10 @@ const CODE_ALIASES = {
   'CHEM 122L': 'CHEM_122',
   'CHEM 221L': 'CHEM_221',
   'CHEM 222L': 'CHEM_222',
+  'KIN 101':   'XS_101',    // KIN 101 equivalent to XS 101
+  'ME 333L':   'ME_333',    // lab bundled with ME 333
+  'CHEM 115L': 'CHEM_115',  // lab bundled with CHEM 115
+  'ME 251L':   'ME_251',    // lab bundled with ME 251
 };
 
 // ── Elective group definitions ─────────────────────────────────
@@ -55,7 +59,7 @@ const ELECTIVE_GROUPS = {
       key: 'be_elec',
       label: 'BE Electives',
       ids: ['BE_ELEC_S5_BM', 'BE_ELEC_S8_1'],
-      approvedLists: ['be_electives'],
+      approvedLists: ['be_electives_biomech'],
       blanketDepts: [],
     },
     {
@@ -71,7 +75,7 @@ const ELECTIVE_GROUPS = {
       key: 'be_elec',
       label: 'BE Electives',
       ids: ['BE_ELEC_S7_BE', 'BE_ELEC_S8_1'],
-      approvedLists: ['be_electives'],
+      approvedLists: ['be_electives_bioelec'],
       blanketDepts: [],
     },
     {
@@ -87,7 +91,7 @@ const ELECTIVE_GROUPS = {
       key: 'be_elec',
       label: 'BE Electives',
       ids: ['BE_ELEC_S7_BD', 'BE_ELEC_S8_1'],
-      approvedLists: ['be_electives'],
+      approvedLists: ['be_electives_biomed'],
       blanketDepts: [],
     },
     {
@@ -194,13 +198,19 @@ function computeAudit(matched, program, codeIndex, unmatched) {
   const courseGrades = {};
   const courseStatuses = {};
 
+  const STATUS_PRIORITY = { completed: 3, transfer: 2, 'no-grade': 1, failed: 0 };
   for (const m of matched) {
     const status = getCourseStatus(m.active.grade);
     if (status === 'completed' || status === 'transfer') {
       completedIds.add(m.courseId);
     }
-    courseGrades[m.courseId] = m.active.grade;
-    courseStatuses[m.courseId] = status;
+    // Don't let a lab alias (no grade) overwrite a real grade
+    const existing = STATUS_PRIORITY[courseStatuses[m.courseId]] || -1;
+    const incoming = STATUS_PRIORITY[status] || -1;
+    if (incoming > existing) {
+      courseGrades[m.courseId] = m.active.grade;
+      courseStatuses[m.courseId] = status;
+    }
   }
 
   // Determine which IDs belong to elective groups
@@ -231,34 +241,36 @@ function computeAudit(matched, program, codeIndex, unmatched) {
       }
     }
 
-    // Check matched courses that aren't already used for required slots
+    // Build sorted candidate list: matched + unmatched, sorted by cross-eligibility
+    // (most specific courses — fewest alternative slots — fill first)
+    const candidates = [];
     for (const m of matched) {
       if (usedForGroups.has(m.code) || completedIds.has(m.courseId)) continue;
       const status = getCourseStatus(m.active.grade);
-      if (status !== 'completed' && status !== 'transfer') continue;
-
-      if (isApprovedElective(m.code, approvedSet, g.blanketDepts, g.checkWorldLang)) {
-        filledCourses.push({ code: m.code, grade: m.active.grade, credits: m.active.credits || 3 });
-        creditsFilled += m.active.credits || 3;
-        usedForGroups.add(m.code);
-        if (creditsFilled >= totalCredits) break;
-      }
+      if (status === 'failed') continue;
+      if (!isApprovedElective(m.code, approvedSet, g.blanketDepts, g.checkWorldLang)) continue;
+      const cr = m.active.credits || (m.courseData && m.courseData.credits) || 0;
+      candidates.push({ code: m.code, grade: m.active.grade, credits: cr, source: 'matched', ref: m });
     }
-
-    // Also scan unmatched courses (not in courses.yml but on approved lists)
-    if (creditsFilled < totalCredits && unmatched) {
+    if (unmatched) {
       for (const u of unmatched) {
         if (usedForGroups.has(u.code) || completedIds.has('unmatched:' + u.code)) continue;
         const status = getCourseStatus(u.active.grade);
-        if (status !== 'completed' && status !== 'transfer') continue;
-
-        if (isApprovedElective(u.code, approvedSet, g.blanketDepts, g.checkWorldLang)) {
-          filledCourses.push({ code: u.code, grade: u.active.grade, credits: u.active.credits || 3 });
-          creditsFilled += u.active.credits || 3;
-          usedForGroups.add(u.code);
-          if (creditsFilled >= totalCredits) break;
-        }
+        if (status === 'failed') continue;
+        if (!isApprovedElective(u.code, approvedSet, g.blanketDepts, g.checkWorldLang)) continue;
+        candidates.push({ code: u.code, grade: u.active.grade, credits: u.active.credits || 0, source: 'unmatched', ref: u });
       }
+    }
+    // Sort: courses qualifying for fewer slots fill first (most specific → least)
+    candidates.sort((a, b) => countEligibleSlots(a.code, groups, program) - countEligibleSlots(b.code, groups, program));
+
+    for (const c of candidates) {
+      if (usedForGroups.has(c.code)) continue; // may have been claimed by earlier iteration
+      filledCourses.push({ code: c.code, grade: c.grade, credits: c.credits });
+      creditsFilled += c.credits;
+      usedForGroups.add(c.code);
+      if (c.source === 'unmatched') completedIds.add('unmatched:' + c.code);
+      if (creditsFilled >= totalCredits) break;
     }
 
     const groupStatus = creditsFilled >= totalCredits ? 'filled'
@@ -347,17 +359,32 @@ function tryFillElective(placeholder, matched, completedIds, codeIndex) {
   return null;
 }
 
+// ── Slot mappings for single-placeholder fills ─────────────────
+const SLOT_MAPPING = {
+  'THEO_GE': { lists: ['theology'], blanketDepts: [], checkWorldLang: false },
+  'ME_PROF': { lists: ['professional_electives'], blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'], checkWorldLang: false },
+  'ME_WL':   { lists: ['world_languages', 'cultural_diversity'], blanketDepts: [], checkWorldLang: true },
+  'BE_WL':   { lists: ['world_languages', 'cultural_diversity'], blanketDepts: [], checkWorldLang: true },
+};
+
+// ── Cross-eligibility: count how many groups + single slots a course qualifies for ──
+function countEligibleSlots(code, groups, program) {
+  let count = 0;
+  for (const g of groups) {
+    const approved = buildApprovedSet(g.approvedLists);
+    if (isApprovedElective(code, approved, g.blanketDepts || [], g.checkWorldLang)) count++;
+  }
+  for (const [slotId, mapping] of Object.entries(SLOT_MAPPING)) {
+    const approved = buildApprovedSet(mapping.lists);
+    if (isApprovedElective(code, approved, mapping.blanketDepts, mapping.checkWorldLang)) count++;
+  }
+  return count;
+}
+
 // ── Try to fill non-grouped placeholder from approved lists ────
 // Scans unmatched transcript courses (not in courses.yml) against approved lists
 function tryFillFromUnmatched(course, program, unmatchedList, completedIds, usedForGroups) {
-  const slotMapping = {
-    'THEO_GE': { lists: ['theology'], blanketDepts: [], checkWorldLang: false },
-    'ME_PROF': { lists: ['professional_electives'], blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'], checkWorldLang: false },
-    'ME_WL':   { lists: ['world_languages', 'cultural_diversity'], blanketDepts: [], checkWorldLang: true },
-    'BE_WL':   { lists: ['world_languages', 'cultural_diversity'], blanketDepts: [], checkWorldLang: true },
-  };
-
-  const mapping = slotMapping[course.id];
+  const mapping = SLOT_MAPPING[course.id];
   if (!mapping) return null;
 
   const approvedSet = buildApprovedSet(mapping.lists);
@@ -497,10 +524,18 @@ function createAuditCard(course) {
     'no-grade':  '',
   }[course.status] || '';
 
-  // Grade badge
-  const gradeBadge = course.grade
-    ? '<span class="grade-badge grade-' + gradeClass(course.grade) + '">' + course.grade + '</span>'
-    : '';
+  // Grade badge — show TR/CR / IP when no letter grade
+  let gradeBadge;
+  if (course.status === 'transfer') {
+    const trLabel = course.grade === 'CR' ? 'CR' : 'TR';
+    gradeBadge = '<span class="grade-badge grade-tr">' + trLabel + '</span>';
+  } else if (course.status === 'no-grade') {
+    gradeBadge = '<span class="grade-badge grade-ip">IP</span>';
+  } else if (course.grade) {
+    gradeBadge = '<span class="grade-badge grade-' + gradeClass(course.grade) + '">' + course.grade + '</span>';
+  } else {
+    gradeBadge = '';
+  }
 
   // If filled by a different course, show that
   const displayCode = course.filledBy || course.code;
@@ -529,12 +564,22 @@ function createGroupCard(gc) {
 
   let coursesHtml = '';
   for (const fc of gc.filledCourses) {
-    const badge = '<span class="grade-badge grade-' + gradeClass(fc.grade) + '">' + fc.grade + '</span>';
+    const status = getCourseStatus(fc.grade);
+    let badge;
+    if (status === 'transfer') {
+      const trLabel = fc.grade === 'CR' ? 'CR' : 'TR';
+      badge = '<span class="grade-badge grade-tr">' + trLabel + '</span>';
+    } else if (!fc.grade) {
+      badge = '<span class="grade-badge grade-ip">IP</span>';
+    } else {
+      badge = '<span class="grade-badge grade-' + gradeClass(fc.grade) + '">' + fc.grade + '</span>';
+    }
+    const crLabel = (!fc.grade && !fc.credits) ? '- cr' : fc.credits + ' cr';
     coursesHtml +=
       '<div class="group-course-item">' +
         '<span class="group-course-code">' + fc.code + '</span>' +
         badge +
-        '<span>' + fc.credits + ' cr</span>' +
+        '<span>' + crLabel + '</span>' +
       '</div>';
   }
 
@@ -562,6 +607,15 @@ function gradeClass(grade) {
   return 'f';
 }
 
+function unmatchedSemesterLabel(endDate) {
+  if (!endDate) return 'Other';
+  const m = endDate.getMonth(); // 0-indexed
+  const y = endDate.getFullYear();
+  if (m <= 4)       return 'Spring ' + y;
+  else if (m <= 6)  return 'Summer ' + y;
+  else              return 'Fall ' + y;
+}
+
 function renderUnmatched(unmatched) {
   const section = document.getElementById('unmatched-section');
   const list = document.getElementById('unmatched-list');
@@ -578,15 +632,37 @@ function renderUnmatched(unmatched) {
     const item = document.createElement('div');
     item.className = 'unmatched-item';
 
-    const gradeBadge = u.active.grade
-      ? '<span class="grade-badge grade-' + gradeClass(u.active.grade) + '">' + u.active.grade + '</span>'
+    // Grade badge: transfer → TR/CR, in-progress (no grade) → IP, otherwise letter grade
+    const status = getCourseStatus(u.active.grade);
+    let gradeBadge;
+    if (status === 'transfer') {
+      const trLabel = u.active.grade === 'CR' ? 'CR' : 'TR';
+      gradeBadge = '<span class="grade-badge grade-tr">' + trLabel + '</span>';
+    } else if (!u.active.grade) {
+      gradeBadge = '<span class="grade-badge grade-ip">IP</span>';
+    } else {
+      gradeBadge = '<span class="grade-badge grade-' + gradeClass(u.active.grade) + '">' + u.active.grade + '</span>';
+    }
+
+    // Credits: show "-" for in-progress with no credit value
+    const crLabel = (!u.active.grade && !u.active.credits) ? '-' : (u.active.credits || 0);
+
+    // Semester tag
+    const semLabel = unmatchedSemesterLabel(u.active.endDate);
+    const semTag = semLabel !== 'Other'
+      ? '<span class="unmatched-sem-tag">' + semLabel + '</span>'
       : '';
 
     item.innerHTML =
-      '<span class="unmatched-code">' + u.code + '</span>' +
-      '<span class="unmatched-title">' + (u.active.title || '') + '</span>' +
-      gradeBadge +
-      '<span class="unmatched-credits">' + (u.active.credits || 0) + ' cr</span>';
+      '<div class="unmatched-top">' +
+        '<span class="unmatched-code">' + u.code + '</span>' +
+        '<span class="unmatched-title">' + (u.active.title || '') + '</span>' +
+      '</div>' +
+      '<div class="unmatched-meta">' +
+        gradeBadge +
+        '<span class="unmatched-credits">' + crLabel + ' cr</span>' +
+        semTag +
+      '</div>';
 
     list.appendChild(item);
   }

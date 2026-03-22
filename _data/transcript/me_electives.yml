@@ -1,5 +1,5 @@
 # ME Technical Electives — 12 credits required
-# Source: Undergraduate Catalog 2025-2026, p.1132
+# Source: Undergraduate Catalog 2025-2026, p.1132 + ME Elective Schedule PDF
 # "Other courses may be used with approval of department faculty."
 
 - code: "GE 190"
@@ -9,6 +9,7 @@
 - code: "ME 367"
 - code: "ME 368"
 - code: "ME 369"
+- code: "ME 370"
 - code: "ME 377"
 - code: "ME 453"
 - code: "ME 455"
@@ -19,9 +20,11 @@
 - code: "ME 476"
 - code: "ME 477"
 - code: "BE 200"
+- code: "BE 210"
 - code: "BE 320"
 - code: "BE 340"
 - code: "BE 369"
+- code: "BE 415"
 - code: "BE 468"
 - code: "ME 490"
 - code: "ME 499"

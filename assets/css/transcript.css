@@ -274,6 +274,7 @@
 .grade-f  { background: #a80087; color: #fff; }
 .grade-tr { background: var(--light-blue); color: var(--dark-brown); }
 .grade-w  { background: var(--orange); color: #fff; }
+.grade-ip { background: #475569; color: #e2e8f0; font-style: italic; }
 
 
 /* ── UNMATCHED SECTION ──────────────────────────────────────── */
@@ -286,22 +287,34 @@
   color: var(--gold); margin-bottom: .75rem;
 }
 .unmatched-list {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: .5rem;
 }
 .unmatched-item {
-  display: flex; align-items: center; gap: .5rem;
+  display: flex; flex-direction: column; gap: .3rem;
   background: rgba(255,255,255,.05); border-radius: 6px;
   padding: .5rem .75rem; font-size: .8rem;
+}
+.unmatched-top {
+  display: flex; align-items: center; gap: .5rem;
 }
 .unmatched-code {
   font-family: var(--font-mono); font-weight: 700;
   color: var(--gold); white-space: nowrap;
 }
-.unmatched-title { color: var(--light-gray); flex: 1; }
+.unmatched-title { color: var(--light-gray); flex: 1; font-size: .75rem; }
+.unmatched-meta {
+  display: flex; align-items: center; gap: .4rem;
+}
 .unmatched-credits {
-  font-family: var(--font-mono); font-size: .7rem;
+  font-family: var(--font-mono); font-size: .65rem;
   color: var(--light-gray); opacity: .6; white-space: nowrap;
+}
+.unmatched-sem-tag {
+  font-size: .6rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--light-gray); opacity: .55;
+  background: rgba(255,255,255,.06); border-radius: 3px;
+  padding: .1rem .4rem; white-space: nowrap;
 }
 
 
