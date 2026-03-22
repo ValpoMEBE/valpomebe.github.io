@@ -1,0 +1,81 @@
+- id: ECE_281
+  code: ECE 281
+  title: Fundamentals of Electrical Engr.
+  credits: 2.5
+  tags:
+  - electrical
+  prereqs:
+  - PHYS_142
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 3
+    BE_Bioelec: 3
+    BE_Biomed: 3
+  desc: Circuit analysis, AC/DC circuits, operational amplifiers, and introductory electronics.
+- id: ECE_221
+  code: ECE 221
+  title: Digital Logic Design
+  credits: 3
+  tags:
+  - electrical
+  - computing
+  prereqs:
+  - ECE_281
+  coreqs: []
+  semesters:
+    BE_Bioelec: 5
+  desc: Boolean algebra, logic gates, combinational and sequential circuits, memory, and microprocessors.
+- id: ECE_251
+  code: ECE 251
+  title: Engineering Programming I
+  credits: 3
+  tags:
+  - computing
+  - electrical
+  prereqs:
+  - ME_125
+  coreqs: []
+  semesters:
+    BE_Bioelec: 5
+  desc: 'Structured programming for engineering: algorithms, data structures, and ECE applications.'
+- id: ECE_360
+  code: ECE 360
+  title: Signals & Systems
+  credits: 3
+  tags:
+  - electrical
+  - systems
+  prereqs:
+  - ECE_281
+  coreqs: []
+  semesters:
+    BE_Bioelec: 5
+  desc: Continuous and discrete-time signals, Fourier analysis, sampling, filtering, and system response.
+- id: ECE_322
+  code: ECE 322
+  title: Embedded Microcontrollers
+  credits: 3
+  tags:
+  - electrical
+  - systems
+  prereqs:
+  - ECE_221
+  - ECE_251
+  coreqs: []
+  semesters:
+    BE_Bioelec: 7
+  desc: Microcontroller architecture, assembly/C programming, I/O interfacing, and real-time systems.
+- id: ECE_452
+  code: ECE 452
+  title: Digital Signal Processing
+  credits: 3
+  tags:
+  - electrical
+  - systems
+  prereqs:
+  - ECE_360
+  coreqs: []
+  semesters:
+    BE_Bioelec: 8
+  desc: Discrete-time systems, DFT, FFT, FIR/IIR filter design, and biomedical signal processing.

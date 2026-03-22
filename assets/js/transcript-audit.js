@@ -8,6 +8,7 @@
 let AUDIT_STATE = {
   program: 'ME',
   file: null,
+  selectedMinors: [],
   // Stored after parsing so we can re-audit on program change
   lastMatched: null,
   lastUnmatched: null,
@@ -952,6 +953,9 @@ function runAudit(matched, unmatched, codeIndex) {
   const auditResult = computeAudit(matched, AUDIT_STATE.program, codeIndex, unmatched);
   const summary = computeSummary(auditResult, matched);
   renderAudit(auditResult, unmatched, summary);
+
+  // Re-run minor audits if any are selected
+  if (typeof rerunMinors === 'function') rerunMinors();
 }
 
 function rerunAudit() {

@@ -1,0 +1,26 @@
+id: neuroscience
+name: "Neuroscience"
+min_credits: 15
+requirements:
+  - label: "Core Courses"
+    type: required
+    courses: ["BIO 370", "PSY 245"]
+
+  - label: "Electives (from 2+ departments)"
+    type: credits
+    credits: 9
+    min_depts: 2
+    approved_extras:
+      - "BE 200"
+      - "BE 468"
+      - "BIO 380"
+      - "ENGL 343"
+      - "NSCI 393"
+      - "NSCI 499"
+      - "PSY 246"
+      - "PSY 320"
+      - "PSY 321"
+      - "PSY 350"
+      - "PSY 351"
+      - "PSY 375"
+      - "PSY 376"

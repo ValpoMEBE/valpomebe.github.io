@@ -1,0 +1,18 @@
+id: ece
+name: "Electrical & Computer Engineering"
+min_credits: 18
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["ECE 221", "ECE 251", "ECE 263"]
+    substitutions:
+      "ECE 203+ECE 281+ME 125+ME 261": "ECE 263"
+
+  - label: "Additional ECE Credits"
+    type: credits
+    credits: 8
+    depts: ["ECE"]
+    min_level: 200
+    exclude: ["ECE 211", "ECE 212"]
+    substitutions:
+      "ME 442": "ECE 460"

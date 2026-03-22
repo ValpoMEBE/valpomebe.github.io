@@ -1,0 +1,13 @@
+- id: XS_101
+  code: XS 101
+  title: Wellness & Stress
+  credits: 1
+  tags: []
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 1
+    BE_Biomech: 1
+    BE_Bioelec: 1
+    BE_Biomed: 1
+  desc: Introduction to wellness strategies and stress management.

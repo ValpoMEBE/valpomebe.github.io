@@ -1,0 +1,13 @@
+id: fundamentals_business
+name: "Fundamentals of Business"
+min_credits: 18
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses:
+      - "ECON 221"
+      - "ACC 205"
+      - "BLAW 204"
+      - "FIN 304"
+      - "MGT 304"
+      - "MKT 304"

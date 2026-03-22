@@ -12,6 +12,18 @@
   </div>
 </div>
 
+<!-- Minor selector — collapsible picker with tag pills -->
+<div class="minor-controls-bar">
+  <button class="minor-toggle" onclick="toggleMinorPicker()">
+    <span class="prog-label">Minors (optional)</span>
+    <span class="minor-toggle-arrow">&#9660;</span>
+  </button>
+  <div id="minor-tags" class="minor-tags"></div>
+  <div id="minor-picker" class="minor-picker" style="display:none;">
+    <!-- JS populates checkboxes from MINORS_DATA -->
+  </div>
+</div>
+
 <div id="upload-section" class="upload-section">
   <h1 class="upload-title">Transcript Audit</h1>
   <p class="upload-subtitle">Upload your DataVU transcript to see your degree progress.</p>

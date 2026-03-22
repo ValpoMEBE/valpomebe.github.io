@@ -1,0 +1,14 @@
+id: computer_science
+name: "Computer Science"
+min_credits: 15
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["CS 157", "CS 158"]
+
+  - label: "Upper-level CS or Approved (200+)"
+    type: credits
+    credits: 9
+    depts: ["CS"]
+    min_level: 200
+    approved_extras: ["DATA 151", "ECE 221", "MATH 371", "DATA 374", "DATA 433"]

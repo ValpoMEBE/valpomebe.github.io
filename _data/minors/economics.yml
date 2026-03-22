@@ -1,0 +1,24 @@
+id: economics
+name: "Economics"
+min_credits: 15
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["ECON 221", "ECON 222"]
+
+  - label: "Intermediate Theory (300+)"
+    type: pick
+    pick: 1
+    courses: ["ECON 321", "ECON 322", "ECON 325"]
+
+  - label: "Additional ECON (300+)"
+    type: credits
+    credits: 3
+    depts: ["ECON"]
+    min_level: 300
+    exclude: ["ECON 136", "ECON 486"]
+
+  - label: "Math Prerequisite"
+    type: pick
+    pick: 1
+    courses: ["MATH 126", "MATH 131"]

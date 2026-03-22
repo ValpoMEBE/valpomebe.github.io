@@ -1,0 +1,18 @@
+- id: THEO_GE
+  code: THEO/REL
+  title: Theology / Religion Course
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 6
+    BE_Biomech: 6
+    BE_Bioelec: 6
+    BE_Biomed: 6
+  desc: REL 100 (ME) or THEO 100/200 (BE). Satisfies the theology/religion general education requirement.
+  eligible:
+  - REL 100 – Religion and Society
+  - THEO 100 – The Christian Tradition (Intro)
+  - THEO 200 – The Christian Tradition (Advanced)

@@ -1,0 +1,22 @@
+id: physics
+name: "Physics"
+min_credits: 16
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["PHYS 141", "PHYS 141L", "PHYS 142", "PHYS 142L", "PHYS 243"]
+
+  - label: "Experimental Elective"
+    type: pick
+    pick: 1
+    courses: ["PHYS 245", "PHYS 246"]
+
+  - label: "Upper-level PHYS/ASTR (200+)"
+    type: credits
+    credits: 4
+    depts: ["PHYS", "ASTR"]
+    min_level: 200
+    exclude: ["PHYS 314"]
+    max_from:
+      "PHYS 492": 1
+      "ASTR 492": 1

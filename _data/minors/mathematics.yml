@@ -1,0 +1,26 @@
+id: mathematics
+name: "Mathematics"
+min_credits: 15
+requirements:
+  - label: "Core Requirement"
+    type: pick
+    pick: 1
+    courses: ["MATH 213", "MATH 220", "MATH 264", "MATH 266"]
+    dept_level:
+      depts: ["MATH"]
+      min_level: 300
+
+  - label: "Additional MATH/STAT/DATA (213+)"
+    type: pick
+    pick: 1
+    dept_level:
+      depts: ["MATH", "STAT", "DATA"]
+      min_level: 213
+      min_credits_each: 3
+
+  - label: "Additional MATH/STAT/DATA Credits"
+    type: credits
+    credits: 7
+    depts: ["MATH", "STAT", "DATA"]
+    min_level: 100
+    exclude: ["MATH 110", "MATH 111", "MATH 115", "MATH 125"]

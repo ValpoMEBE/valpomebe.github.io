@@ -1,0 +1,15 @@
+id: mechanical_engineering
+name: "Mechanical Engineering"
+min_credits: 18
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["GE 109", "ME 209", "ME 270"]
+
+  - label: "ME Courses (200+)"
+    type: credits
+    credits: 9
+    depts: ["ME"]
+    min_level: 200
+    substitutions:
+      "ECE 460": "ME 442"

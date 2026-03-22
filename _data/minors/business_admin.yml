@@ -1,0 +1,19 @@
+id: business_admin
+name: "Business Administration"
+min_credits: 27
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses:
+      - "ACC 205"
+      - "ACC 206"
+      - "BLAW 204"
+      - "BUS 205"
+      - "ECON 221"
+      - "ECON 222"
+      - "FIN 304"
+      - "MGT 304"
+      - "MKT 304"
+    substitutions:
+      "STAT 340": "BUS 205"
+      "BAN 340": "BUS 205"

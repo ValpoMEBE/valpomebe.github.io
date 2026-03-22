@@ -1,0 +1,17 @@
+id: astronomy
+name: "Astronomy"
+min_credits: 17
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["PHYS 141", "PHYS 141L", "PHYS 142", "PHYS 243"]
+
+  - label: "Astronomy Courses (pick 2)"
+    type: pick
+    pick: 2
+    courses: ["ASTR 101", "ASTR 252", "ASTR 253"]
+
+  - label: "Lab Elective"
+    type: pick
+    pick: 1
+    courses: ["PHYS 142L", "ASTR 101L", "ASTR 221"]

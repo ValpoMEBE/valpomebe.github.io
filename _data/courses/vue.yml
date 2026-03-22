@@ -1,0 +1,27 @@
+- id: VUE_101
+  code: VUE 101
+  title: Exploring Values
+  credits: 4
+  tags: []
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 1
+    BE_Biomech: 1
+    BE_Bioelec: 1
+    BE_Biomed: 1
+  desc: 'Valparaiso University Experience: Exploring Values. Introduction to liberal education, the university, and vocational
+    discernment.'
+- id: VUE_102
+  code: VUE 102
+  title: Finding Your Voice
+  credits: 4
+  tags: []
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: 'Valparaiso University Experience: Finding Your Voice. Continuation of the VUE sequence.'

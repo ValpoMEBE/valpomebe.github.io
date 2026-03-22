@@ -1,0 +1,440 @@
+- id: ME_102
+  code: ME 102
+  title: Computer Aided Design
+  credits: 1
+  tags:
+  - design
+  - computing
+  prereqs:
+  - GE_100
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: Introduction to 3D solid modeling using CAD software for engineering design and documentation.
+- id: ME_125
+  code: ME 125
+  title: Computer Programming
+  credits: 1
+  tags:
+  - computing
+  prereqs: []
+  coreqs: []
+  semesters:
+    ME: 2
+    BE_Biomech: 2
+    BE_Bioelec: 2
+    BE_Biomed: 2
+  desc: Introduction to programming for mechanical engineers and bioengineers using MATLAB or Python.
+- id: ME_209
+  code: ME 209
+  title: Mechanics–Dynamics
+  credits: 3
+  tags:
+  - mechanics
+  prereqs:
+  - GE_109
+  - MATH_132
+  - ME_125
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 3
+    BE_Bioelec: 3
+    BE_Biomed: 3
+  desc: Kinematics and kinetics of particles and rigid bodies; work-energy and impulse-momentum methods.
+- id: ME_201
+  code: ME 201
+  title: Technical Writing (WIC)
+  credits: 1
+  tags: []
+  prereqs:
+  - VUE_102
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: 'Writing Intensive Course: technical communication for mechanical and bioengineers.'
+- id: ME_251
+  code: ME 251
+  title: Intro to Manufacturing
+  credits: 1
+  tags:
+  - design
+  prereqs:
+  - ME_102
+  coreqs: []
+  semesters:
+    ME: 3
+  desc: 'Overview of manufacturing processes: casting, forming, machining, welding, and polymer processing.'
+- id: ME_261
+  code: ME 261
+  title: Analog Circuits Lab
+  credits: 0.5
+  tags:
+  - electrical
+  - lab
+  prereqs: []
+  coreqs:
+  - ECE_281
+  semesters:
+    ME: 4
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: Laboratory experiments in analog circuits, amplifiers, and instrumentation.
+- id: ME_215
+  code: ME 215
+  title: Mechanics of Materials
+  credits: 3
+  tags:
+  - mechanics
+  - materials
+  prereqs:
+  - GE_109
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 4
+  desc: Stress, strain, deformation, axial loads, torsion, bending, shear, buckling, and failure criteria.
+- id: ME_270
+  code: ME 270
+  title: Thermodynamics I
+  credits: 3
+  tags:
+  - thermalFluids
+  prereqs:
+  - MATH_132
+  - PHYS_141
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 6
+    BE_Biomed: 7
+  desc: First and second laws of thermodynamics, properties of pure substances, power and refrigeration cycles.
+- id: ME_252
+  code: ME 252
+  title: Materials Science
+  credits: 2.5
+  tags:
+  - materials
+  prereqs:
+  - CHEM_115
+  coreqs: []
+  semesters:
+    ME: 4
+    BE_Biomech: 6
+    BE_Bioelec: 6
+    BE_Biomed: 6
+  desc: Crystal structure, defects, mechanical/thermal/electrical properties of metals, polymers, ceramics, and composites.
+- id: ME_333
+  code: ME 333
+  title: Mechanical Measurements Lab
+  credits: 4
+  tags:
+  - lab
+  prereqs:
+  - PHYS_142
+  - ME_201
+  coreqs:
+  - ME_125
+  - ME_261
+  - STAT_240
+  semesters:
+    ME: 5
+    BE_Biomech: 5
+    BE_Bioelec: 5
+    BE_Biomed: 5
+  desc: Experimental methods, instrumentation, data acquisition, and uncertainty analysis. Includes ME 333L (0 cr).
+- id: ME_352
+  code: ME 352
+  title: Materials Science & Mechanics Lab
+  credits: 0.5
+  tags:
+  - materials
+  - lab
+  prereqs:
+  - ME_201
+  coreqs:
+  - ME_252
+  semesters:
+    ME: 5
+    BE_Biomech: 7
+    BE_Bioelec: 7
+    BE_Biomed: 7
+  desc: Laboratory experiments in materials testing, mechanical behavior, and failure analysis.
+- id: ME_355
+  code: ME 355
+  title: System Modeling & Numerical Methods
+  credits: 3
+  tags:
+  - systems
+  - computing
+  prereqs:
+  - ME_125
+  - MATH_260
+  - MATH_270
+  - ECE_281
+  coreqs:
+  - ME_209
+  semesters:
+    ME: 5
+    BE_Biomech: 5
+    BE_Bioelec: 5
+    BE_Biomed: 5
+  desc: Mathematical modeling of dynamic systems, numerical methods, simulation, and introduction to control concepts.
+- id: ME_363
+  code: ME 363
+  title: Machine Design I
+  credits: 3
+  tags:
+  - design
+  - mechanics
+  prereqs:
+  - ME_102
+  - ME_125
+  - ME_215
+  coreqs: []
+  semesters:
+    ME: 5
+  desc: 'Fatigue analysis, failure theories, and design of machine elements: shafts, bearings, gears, and fasteners.'
+- id: ME_373
+  code: ME 373
+  title: Fluid Mechanics
+  credits: 3
+  tags:
+  - thermalFluids
+  prereqs:
+  - ME_209
+  coreqs: []
+  semesters:
+    ME: 5
+    BE_Biomech: 7
+  desc: Fluid statics, kinematics, Bernoulli equation, pipe flow, dimensional analysis, and boundary layers.
+- id: ME_351
+  code: ME 351
+  title: Manufacturing Processes
+  credits: 3
+  tags:
+  - design
+  prereqs:
+  - ME_125
+  - ME_215
+  - ME_252
+  coreqs:
+  - ME_251
+  semesters:
+    ME: 6
+  desc: 'Advanced manufacturing: machining operations, tolerances, surface finish, process planning, and quality control.'
+- id: ME_354
+  code: ME 354
+  title: Mechanical Systems Lab
+  credits: 0.5
+  tags:
+  - mechanics
+  - lab
+  prereqs:
+  - ME_261
+  coreqs:
+  - ME_364
+  semesters:
+    ME: 6
+  desc: Laboratory experiments in mechanical systems, vibrations, and machine component testing.
+- id: ME_364
+  code: ME 364
+  title: Vibrations
+  credits: 2
+  tags:
+  - mechanics
+  - systems
+  prereqs:
+  - ME_209
+  - ME_125
+  - ME_215
+  - MATH_260
+  - MATH_270
+  coreqs: []
+  semesters:
+    ME: 6
+  desc: Free and forced vibrations of single and multi-DOF systems, resonance, and vibration control.
+- id: ME_372
+  code: ME 372
+  title: Heat Power Lab
+  credits: 0.5
+  tags:
+  - thermalFluids
+  - lab
+  prereqs:
+  - ME_333
+  - ME_270
+  - ME_373
+  coreqs:
+  - ME_376
+  semesters:
+    ME: 6
+  desc: Laboratory experiments in thermodynamics and heat transfer systems.
+- id: ME_376
+  code: ME 376
+  title: Heat Transfer
+  credits: 3
+  tags:
+  - thermalFluids
+  prereqs:
+  - ME_270
+  coreqs: []
+  semesters:
+    ME: 6
+    BE_Biomech: 8
+  desc: Conduction, convection, and radiation heat transfer; heat exchangers.
+- id: ME_ELEC_1
+  code: ME Elective
+  title: ME Technical Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 6
+  desc: 12 total credits required from the ME Technical Elective list.
+  eligible:
+  - ME 361 – Machine Design II
+  - ME 365–ME 369 – Advanced ME Topics
+  - ME 377 – Advanced Heat Transfer
+  - ME 453 – Combustion Engineering
+  - ME 455 – Computational Fluid Dynamics
+  - ME 456 – Advanced Thermodynamics
+  - ME 457 – Renewable Energy Systems
+  - ME 467 – Advanced Control Systems
+  - BE 200, BE 320, BE 340, BE 369, BE 468
+  - ME 490 – Special Topics / ME 499 – Independent Study
+- id: ME_442
+  code: ME 442
+  title: Automatic Control
+  credits: 3
+  tags:
+  - systems
+  - electrical
+  prereqs:
+  - MATH_260
+  - MATH_270
+  coreqs:
+  - ME_333
+  - ME_355
+  semesters:
+    ME: 7
+    BE_Biomech: 7
+  desc: Feedback control systems, transfer functions, root locus, frequency response, stability, and PID control.
+- id: ME_ELEC_2
+  code: ME Elective
+  title: ME Technical Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 7
+  desc: 12 total credits required from the ME Technical Elective list.
+  eligible:
+  - ME 361 – Machine Design II
+  - ME 365–ME 369, ME 377, ME 453–ME 457, ME 467
+  - ME 475–ME 477 – Capstone Research
+  - BE 200, BE 320, BE 340, BE 369, BE 468
+  - ME 490 – Special Topics / ME 499 – Independent Study
+- id: ME_PROF
+  code: Prof. Elective
+  title: Professional Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 7
+  desc: 3 credits selected in consultation with advisor to support career goals.
+  eligible:
+  - Advisor-approved elective from the College of Engineering list
+  - Other choices available by petition to MEBE Dept.
+- id: ME_HUM_1
+  code: Hum/SS/RS
+  title: Humanities / Social Sci. Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 7
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Science course
+  - Any approved Religious Studies course
+- id: ME_ELEC_3
+  code: ME Elective
+  title: ME Technical Elective 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: 12 total credits required from the ME Technical Elective list.
+  eligible:
+  - ME 361–ME 369, ME 377
+  - ME 453–ME 457, ME 467
+  - ME 475–ME 477
+  - BE 200, BE 320, BE 340, BE 369, BE 468
+  - ME 490 / ME 499
+- id: ME_ELEC_4
+  code: ME Elective
+  title: ME Technical Elective 4
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: 12 total credits required from the ME Technical Elective list.
+  eligible:
+  - ME 361–ME 369, ME 377
+  - ME 453–ME 457, ME 467
+  - ME 475–ME 477
+  - BE 200, BE 320, BE 340, BE 369, BE 468
+  - ME 490 / ME 499
+- id: ME_HUM_2
+  code: Hum/SS/RS
+  title: Humanities / Social Sci. Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Science course
+  - Any approved Religious Studies course
+- id: ME_WL
+  code: WL / Diversity
+  title: World Language / Diversity Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  semesters:
+    ME: 8
+  desc: 3 credits from a world language at 102+ level or from the approved cultural diversity list.
+  eligible:
+  - Any World Language at 102 level or above
+  - Any approved Cultural Diversity course

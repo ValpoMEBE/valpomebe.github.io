@@ -12,7 +12,11 @@ layout: default
   // ── Jekyll injects YAML data as JSON at build time ──────────
   const TAGS_DATA      = {{ site.data.tags | jsonify }};
   const SEMESTERS      = {{ site.data.semesters | jsonify }};
-  const COURSES_ARRAY  = {{ site.data.courses | jsonify }};
+  {%- assign all_courses = "" | split: "" -%}
+  {%- for pair in site.data.courses -%}
+    {%- assign all_courses = all_courses | concat: pair[1] -%}
+  {%- endfor -%}
+  const COURSES_ARRAY  = {{ all_courses | jsonify }};
 
   // Convert arrays to keyed objects (JS expects objects, YAML stores arrays)
   const TAGS = {};

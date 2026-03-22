@@ -1,0 +1,61 @@
+- id: CHEM_115
+  code: CHEM 115
+  title: Essentials of Chemistry
+  credits: 4
+  tags:
+  - materials
+  prereqs:
+  - MATH_131
+  coreqs: []
+  semesters:
+    ME: 3
+    BE_Biomech: 3
+    BE_Bioelec: 3
+  desc: Atomic structure, bonding, stoichiometry, thermochemistry, and solutions.
+- id: CHEM_121
+  code: CHEM 121
+  title: General Chemistry I
+  credits: 4
+  tags:
+  - materials
+  prereqs: []
+  coreqs: []
+  semesters:
+    BE_Biomed: 3
+  desc: Atomic structure, bonding, stoichiometry, thermochemistry, and equilibrium.
+- id: CHEM_122
+  code: CHEM 122
+  title: General Chemistry II
+  credits: 4
+  tags:
+  - materials
+  prereqs:
+  - CHEM_121
+  coreqs: []
+  semesters:
+    BE_Biomed: 4
+  desc: Acids/bases, electrochemistry, kinetics, nuclear chemistry, and descriptive inorganic chemistry.
+- id: CHEM_221
+  code: CHEM 221
+  title: Organic Chemistry I
+  credits: 4
+  tags:
+  - materials
+  prereqs:
+  - CHEM_122
+  coreqs: []
+  semesters:
+    BE_Biomed: 5
+  desc: Structure, bonding, stereochemistry, and reactions of carbon compounds.
+- id: CHEM_222
+  code: CHEM 222
+  title: Organic Chemistry II
+  credits: 4
+  tags:
+  - materials
+  prereqs:
+  - CHEM_221
+  coreqs: []
+  semesters:
+    BE_Biomed: 6
+  desc: Carbonyl chemistry, aromatic compounds, amines, and biomolecules.

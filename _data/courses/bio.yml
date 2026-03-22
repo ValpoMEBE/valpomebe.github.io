@@ -1,0 +1,27 @@
+- id: BIO_151
+  code: BIO 151
+  title: Anatomy & Physiology I
+  credits: 4
+  tags:
+  - biology
+  prereqs: []
+  coreqs: []
+  semesters:
+    BE_Biomech: 3
+    BE_Bioelec: 3
+    BE_Biomed: 3
+  desc: Structure and function of the human body — cells, tissues, and organ systems, Part I.
+- id: BIO_152
+  code: BIO 152
+  title: Anatomy & Physiology II
+  credits: 4
+  tags:
+  - biology
+  prereqs:
+  - BIO_151
+  coreqs: []
+  semesters:
+    BE_Biomech: 4
+    BE_Bioelec: 4
+    BE_Biomed: 4
+  desc: Continuation of BIO 151 — additional organ systems and physiological mechanisms.

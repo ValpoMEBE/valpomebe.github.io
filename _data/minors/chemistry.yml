@@ -1,0 +1,13 @@
+id: chemistry
+name: "Chemistry"
+min_credits: 16
+requirements:
+  - label: "Chemistry Credits (8+ at 200+)"
+    type: credits
+    credits: 16
+    depts: ["CHEM"]
+    min_level: 100
+    sub_requirements:
+      - label: "At least 8 credits at 200-level or above"
+        credits: 8
+        min_level: 200

@@ -1,0 +1,36 @@
+id: data_science
+name: "Data Science"
+min_credits: 15
+requirements:
+  - label: "Required Course"
+    type: required
+    courses: ["DATA 151"]
+
+  - label: "Core Electives (3 courses)"
+    type: pick
+    pick: 3
+    courses: ["BAN 330", "BAN 370", "BAN 440", "CS 350", "DATA 374", "DATA 375", "DATA 433", "DATA 490"]
+
+  - label: "Additional DATA or Approved"
+    type: credits
+    credits: 3
+    depts: ["DATA"]
+    min_level: 100
+    approved_extras:
+      - "BIO 321"
+      - "MATH 321"
+      - "CS 325"
+      - "CS 345"
+      - "ECE 452"
+      - "ECON 473"
+      - "GEO 460"
+      - "MET 460"
+      - "ME 333"
+      - "PHYS 246"
+      - "PSY 370"
+      - "STAT 343"
+      - "STAT 361"
+      - "STAT 362"
+      - "STAT 363"
+    max_from:
+      "DATA 490": 6

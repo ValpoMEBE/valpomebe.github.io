@@ -1,0 +1,15 @@
+id: bioengineering
+name: "Bioengineering"
+min_credits: 18
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["BIO 151", "GE 109", "ME 125", "ME 209"]
+
+  - label: "BE Courses (200+)"
+    type: credits
+    credits: 7
+    depts: ["BE"]
+    min_level: 200
+    max_from:
+      "BE 499": 3

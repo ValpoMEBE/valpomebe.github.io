@@ -1,0 +1,14 @@
+id: general_biology
+name: "General Biology"
+min_credits: 15
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["BIO 171", "BIO 172", "BIO 270"]
+
+  - label: "Upper-level BIO (290-490)"
+    type: credits
+    credits: 3
+    depts: ["BIO"]
+    min_level: 290
+    exclude: ["BIO 486"]
