@@ -49,15 +49,15 @@ BE_340: 6
 BE_369: 6
 CHEM_222: 6
 ME_252: 6
-THEO_GE: 6
+ME_270: 6
 
 # ── Semester 7 ── Senior Fall ──
 BE_415: 7
 BE_ELEC_S7_BD: 7
 BE_HUM_1: 7
 GE_497: 7
-ME_270: 7
 ME_352: 7
+THEO_GE: 7
 
 # ── Semester 8 ── Senior Spring ──
 BE_ELEC_S8_1: 8

@@ -88,7 +88,7 @@
   - MATH_132
   - PHYS_141
   coreqs: []
-  offered: Fall
+  offered: Spring
   desc: First and second laws of thermodynamics, properties of pure substances, power and refrigeration cycles.
 - id: ME_252
   code: ME 252
