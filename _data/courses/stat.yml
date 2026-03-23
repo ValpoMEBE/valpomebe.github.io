@@ -7,9 +7,4 @@
   prereqs:
   - MATH_131
   coreqs: []
-  semesters:
-    ME: 4
-    BE_Biomech: 4
-    BE_Bioelec: 4
-    BE_Biomed: 4
   desc: Descriptive statistics, probability, hypothesis testing, regression, and experimental design.

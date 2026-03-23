@@ -7,11 +7,6 @@
   prereqs: []
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 1
-    BE_Biomech: 1
-    BE_Bioelec: 1
-    BE_Biomed: 1
   desc: Introduction to the engineering profession, design process, and basic engineering tools. Includes GE 100L (0 cr lab,
     listed separately in catalog).
 - id: GE_109
@@ -25,11 +20,6 @@
   - MATH_131
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 2
-    BE_Biomech: 2
-    BE_Bioelec: 2
-    BE_Biomed: 2
   desc: Equilibrium of particles and rigid bodies, trusses, frames, distributed loads, centroids, and moments of inertia.
 - id: GE_311
   code: GE 311
@@ -40,11 +30,6 @@
   - MATH_132
   coreqs: []
   offered: Both
-  semesters:
-    ME: 6
-    BE_Biomech: 5
-    BE_Bioelec: 6
-    BE_Biomed: 5
   desc: Engineering economics, time value of money, cost-benefit analysis, and project evaluation.
 - id: GE_312
   code: GE 312
@@ -55,11 +40,6 @@
   coreqs:
   - ME_201
   offered: Both
-  semesters:
-    ME: 6
-    BE_Biomech: 5
-    BE_Bioelec: 6
-    BE_Biomed: 5
   desc: Engineering ethics, professional responsibility, and societal impact of engineering decisions.
 - id: GE_497
   code: GE 497
@@ -72,11 +52,6 @@
   - GE_312
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 7
-    BE_Biomech: 7
-    BE_Bioelec: 7
-    BE_Biomed: 7
   desc: 'Capstone design: team-based engineering project, problem definition, design process, and prototyping. ME students
     should have completed ME 363; BE students should have completed BE 415.'
 - id: GE_498
@@ -89,9 +64,4 @@
   - GE_497
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 8
-    BE_Biomech: 8
-    BE_Bioelec: 8
-    BE_Biomed: 8
   desc: 'Capstone design: project completion, testing, documentation, and final presentation.'

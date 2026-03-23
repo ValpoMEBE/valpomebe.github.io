@@ -8,17 +8,7 @@ layout: default
   Used by _pages/scheduler.html
 {%- endcomment -%}
 
-<script>
-  {% assign all_courses = "" | split: "" %}
-  {% for pair in site.data.courses %}
-    {% assign all_courses = all_courses | concat: pair[1] %}
-  {% endfor %}
-  const COURSES_ARRAY = {{ all_courses | jsonify }};
-
-  // Convert to keyed object by id
-  const COURSES = {};
-  COURSES_ARRAY.forEach(c => { COURSES[c.id] = c; });
-</script>
+{%- include inject-courses.html -%}
 
 {{ content }}
 

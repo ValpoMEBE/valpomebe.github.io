@@ -6,11 +6,6 @@
   - math
   prereqs: []
   coreqs: []
-  semesters:
-    ME: 1
-    BE_Biomech: 1
-    BE_Bioelec: 1
-    BE_Biomed: 1
   desc: Limits, derivatives, and integrals of functions of one variable.
 - id: MATH_132
   code: MATH 132
@@ -21,11 +16,6 @@
   prereqs:
   - MATH_131
   coreqs: []
-  semesters:
-    ME: 2
-    BE_Biomech: 2
-    BE_Bioelec: 2
-    BE_Biomed: 2
   desc: Techniques and applications of integration, sequences and series.
 - id: MATH_253
   code: MATH 253
@@ -36,11 +26,6 @@
   prereqs:
   - MATH_132
   coreqs: []
-  semesters:
-    ME: 3
-    BE_Biomech: 3
-    BE_Bioelec: 3
-    BE_Biomed: 3
   desc: 'Multivariable calculus: partial derivatives, multiple integrals, and vector calculus.'
 - id: MATH_260
   code: MATH 260
@@ -51,11 +36,6 @@
   prereqs:
   - MATH_132
   coreqs: []
-  semesters:
-    ME: 4
-    BE_Biomech: 4
-    BE_Bioelec: 4
-    BE_Biomed: 4
   desc: Vectors, matrices, linear systems, eigenvalues, and eigenvectors.
 - id: MATH_270
   code: MATH 270
@@ -67,9 +47,4 @@
   - MATH_132
   coreqs:
   - MATH_260
-  semesters:
-    ME: 4
-    BE_Biomech: 4
-    BE_Bioelec: 4
-    BE_Biomed: 4
   desc: First and higher-order ODEs, systems of ODEs, Laplace transforms, and engineering applications.

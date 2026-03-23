@@ -7,11 +7,6 @@
   prereqs: []
   coreqs:
   - MATH_131
-  semesters:
-    ME: 1
-    BE_Biomech: 1
-    BE_Bioelec: 1
-    BE_Biomed: 1
   desc: 'Classical mechanics: kinematics, Newton''s laws, energy, momentum. Includes PHYS 141L (1 cr lab).'
 - id: PHYS_142
   code: PHYS 142
@@ -23,9 +18,4 @@
   - PHYS_141
   coreqs:
   - MATH_132
-  semesters:
-    ME: 2
-    BE_Biomech: 2
-    BE_Bioelec: 2
-    BE_Biomed: 2
   desc: Electrostatics, circuits, magnetism, optics, and waves.

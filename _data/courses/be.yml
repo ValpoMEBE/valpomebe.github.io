@@ -8,10 +8,6 @@
   - GE_100
   coreqs: []
   offered: Spring
-  semesters:
-    BE_Biomech: 4
-    BE_Bioelec: 4
-    BE_Biomed: 4
   desc: 'Introduction to bioengineering design: problem identification, human factors, regulatory considerations, and iterative
     design.'
 - id: BE_317
@@ -23,11 +19,6 @@
   - ME_201
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 5
-    BE_Biomech: 5
-    BE_Bioelec: 5
-    BE_Biomed: 5
   desc: Environmental impact of engineering, lifecycle analysis, and sustainable design principles.
 - id: BE_ELEC_S5_BM
   code: BE Elective
@@ -37,8 +28,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    BE_Biomech: 5
   desc: Technical elective — Biomechanical track. 6 total BE elective credits required.
   eligible:
   - BE 200 – Intro to Bioengineering
@@ -59,10 +48,6 @@
   - ME_333
   coreqs: []
   offered: Spring
-  semesters:
-    BE_Biomech: 6
-    BE_Bioelec: 6
-    BE_Biomed: 6
   desc: Laboratory experiments in bioengineering technologies including biosensors and imaging.
 - id: BE_340
   code: BE 340
@@ -77,10 +62,6 @@
   - MATH_270
   coreqs: []
   offered: Spring
-  semesters:
-    BE_Biomech: 6
-    BE_Bioelec: 6
-    BE_Biomed: 6
   desc: 'Electrical phenomena in biological systems: membrane potentials, neural signals, cardiac signals, and bioelectrical
     instrumentation.'
 - id: BE_369
@@ -96,10 +77,6 @@
   - MATH_260
   coreqs: []
   offered: Spring
-  semesters:
-    BE_Biomech: 6
-    BE_Bioelec: 6
-    BE_Biomed: 6
   desc: 'Mechanical analysis of biological tissues and systems: bone, muscle, joints, and fluid flow in the body.'
 - id: BE_415
   code: BE 415
@@ -112,10 +89,6 @@
   - CHEM_115
   coreqs: []
   offered: Fall
-  semesters:
-    BE_Biomech: 7
-    BE_Bioelec: 7
-    BE_Biomed: 7
   desc: Structure-property relationships of biomaterials, biocompatibility, implants, and tissue engineering scaffolds.
 - id: BE_HUM_1
   code: Hum/SS/Theo
@@ -125,10 +98,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    BE_Biomech: 7
-    BE_Bioelec: 7
-    BE_Biomed: 7
   desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
   eligible:
   - Any approved Humanities course
@@ -142,8 +111,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    BE_Bioelec: 7
   desc: Senior-year technical elective — Bioelectrical track.
   eligible:
   - BE 200, BE 468
@@ -157,8 +124,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    BE_Biomed: 7
   desc: Senior-year technical elective — Biomedical track.
   eligible:
   - BE 200, BE 468
@@ -172,10 +137,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    BE_Biomech: 8
-    BE_Bioelec: 8
-    BE_Biomed: 8
   desc: Senior-year elective — slot 1.
   eligible:
   - BE 200, BE 468
@@ -189,10 +150,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    BE_Biomech: 8
-    BE_Bioelec: 8
-    BE_Biomed: 8
   desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
   eligible:
   - Any approved Humanities course
@@ -206,10 +163,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    BE_Biomech: 8
-    BE_Bioelec: 8
-    BE_Biomed: 8
   desc: 3 credits from a world language at 102+ level or from the approved cultural diversity list.
   eligible:
   - Any World Language at 102 level or above

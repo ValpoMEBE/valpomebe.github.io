@@ -6,11 +6,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 6
-    BE_Biomech: 6
-    BE_Bioelec: 6
-    BE_Biomed: 6
   desc: REL 100 (ME) or THEO 100/200 (BE). Satisfies the theology/religion general education requirement.
   eligible:
   - REL 100 – Religion and Society

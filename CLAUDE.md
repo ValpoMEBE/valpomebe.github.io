@@ -29,7 +29,12 @@ The `.claude/launch.json` is configured for `preview_start` with the `jekyll-dev
 _config.yml              # Production config (baseurl: "")
 _config.dev.yml           # Dev overrides (baseurl: "/dev")
 _data/
-  courses.yml             # THE canonical course catalog — single source of truth
+  courses/                # Course catalog — split by subject (me.yml, ge.yml, etc.)
+  curriculum/             # Per-program semester placements (flat map: course_id → semester)
+    me.yml                # ME semester layout
+    be_biomech.yml        # BE Biomechanical semester layout
+    be_bioelec.yml        # BE Bioelectrical semester layout
+    be_biomed.yml         # BE Biomedical semester layout
   transcript/             # Approved elective lists (from Undergraduate Catalog 2025-2026)
     me_electives.yml      # ME technical elective approved courses
     be_electives.yml      # BE technical elective approved courses
@@ -40,11 +45,12 @@ _data/
     theology.yml           # Theology/Religious Studies courses
     professional_electives.yml # ME professional elective approved courses
 _includes/
+  inject-courses.html     # Shared include: aggregates courses + merges curriculum data
   degree-map/             # Degree map page partials (flowchart, detail-panel, etc.)
   transcript/             # Transcript audit page partials (upload, results)
 _layouts/
-  degree-map.html         # Injects courses.yml as COURSES global
-  transcript.html         # Injects courses.yml + ELECTIVE_DATA globals
+  degree-map.html         # Degree map layout (uses inject-courses.html)
+  transcript.html         # Transcript audit layout (uses inject-courses.html)
 _pages/
   curriculum.html         # Degree map page (/curriculum/)
   transcript.html         # Transcript audit page (/transcript/)
@@ -63,9 +69,13 @@ ReferenceDocuments/
 
 ## Key Concepts
 
-### courses.yml
+### courses/ (Course Catalog)
 
-The single source of truth for all course data across both the degree map and transcript audit. Each entry has: `id`, `code`, `title`, `credits`, `tags`, `prereqs`, `coreqs`, `semesters` (keyed by program: `ME`, `BE_Biomech`, `BE_Bioelec`, `BE_Biomed`), `desc`, and optionally `isPlaceholder`, `eligible`.
+Split by subject into `_data/courses/*.yml`. Each entry has: `id`, `code`, `title`, `credits`, `tags`, `prereqs`, `coreqs`, `desc`, and optionally `isPlaceholder`, `eligible`, `offered`.
+
+### curriculum/ (Semester Placements)
+
+Per-program files in `_data/curriculum/` map course IDs to semester numbers (1–8). Each program has its own file (`me.yml`, `be_biomech.yml`, `be_bioelec.yml`, `be_biomed.yml`). To move a course to a different semester, edit the number in the relevant curriculum file. The shared include `_includes/inject-courses.html` merges these into `COURSES[id].semesters[program]` at build time.
 
 ### Elective Groups (Transcript Audit)
 
@@ -77,13 +87,7 @@ Multiple placeholder course slots (e.g., 4× ME Elective) are combined into a si
 
 ### Data Injection (Liquid → JS)
 
-Layouts use Liquid to inject YAML data as JSON globals:
-```html
-<script>
-  const COURSES = {{ site.data.courses | jsonify }};
-  const ELECTIVE_DATA = { me_electives: {{ site.data.transcript.me_electives | jsonify }}, ... };
-</script>
-```
+The shared include `_includes/inject-courses.html` aggregates all course files and merges curriculum semester placements, providing `COURSES_ARRAY` and `COURSES` globals. Layouts add page-specific globals (SEMESTERS, ELECTIVE_DATA, etc.) in separate script blocks.
 
 ### Transcript Parser
 

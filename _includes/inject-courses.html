@@ -1,0 +1,33 @@
+{%- comment -%}
+  inject-courses.html — Aggregates course data from _data/courses/ and merges
+  per-program semester placements from _data/curriculum/ into each course object.
+  Provides: COURSES_ARRAY (array) and COURSES (keyed object by id).
+{%- endcomment -%}
+<script>
+  {%- assign all_courses = "" | split: "" -%}
+  {%- for pair in site.data.courses -%}
+    {%- assign all_courses = all_courses | concat: pair[1] -%}
+  {%- endfor -%}
+  const COURSES_ARRAY = {{ all_courses | jsonify }};
+
+  const COURSES = {};
+  COURSES_ARRAY.forEach(c => { COURSES[c.id] = c; });
+
+  // Per-program semester placements (from _data/curriculum/*.yml)
+  const _CURRICULUM = {
+    ME:         {{ site.data.curriculum.me | jsonify }},
+    BE_Biomech: {{ site.data.curriculum.be_biomech | jsonify }},
+    BE_Bioelec: {{ site.data.curriculum.be_bioelec | jsonify }},
+    BE_Biomed:  {{ site.data.curriculum.be_biomed | jsonify }}
+  };
+
+  // Merge semesters onto each course object
+  for (const [prog, map] of Object.entries(_CURRICULUM)) {
+    for (const [cid, sem] of Object.entries(map)) {
+      if (COURSES[cid]) {
+        if (!COURSES[cid].semesters) COURSES[cid].semesters = {};
+        COURSES[cid].semesters[prog] = sem;
+      }
+    }
+  }
+</script>

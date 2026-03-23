@@ -9,11 +9,6 @@
   - GE_100
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 2
-    BE_Biomech: 2
-    BE_Bioelec: 2
-    BE_Biomed: 2
   desc: Introduction to 3D solid modeling using CAD software for engineering design and documentation.
 - id: ME_125
   code: ME 125
@@ -24,11 +19,6 @@
   prereqs: []
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 2
-    BE_Biomech: 2
-    BE_Bioelec: 2
-    BE_Biomed: 2
   desc: Introduction to programming for mechanical engineers and bioengineers using MATLAB or Python.
 - id: ME_209
   code: ME 209
@@ -42,11 +32,6 @@
   - ME_125
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 3
-    BE_Biomech: 3
-    BE_Bioelec: 3
-    BE_Biomed: 3
   desc: Kinematics and kinetics of particles and rigid bodies; work-energy and impulse-momentum methods.
 - id: ME_201
   code: ME 201
@@ -57,11 +42,6 @@
   - VUE_102
   coreqs: []
   offered: Both
-  semesters:
-    ME: 3
-    BE_Biomech: 4
-    BE_Bioelec: 4
-    BE_Biomed: 4
   desc: 'Writing Intensive Course: technical communication for mechanical and bioengineers.'
 - id: ME_251
   code: ME 251
@@ -73,8 +53,6 @@
   - ME_102
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 3
   desc: 'Overview of manufacturing processes: casting, forming, machining, welding, and polymer processing.'
 - id: ME_261
   code: ME 261
@@ -87,11 +65,6 @@
   coreqs:
   - ECE_281
   offered: Spring
-  semesters:
-    ME: 4
-    BE_Biomech: 4
-    BE_Bioelec: 4
-    BE_Biomed: 4
   desc: Laboratory experiments in analog circuits, amplifiers, and instrumentation.
 - id: ME_215
   code: ME 215
@@ -104,9 +77,6 @@
   - GE_109
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 4
-    BE_Biomech: 4
   desc: Stress, strain, deformation, axial loads, torsion, bending, shear, buckling, and failure criteria.
 - id: ME_270
   code: ME 270
@@ -119,10 +89,6 @@
   - PHYS_141
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 4
-    BE_Biomech: 6
-    BE_Biomed: 7
   desc: First and second laws of thermodynamics, properties of pure substances, power and refrigeration cycles.
 - id: ME_252
   code: ME 252
@@ -134,11 +100,6 @@
   - CHEM_115
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 4
-    BE_Biomech: 6
-    BE_Bioelec: 6
-    BE_Biomed: 6
   desc: Crystal structure, defects, mechanical/thermal/electrical properties of metals, polymers, ceramics, and composites.
 - id: ME_333
   code: ME 333
@@ -154,11 +115,6 @@
   - ME_261
   - STAT_240
   offered: Fall
-  semesters:
-    ME: 5
-    BE_Biomech: 5
-    BE_Bioelec: 5
-    BE_Biomed: 5
   desc: Experimental methods, instrumentation, data acquisition, and uncertainty analysis. Includes ME 333L (0 cr).
 - id: ME_352
   code: ME 352
@@ -172,11 +128,6 @@
   coreqs:
   - ME_252
   offered: Fall
-  semesters:
-    ME: 5
-    BE_Biomech: 7
-    BE_Bioelec: 7
-    BE_Biomed: 7
   desc: Laboratory experiments in materials testing, mechanical behavior, and failure analysis.
 - id: ME_355
   code: ME 355
@@ -193,11 +144,6 @@
   coreqs:
   - ME_209
   offered: Fall
-  semesters:
-    ME: 5
-    BE_Biomech: 5
-    BE_Bioelec: 5
-    BE_Biomed: 5
   desc: Mathematical modeling of dynamic systems, numerical methods, simulation, and introduction to control concepts.
 - id: ME_363
   code: ME 363
@@ -212,8 +158,6 @@
   - ME_215
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 5
   desc: 'Fatigue analysis, failure theories, and design of machine elements: shafts, bearings, gears, and fasteners.'
 - id: ME_373
   code: ME 373
@@ -225,9 +169,6 @@
   - ME_209
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 5
-    BE_Biomech: 7
   desc: Fluid statics, kinematics, Bernoulli equation, pipe flow, dimensional analysis, and boundary layers.
 - id: ME_351
   code: ME 351
@@ -242,8 +183,6 @@
   coreqs:
   - ME_251
   offered: Spring
-  semesters:
-    ME: 6
   desc: 'Advanced manufacturing: machining operations, tolerances, surface finish, process planning, and quality control.'
 - id: ME_354
   code: ME 354
@@ -257,8 +196,6 @@
   coreqs:
   - ME_364
   offered: Spring
-  semesters:
-    ME: 6
   desc: Laboratory experiments in mechanical systems, vibrations, and machine component testing.
 - id: ME_364
   code: ME 364
@@ -275,8 +212,6 @@
   - MATH_270
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 6
   desc: Free and forced vibrations of single and multi-DOF systems, resonance, and vibration control.
 - id: ME_372
   code: ME 372
@@ -292,8 +227,6 @@
   coreqs:
   - ME_376
   offered: Spring
-  semesters:
-    ME: 6
   desc: Laboratory experiments in thermodynamics and heat transfer systems.
 - id: ME_376
   code: ME 376
@@ -305,9 +238,6 @@
   - ME_270
   coreqs: []
   offered: Spring
-  semesters:
-    ME: 6
-    BE_Biomech: 8
   desc: Conduction, convection, and radiation heat transfer; heat exchangers.
 - id: ME_ELEC_1
   code: ME Elective
@@ -317,8 +247,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 6
   desc: 12 total credits required from the ME Technical Elective list.
   eligible:
   - ME 361 – Machine Design II
@@ -345,9 +273,6 @@
   - ME_333
   - ME_355
   offered: Fall
-  semesters:
-    ME: 7
-    BE_Biomech: 7
   desc: Feedback control systems, transfer functions, root locus, frequency response, stability, and PID control.
 - id: ME_ELEC_2
   code: ME Elective
@@ -357,8 +282,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 7
   desc: 12 total credits required from the ME Technical Elective list.
   eligible:
   - ME 361 – Machine Design II
@@ -374,8 +297,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 7
   desc: 3 credits selected in consultation with advisor to support career goals.
   eligible:
   - Advisor-approved elective from the College of Engineering list
@@ -388,8 +309,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 7
   desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
   eligible:
   - Any approved Humanities course
@@ -403,8 +322,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 8
   desc: 12 total credits required from the ME Technical Elective list.
   eligible:
   - ME 361–ME 369, ME 377
@@ -420,8 +337,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 8
   desc: 12 total credits required from the ME Technical Elective list.
   eligible:
   - ME 361–ME 369, ME 377
@@ -437,8 +352,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 8
   desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
   eligible:
   - Any approved Humanities course
@@ -452,8 +365,6 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  semesters:
-    ME: 8
   desc: 3 credits from a world language at 102+ level or from the approved cultural diversity list.
   eligible:
   - Any World Language at 102 level or above

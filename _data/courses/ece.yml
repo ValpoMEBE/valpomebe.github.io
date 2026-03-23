@@ -8,11 +8,6 @@
   - PHYS_142
   coreqs: []
   offered: Fall
-  semesters:
-    ME: 3
-    BE_Biomech: 3
-    BE_Bioelec: 3
-    BE_Biomed: 3
   desc: Circuit analysis, AC/DC circuits, operational amplifiers, and introductory electronics.
 - id: ECE_221
   code: ECE 221
@@ -25,8 +20,6 @@
   - ECE_281
   coreqs: []
   offered: Fall
-  semesters:
-    BE_Bioelec: 5
   desc: Boolean algebra, logic gates, combinational and sequential circuits, memory, and microprocessors.
 - id: ECE_251
   code: ECE 251
@@ -39,8 +32,6 @@
   - ME_125
   coreqs: []
   offered: Fall
-  semesters:
-    BE_Bioelec: 5
   desc: 'Structured programming for engineering: algorithms, data structures, and ECE applications.'
 - id: ECE_360
   code: ECE 360
@@ -53,8 +44,6 @@
   - ECE_281
   coreqs: []
   offered: Fall
-  semesters:
-    BE_Bioelec: 5
   desc: Continuous and discrete-time signals, Fourier analysis, sampling, filtering, and system response.
 - id: ECE_322
   code: ECE 322
@@ -68,8 +57,6 @@
   - ECE_251
   coreqs: []
   offered: Fall
-  semesters:
-    BE_Bioelec: 7
   desc: Microcontroller architecture, assembly/C programming, I/O interfacing, and real-time systems.
 - id: ECE_452
   code: ECE 452
@@ -82,6 +69,4 @@
   - ECE_360
   coreqs: []
   offered: Spring
-  semesters:
-    BE_Bioelec: 8
   desc: Discrete-time systems, DFT, FFT, FIR/IIR filter design, and biomedical signal processing.

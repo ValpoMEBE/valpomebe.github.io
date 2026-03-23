@@ -8,23 +8,14 @@ layout: default
   Used by _pages/transcript.html
 {%- endcomment -%}
 
+{%- include inject-courses.html -%}
 <script>
-  // ── Jekyll injects YAML data as JSON at build time ──────────
+  // ── Additional globals for transcript audit ────────────────
   const SITE_BASEURL   = {{ site.baseurl | jsonify }};
   const TAGS_DATA      = {{ site.data.tags | jsonify }};
   const SEMESTERS      = {{ site.data.semesters | jsonify }};
-  {%- assign all_courses = "" | split: "" -%}
-  {%- for pair in site.data.courses -%}
-    {%- assign all_courses = all_courses | concat: pair[1] -%}
-  {%- endfor -%}
-  const COURSES_ARRAY  = {{ all_courses | jsonify }};
-
-  // Convert arrays to keyed objects
   const TAGS = {};
   TAGS_DATA.forEach(t => { TAGS[t.key] = { label: t.label, bg: t.bg, fg: t.fg }; });
-
-  const COURSES = {};
-  COURSES_ARRAY.forEach(c => { COURSES[c.id] = c; });
 
   // ── Elective approved-course lists ──────────────────────────
   const ELECTIVE_DATA = {
