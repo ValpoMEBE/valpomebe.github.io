@@ -1114,6 +1114,22 @@ function rerunAudit() {
   runAudit(AUDIT_STATE.lastMatched, AUDIT_STATE.lastUnmatched, AUDIT_STATE.lastCodeIndex);
 }
 
+async function loadExampleTranscript() {
+  const url = (typeof SITE_BASEURL !== 'undefined' ? SITE_BASEURL : '') + '/assets/example-transcript.csv';
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Could not load example transcript');
+    const blob = await resp.blob();
+    const file = new File([blob], 'example-transcript.csv', { type: 'text/csv' });
+    setFile(file);
+    // Auto-select ME for this example
+    selectProgram('ME', document.querySelectorAll('.prog-btn')[0]);
+    parseTranscript();
+  } catch (err) {
+    showError('Could not load example: ' + err.message);
+  }
+}
+
 function downloadCSV() {
   if (!AUDIT_STATE.lastEntries) return;
   const csv = exportTranscriptCSV(AUDIT_STATE.lastEntries);

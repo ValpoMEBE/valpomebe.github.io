@@ -13,13 +13,16 @@ permalink: /
     <span class="card-arrow">View degree maps &rarr;</span>
   </a>
 
-  <!-- Future pages can be added here as new cards -->
-  <!--
-  <a href="{{ '/resources/' | relative_url }}" class="card-link">
-    <h2>Student Resources</h2>
-    <p>Advising guides, lab manuals, and other resources for ME and BE students.</p>
-    <span class="card-arrow">Browse resources &rarr;</span>
+  <a href="{{ '/transcript/' | relative_url }}" class="card-link">
+    <h2>Transcript Audit</h2>
+    <p>Upload your unofficial transcript to check degree progress, identify missing requirements, and verify elective eligibility for ME and BE programs.</p>
+    <span class="card-arrow">Run audit &rarr;</span>
   </a>
-  -->
+
+  <a href="{{ '/scheduler/' | relative_url }}" class="card-link">
+    <h2>Course Schedule Optimizer</h2>
+    <p>Generate optimized class schedules that minimize student conflicts and balance faculty loads. Upload course data and let the solver find the best arrangement.</p>
+    <span class="card-arrow">Build schedule &rarr;</span>
+  </a>
 
 </div>

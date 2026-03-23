@@ -210,72 +210,93 @@ function scheduleCourses(remainingCourses, startSem, program, matched) {
   // Schedule up to MAX_SEMESTERS from start, or until all placed
   const endSem = startSem + MAX_SEMESTERS - 1;
 
-  for (let sem = startSem; sem <= endSem; sem++) {
+  // Helper: check if a cluster is eligible for a given semester
+  function isClusterEligible(cluster, sem) {
     const season = sem % 2 === 1 ? 'Fall' : 'Spring';
-    semCredits[sem] = 0;
 
-    // Find eligible clusters for this semester
+    // Skip if any member already placed
+    if (cluster.some(c => placed[c.id] !== undefined)) return false;
+
+    // All members must be offerable this season
+    if (!cluster.every(c => isOfferedIn(c, season))) return false;
+
+    // All prereqs for all members must be satisfied
+    const allPrereqsMet = cluster.every(c =>
+      c.prereqs.every(p => {
+        if (completedIds.has(p)) return true;
+        if (placed[p] !== undefined && placed[p] < sem) return true;
+        // If prereq course isn't in this program's map, treat as satisfied
+        const prereqCourse = COURSES_ARRAY.find(x => x.id === p);
+        if (prereqCourse && (!prereqCourse.semesters || !prereqCourse.semesters[program])) return true;
+        return false;
+      })
+    );
+    if (!allPrereqsMet) return false;
+
+    // Check coreq constraint: any coreq not in this cluster must already be done
+    const clusterIds = new Set(cluster.map(c => c.id));
+    const externalCoreqsMet = cluster.every(c =>
+      c.coreqs.every(co =>
+        clusterIds.has(co) || completedIds.has(co) || (placed[co] !== undefined && placed[co] <= sem)
+      )
+    );
+    return externalCoreqsMet;
+  }
+
+  // Separate clusters into required (non-placeholder) and placeholder
+  const requiredClusters = clusters.filter(cl => cl.some(c => !c.isPlaceholder));
+  const placeholderClusters = clusters.filter(cl => cl.every(c => c.isPlaceholder));
+
+  // Pass 1: Schedule required courses first
+  for (let sem = startSem; sem <= endSem; sem++) {
+    semCredits[sem] = semCredits[sem] || 0;
+
     const eligibleClusters = [];
-
-    for (const cluster of clusters) {
-      // Skip if any member already placed
-      if (cluster.some(c => placed[c.id] !== undefined)) continue;
-
-      // All members must be offerable this season
-      if (!cluster.every(c => isOfferedIn(c, season))) continue;
-
-      // All prereqs for all members must be satisfied
-      // A prereq is met if: completed, placed earlier, or not in this program's map
-      // (e.g., CHEM_115 prereq when BE_Biomed uses CHEM_121 instead)
-      const allPrereqsMet = cluster.every(c =>
-        c.prereqs.every(p => {
-          if (completedIds.has(p)) return true;
-          if (placed[p] !== undefined && placed[p] < sem) return true;
-          // If prereq course isn't in this program's map, treat as satisfied
-          const prereqCourse = COURSES_ARRAY.find(x => x.id === p);
-          if (prereqCourse && (!prereqCourse.semesters || !prereqCourse.semesters[program])) return true;
-          return false;
-        })
-      );
-      if (!allPrereqsMet) continue;
-
-      // Check coreq constraint: any coreq not in this cluster must already be done
-      const clusterIds = new Set(cluster.map(c => c.id));
-      const externalCoreqsMet = cluster.every(c =>
-        c.coreqs.every(co =>
-          clusterIds.has(co) || completedIds.has(co) || (placed[co] !== undefined && placed[co] <= sem)
-        )
-      );
-      if (!externalCoreqsMet) continue;
+    for (const cluster of requiredClusters) {
+      if (!isClusterEligible(cluster, sem)) continue;
 
       const clusterCredits = cluster.reduce((sum, c) => sum + c.credits, 0);
-
-      // Priority score: constrained courses first, then by descendants
       const maxDescendants = Math.max(...cluster.map(c => descendants[c.id] || 0));
       const isConstrained = cluster.some(c => c.offered !== null);
-      const isPlaceholder = cluster.every(c => c.isPlaceholder);
 
       eligibleClusters.push({
         cluster,
         credits: clusterCredits,
-        priority: (isConstrained ? 2000 : 0) + (!isPlaceholder ? 1000 : 0) + maxDescendants,
+        priority: (isConstrained ? 2000 : 0) + 1000 + maxDescendants,
       });
     }
 
-    // Sort by priority descending
     eligibleClusters.sort((a, b) => b.priority - a.priority);
 
-    // Place clusters greedily
     for (const { cluster, credits } of eligibleClusters) {
       if (semCredits[sem] + credits <= MAX_CREDITS_PER_SEM) {
-        for (const c of cluster) {
-          placed[c.id] = sem;
-        }
+        for (const c of cluster) placed[c.id] = sem;
         semCredits[sem] += credits;
       }
     }
 
-    // Early exit if all courses are placed
+    // Early exit if all required courses are placed
+    if (requiredClusters.every(cl => cl.some(c => placed[c.id] !== undefined))) break;
+  }
+
+  // Pass 2: Backfill placeholder/elective courses into remaining capacity
+  for (let sem = startSem; sem <= endSem; sem++) {
+    semCredits[sem] = semCredits[sem] || 0;
+
+    const eligibleClusters = [];
+    for (const cluster of placeholderClusters) {
+      if (!isClusterEligible(cluster, sem)) continue;
+      const clusterCredits = cluster.reduce((sum, c) => sum + c.credits, 0);
+      eligibleClusters.push({ cluster, credits: clusterCredits });
+    }
+
+    for (const { cluster, credits } of eligibleClusters) {
+      if (semCredits[sem] + credits <= MAX_CREDITS_PER_SEM) {
+        for (const c of cluster) placed[c.id] = sem;
+        semCredits[sem] += credits;
+      }
+    }
+
     if (Object.keys(placed).length >= totalRemaining) break;
   }
 

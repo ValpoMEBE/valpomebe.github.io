@@ -1,0 +1,45 @@
+<!-- ═══ Upload Panel ═══════════════════════════════════════════ -->
+<section id="scheduler-upload" class="sched-section">
+  <h1 class="sched-title">Course Schedule Optimizer</h1>
+  <p class="sched-subtitle">Upload your data files, then generate an optimized schedule.</p>
+
+  <div class="upload-grid">
+    <!-- Courses to schedule -->
+    <div class="upload-card">
+      <h3>Courses to Schedule</h3>
+      <p class="upload-desc">CSV with department courses, instructors, sections, and lab links.</p>
+      <label class="upload-btn" for="file-courses">
+        <span class="upload-icon">&#128196;</span> Choose CSV
+        <input type="file" id="file-courses" accept=".csv" hidden>
+      </label>
+      <span class="upload-status" id="status-courses">No file selected</span>
+    </div>
+
+    <!-- External schedules (multiple) -->
+    <div class="upload-card">
+      <h3>External Schedules</h3>
+      <p class="upload-desc">Frozen schedules from other departments (MATH, PHYS, etc.). Select multiple files.</p>
+      <label class="upload-btn" for="file-externals">
+        <span class="upload-icon">&#128197;</span> Choose CSVs
+        <input type="file" id="file-externals" accept=".csv" multiple hidden>
+      </label>
+      <span class="upload-status" id="status-externals">No files selected</span>
+    </div>
+
+    <!-- Time slots -->
+    <div class="upload-card">
+      <h3>Time Slots</h3>
+      <p class="upload-desc">Available class and lab periods for the semester.</p>
+      <label class="upload-btn" for="file-timeslots">
+        <span class="upload-icon">&#128336;</span> Choose CSV
+        <input type="file" id="file-timeslots" accept=".csv" hidden>
+      </label>
+      <span class="upload-status" id="status-timeslots">No file selected</span>
+    </div>
+  </div>
+
+  <div class="upload-actions">
+    <button id="btn-generate" class="action-btn primary" disabled>Generate Schedule</button>
+    <button id="btn-sample" class="action-btn secondary">Load Sample Data</button>
+  </div>
+</section>

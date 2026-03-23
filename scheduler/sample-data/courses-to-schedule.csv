@@ -1,0 +1,16 @@
+course_code,instructor,sections,is_lab,linked_to
+ME 209,Johnson,1,false,
+ME 201,Miller,1,false,
+ME 251,Williams,1,false,
+ME 261,Johnson,1,false,
+ME 261L,Johnson,1,true,ME 261
+ME 311,Smith,1,false,
+ME 312,Adams,1,false,
+ME 312L,Adams,1,true,ME 312
+ME 341,Smith,1,false,
+ME 352,Clark,1,false,
+ME 352L,Clark,1,true,ME 352
+ME 361,Williams,1,false,
+GE 100,Davis,2,false,
+GE 100L,Davis,2,true,GE 100
+GE 109,Davis,1,false,

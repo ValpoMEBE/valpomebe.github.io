@@ -1,0 +1,60 @@
+<!-- ═══ Results Grid ═══════════════════════════════════════════ -->
+<section id="scheduler-results" class="sched-section" hidden>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label for="filter-instructor">Instructor</label>
+      <select id="filter-instructor"><option value="all">All</option></select>
+    </div>
+    <div class="filter-group">
+      <label for="filter-year">Year Level</label>
+      <select id="filter-year">
+        <option value="all">All</option>
+        <option value="1">Freshman (Sem 1-2)</option>
+        <option value="2">Sophomore (Sem 3-4)</option>
+        <option value="3">Junior (Sem 5-6)</option>
+        <option value="4">Senior (Sem 7-8)</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="filter-program">Program</label>
+      <select id="filter-program">
+        <option value="all">All</option>
+        <option value="ME">ME</option>
+        <option value="BE_Biomech">BE Biomech</option>
+        <option value="BE_Bioelec">BE Bioelec</option>
+        <option value="BE_Biomed">BE Biomed</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Show</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="toggle-dept" title="Show only ME/BE/GE department courses">Dept Only</button>
+        <button class="toggle-btn" id="toggle-all-courses" title="Show department + external courses">All Courses</button>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button id="btn-rerun" class="action-btn secondary" title="Re-run with locked courses">Re-optimize</button>
+      <button id="btn-export-csv" class="action-btn secondary">Export CSV</button>
+      <button id="btn-export-xlsx" class="action-btn secondary">Export Excel</button>
+    </div>
+  </div>
+
+  <!-- Day tabs -->
+  <div class="day-tabs">
+    <button class="day-tab active" data-day="0">Monday</button>
+    <button class="day-tab" data-day="1">Tuesday</button>
+    <button class="day-tab" data-day="2">Wednesday</button>
+    <button class="day-tab" data-day="3">Thursday</button>
+    <button class="day-tab" data-day="4">Friday</button>
+    <button class="day-tab" data-day="all">All Days</button>
+  </div>
+
+  <!-- Calendar grid -->
+  <div class="grid-wrapper">
+    <div id="weekly-grid" class="weekly-grid">
+      <!-- Time column + day columns rendered by JS -->
+    </div>
+  </div>
+</section>

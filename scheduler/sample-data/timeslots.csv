@@ -1,0 +1,16 @@
+slot_type,day_pattern,start_time,end_time
+class,MWF,08:00,08:50
+class,MWF,09:00,09:50
+class,MWF,10:00,10:50
+class,MWF,11:00,11:50
+class,MWF,13:00,13:50
+class,MWF,14:00,14:50
+class,MWF,15:00,15:50
+class,TR,08:00,09:15
+class,TR,09:30,10:45
+class,TR,11:00,12:15
+class,TR,13:00,14:15
+class,TR,14:30,15:45
+lab,TR,14:00,16:50
+lab,MW,14:00,16:50
+lab,F,13:00,15:50
