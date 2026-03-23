@@ -1,11 +1,12 @@
 code,title,grade,credits,isRepeat,endDate
+MATH 131,"Calculus I",TR,4,,05/15/24
+PHYS 141,"Newtonian Mechanics",TR,3,,05/15/24
+PHYS 141L,"Experimental Physics I",TR,1,,05/15/24
 CORE 110,"The Human Experience I",B+,4,,12/13/24
-MATH 131,"Calculus I",A-,4,,12/13/24
-PHYS 141,"Newtonian Mechanics",B,3,,12/13/24
-PHYS 141L,"Experimental Physics I",B,1,,12/13/24
 GE 100,"Fundamentals of Engineering",A,2,,12/13/24
 GE 100L,"Fundamentals of Engineering Lab",,0,,12/13/24
 XS 101,"Wellness and Stress Mgmt",A,1,,12/13/24
+ART 100,"Intro to Visual Arts",B+,3,,12/13/24
 CORE 115,"The Human Experience II",B,4,,05/09/25
 MATH 132,"Calculus II",B+,4,,05/09/25
 PHYS 142,"Electricity Magnetism & Waves",B-,3,,05/09/25
@@ -13,6 +14,7 @@ PHYS 142L,"Experimental Physics II",B-,1,,05/09/25
 GE 109,"Mechanics-Statics",C+,3,,05/09/25
 ME 102,"Computer Aided Design",A,1,,05/09/25
 ME 125,"Computer Prog/Mech Engr",B,1,,05/09/25
+ENGL 200,"Literary Studies",A-,3,,05/09/25
 MATH 253,"Calculus III",B+,4,,12/12/25
 CHEM 115,"Essentials of Chemistry",B,4,,12/12/25
 CHEM 115L,"Essentials of Chemistry Lab",,0,,12/12/25
@@ -28,3 +30,8 @@ ME 215,"Mechanics of Materials",C+,3,,05/08/26
 ME 252,"Materials Science",B-,2.5,,05/08/26
 ME 270,"Thermodynamics I",C,3,,05/08/26
 ME 261,"Analog Circuits Lab",B,0.5,,05/08/26
+ME 333,"Mechanical Measurements Lab",,4,,12/11/26
+ME 355,"System Modeling & Num Meth",,3,,12/11/26
+ME 373,"Fluid Mechanics",,3,,12/11/26
+ME 363,"Machine Design I",,3,,12/11/26
+ME 377,"Computational Fluid Dynamics",,3,,12/11/26
