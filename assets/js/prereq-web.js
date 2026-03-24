@@ -583,6 +583,39 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') tooltip.classList.remove('vis');
 });
 
+/* ── HASH ROUTING ──────────────────────────────────────────── */
+const PW_HASH_MAP = {
+  'ME/BE': 'MEBE', 'ME': 'ME', 'BE_Biomech': 'BE_Biomech',
+  'BE_Bioelec': 'BE_Bioelec', 'BE_Biomed': 'BE_Biomed',
+  'EE/CPE': 'EECPE', 'EE': 'EE', 'CPE': 'CPE',
+  'CE/ENE': 'CEENE', 'CE': 'CE', 'ENE': 'ENE',
+};
+const PW_PROG_TO_HASH = {};
+for (const [h, p] of Object.entries(PW_HASH_MAP)) PW_PROG_TO_HASH[p] = h;
+
+function pwApplyHash() {
+  const hash = decodeURIComponent(location.hash.replace('#', ''));
+  const prog = PW_HASH_MAP[hash];
+  if (!prog) return false;
+  document.querySelectorAll('.pw-btn').forEach(b => {
+    if (b.getAttribute('onclick')?.includes("'" + prog + "'")) {
+      pwSetProgram(prog, b);
+    }
+  });
+  return true;
+}
+
+const _origPwSetProgram = pwSetProgram;
+pwSetProgram = function(prog, btn) {
+  _origPwSetProgram(prog, btn);
+  const hash = PW_PROG_TO_HASH[prog];
+  if (hash) history.replaceState(null, '', '#' + encodeURIComponent(hash));
+};
+
+window.addEventListener('hashchange', pwApplyHash);
+
 /* ── INIT ────────────────────────────────────────────────────── */
-initGraph();
+if (!location.hash || !pwApplyHash()) {
+  initGraph();
+}
 setTimeout(() => pwFitView(), 100);

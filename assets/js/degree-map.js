@@ -509,7 +509,80 @@ document.addEventListener("keydown", (ev) => {
 });
 
 
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  HASH ROUTING                                                ║
+// ╚══════════════════════════════════════════════════════════════╝
+const HASH_TO_PROG = {
+  MechanicalEngineering:    { program: 'ME' },
+  Bioengineering:           { program: 'BE', track: 'BE_Biomech' },
+  Biomechanical:            { program: 'BE', track: 'BE_Biomech' },
+  Bioelectrical:            { program: 'BE', track: 'BE_Bioelec' },
+  Biomedical:               { program: 'BE', track: 'BE_Biomed' },
+  ElectricalEngineering:    { program: 'EE' },
+  ComputerEngineering:      { program: 'CPE' },
+  CivilEngineering:         { program: 'CE' },
+  EnvironmentalEngineering: { program: 'ENE' },
+};
+
+const PROG_TO_HASH = {
+  ME: 'MechanicalEngineering',
+  BE_Biomech: 'Biomechanical',
+  BE_Bioelec: 'Bioelectrical',
+  BE_Biomed: 'Biomedical',
+  EE: 'ElectricalEngineering',
+  CPE: 'ComputerEngineering',
+  CE: 'CivilEngineering',
+  ENE: 'EnvironmentalEngineering',
+};
+
+function applyHash() {
+  const hash = location.hash.replace('#', '');
+  const entry = HASH_TO_PROG[hash];
+  if (!entry) return;
+
+  const progBtn = [...document.querySelectorAll('.prog-btn')]
+    .find(b => b.textContent.replace(/\s+/g, '') ===
+      (entry.program === 'BE' ? 'Bioengineering' : b.textContent.replace(/\s+/g, ''))
+      && b.onclick.toString().includes("'" + entry.program + "'"));
+  // Simpler: find by matching the program key in onclick
+  document.querySelectorAll('.prog-btn').forEach(b => {
+    if (b.getAttribute('onclick')?.includes("'" + entry.program + "'")) {
+      setProgram(entry.program, b);
+    }
+  });
+
+  if (entry.track) {
+    document.querySelectorAll('.track-btn').forEach(b => {
+      if (b.dataset.track === entry.track) setTrack(entry.track, b);
+    });
+  }
+}
+
+function updateHash() {
+  const prog = currentProg();
+  const hash = PROG_TO_HASH[prog];
+  if (hash) history.replaceState(null, '', '#' + hash);
+}
+
+// Hook into program/track switching
+const _origSetProgram = setProgram;
+setProgram = function(prog, btn) {
+  _origSetProgram(prog, btn);
+  updateHash();
+};
+const _origSetTrack = setTrack;
+setTrack = function(track, btn) {
+  _origSetTrack(track, btn);
+  updateHash();
+};
+
+window.addEventListener('hashchange', applyHash);
+
 // ── INIT ──────────────────────────────────────────────────────
 buildTagBar();
-render();
+if (location.hash) {
+  applyHash();
+} else {
+  render();
+}
 applyZoom();
