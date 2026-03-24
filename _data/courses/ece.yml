@@ -141,7 +141,7 @@
   tags:
   - electronics
   prereqs:
-  - ECE_263
+  - [ECE_263, ECE_281]
   coreqs: []
   desc: Introduction to semiconductor theory and design/analysis of electronic circuits. Diodes, field-effect and bipolar transistors, CMOS logic circuits, single-stage discrete transistor amplifiers, and multistage IC amplifiers. (WID)
 
@@ -163,7 +163,7 @@
   tags:
   - signals
   prereqs:
-  - ECE_281
+  - [ECE_263, ECE_281]
   coreqs: []
   offered: Fall
   desc: Continuous and discrete systems and signals in time and frequency domains. Fourier series, Fourier transforms, Laplace transforms, discrete Fourier transform, Z-transform, sampling, quantization, and filtering.
@@ -237,8 +237,8 @@
   - controls
   - embedded
   prereqs:
-  - ECE_263
-  - ECE_251
+  - [ECE_263, ECE_281]
+  - [ECE_100, ECE_251]
   coreqs: []
   desc: Introduction to design of industrial automation control systems. Programmable logic controllers (PLCs), industrial computers, embedded systems, standards, and best practices.
 
@@ -333,7 +333,7 @@
   - controls
   - embedded
   prereqs:
-  - ECE_263
+  - [ECE_263, ECE_281]
   - ECE_322
   coreqs: []
   desc: Basic principles of autonomous mobile robots. Locomotion dynamics, sensors and perception, localization, planning and navigation, feedback control, programming, and hardware integration.
@@ -484,7 +484,7 @@
   - See EE Elective 1 for approved list
 
 - id: EE_MATHSCI_1
-  code: Math/Science Elective
+  code: Math/Sci Elective
   title: Mathematics/Science Elective 1
   credits: 3
   tags: []
@@ -496,7 +496,7 @@
   - Any approved Mathematics/Science elective
 
 - id: EE_MATHSCI_2
-  code: Math/Science Elective
+  code: Math/Sci Elective
   title: Mathematics/Science Elective 2
   credits: 3
   tags: []
@@ -508,7 +508,7 @@
   - Any approved Mathematics/Science elective
 
 - id: EE_MATHSCI_3
-  code: Math/Science Elective
+  code: Math/Sci Elective
   title: Mathematics/Science Elective 3
   credits: 3
   tags: []
@@ -520,7 +520,7 @@
   - Any approved Mathematics/Science elective
 
 - id: EE_PROF_1
-  code: Professional Elective
+  code: Prof. Elective
   title: Professional Elective 1
   credits: 3
   tags: []
@@ -532,7 +532,7 @@
   - Any approved professional elective course
 
 - id: EE_PROF_2
-  code: Professional Elective
+  code: Prof. Elective
   title: Professional Elective 2
   credits: 3
   tags: []
@@ -544,7 +544,7 @@
   - Any approved professional elective course
 
 - id: EE_HUM_1
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 1
   credits: 3
   tags: []
@@ -558,7 +558,7 @@
   - Any approved Religious Studies course
 
 - id: EE_HUM_2
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 2
   credits: 3
   tags: []
@@ -572,7 +572,7 @@
   - Any approved Religious Studies course
 
 - id: EE_WL
-  code: World Lang/Diversity
+  code: WL / Diversity
   title: World Language/Diversity Elective
   credits: 3
   tags: []
@@ -657,7 +657,7 @@
   - See CPE Elective 1 for approved list
 
 - id: CPE_MATHSCI_1
-  code: Math/Science Elective
+  code: Math/Sci Elective
   title: Mathematics/Science Elective 1
   credits: 3
   tags: []
@@ -669,7 +669,7 @@
   - Any approved Mathematics/Science elective
 
 - id: CPE_MATHSCI_2
-  code: Math/Science Elective
+  code: Math/Sci Elective
   title: Mathematics/Science Elective 2
   credits: 3
   tags: []
@@ -681,7 +681,7 @@
   - Any approved Mathematics/Science elective
 
 - id: CPE_PROF
-  code: Professional Elective
+  code: Prof. Elective
   title: Professional Elective
   credits: 3
   tags: []
@@ -693,7 +693,7 @@
   - Any approved professional elective course
 
 - id: CPE_HUM_1
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 1
   credits: 3
   tags: []
@@ -707,7 +707,7 @@
   - Any approved Religious Studies course
 
 - id: CPE_HUM_2
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 2
   credits: 3
   tags: []
@@ -721,7 +721,7 @@
   - Any approved Religious Studies course
 
 - id: CPE_WL
-  code: World Lang/Diversity
+  code: WL / Diversity
   title: World Language/Diversity Elective
   credits: 3
   tags: []

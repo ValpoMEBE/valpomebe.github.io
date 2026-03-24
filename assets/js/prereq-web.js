@@ -22,7 +22,7 @@ const DAMPING       = 0.88;
 const MAX_VEL       = 8;
 
 /* ── STATE ───────────────────────────────────────────────────── */
-let currentProgram = 'ALL';
+let currentProgram = 'MEBE';
 let nodes = {};        // id → {x, y, vx, vy, targetY, fixed}
 let graphData = null;  // current graph (children, parents, coEdges, etc.)
 let disconnectedIds = [];
@@ -52,27 +52,38 @@ function pwSetProgram(prog, btn) {
 /* ── COURSE FILTERING ────────────────────────────────────────── */
 function getVisibleIds(prog) {
   const ids = new Set();
-  if (prog === 'ALL') {
-    for (const [, map] of Object.entries(_CURRICULUM)) {
-      for (const cid of Object.keys(map)) { if (!cid.startsWith('_')) ids.add(cid); }
-    }
-  } else {
-    const map = _CURRICULUM[prog];
+  const groups = {
+    MEBE:  ['ME', 'BE_Biomech', 'BE_Bioelec', 'BE_Biomed'],
+    EECPE: ['EE', 'CPE'],
+    CEENE: ['CE', 'ENE']
+  };
+  const progs = groups[prog] || [prog];
+  for (const p of progs) {
+    const map = _CURRICULUM[p];
     if (map) for (const cid of Object.keys(map)) { if (!cid.startsWith('_')) ids.add(cid); }
   }
   return ids;
 }
 
 /* ── GRAPH BUILDING ──────────────────────────────────────────── */
+// Flatten OR prereq/coreq entries: arrays become individual IDs
+function _flatReqs(reqs) {
+  const out = [];
+  for (const entry of (reqs || [])) {
+    if (Array.isArray(entry)) entry.forEach(id => out.push(id));
+    else out.push(entry);
+  }
+  return out;
+}
 function buildGraph(visibleIds) {
   const children = {}, parents = {}, coEdges = [], indeg = {}, outdeg = {};
   for (const id of visibleIds) { children[id] = []; parents[id] = []; indeg[id] = 0; outdeg[id] = 0; }
   for (const id of visibleIds) {
     const c = COURSES[id]; if (!c) continue;
-    (c.prereqs || []).forEach(pid => {
+    _flatReqs(c.prereqs).forEach(pid => {
       if (visibleIds.has(pid)) { children[pid].push(id); parents[id].push(pid); indeg[id]++; outdeg[pid]++; }
     });
-    (c.coreqs || []).forEach(cid => {
+    _flatReqs(c.coreqs).forEach(cid => {
       if (visibleIds.has(cid)) {
         if (!coEdges.some(e => (e.from === cid && e.to === id) || (e.from === id && e.to === cid)))
           coEdges.push({ from: cid, to: id });

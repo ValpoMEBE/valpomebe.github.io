@@ -38,7 +38,7 @@
   tags: []
   prereqs: []
   coreqs:
-  - ME_201
+  - [CE_213, ECE_211, ME_201]
   offered: Both
   desc: Engineering ethics, professional responsibility, and societal impact of engineering decisions.
 - id: GE_497
@@ -50,6 +50,7 @@
   prereqs:
   - GE_311
   - GE_312
+  - [ME_363, ECE_340, ECE_322, BE_415]
   coreqs: []
   offered: Fall
   desc: 'Capstone design: team-based engineering project, problem definition, design process, and prototyping. ME students

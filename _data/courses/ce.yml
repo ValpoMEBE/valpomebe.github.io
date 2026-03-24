@@ -65,7 +65,7 @@
   tags:
   - transportation
   prereqs:
-  - STAT_240
+  - [STAT_240, CE_202]
   coreqs: []
   desc: Transportation system characteristics, demand, planning, engineering studies, human and vehicle design factors, traffic flow and operations, signing and marking, and safety. Covers highway, rail, air, and water modes.
 
@@ -269,6 +269,7 @@
   tags:
   - geotechnical
   prereqs:
+  - [STAT_240, CE_202]
   - CE_320
   coreqs: []
   desc: Causative mechanisms of earthquakes, magnitudes, ground motion, effect of local soil conditions. Response of soils to seismic loading, liquefaction phenomena, laboratory and in-situ testing for seismic loading.
@@ -291,7 +292,7 @@
   tags:
   - waterResources
   prereqs:
-  - CE_334
+  - [CE_334, ME_373]
   coreqs: []
   desc: Application of fluid mechanics principles to analysis and design of water resources projects. Branching pipes, water towers, manifolds, open-channel hydraulics, culvert design, water hammer, reservoirs, and wells.
 
@@ -478,7 +479,7 @@
   - Any approved science elective course
 
 - id: CE_PROF_ELEC
-  code: Professional Elective
+  code: Prof. Elective
   title: Professional Elective
   credits: 3
   tags: []
@@ -490,7 +491,7 @@
   - Any approved professional elective course
 
 - id: CE_HUM_1
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 1
   credits: 3
   tags: []
@@ -504,7 +505,7 @@
   - Any approved Religious Studies course
 
 - id: CE_HUM_2
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 2
   credits: 3
   tags: []
@@ -518,7 +519,7 @@
   - Any approved Religious Studies course
 
 - id: CE_WL
-  code: World Lang/Diversity
+  code: WL / Diversity
   title: World Language/Diversity Elective
   credits: 3
   tags: []
@@ -562,7 +563,7 @@
   - See ENE Elective 1 for approved list
 
 - id: ENE_PROF_ELEC
-  code: Professional Elective
+  code: Prof. Elective
   title: Professional Elective
   credits: 3
   tags: []
@@ -574,7 +575,7 @@
   - Any approved professional elective course
 
 - id: ENE_HUM_1
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 1
   credits: 3
   tags: []
@@ -588,7 +589,7 @@
   - Any approved Religious Studies course
 
 - id: ENE_HUM_2
-  code: Humanities/SS/RS Elective
+  code: Hum/SS/RS
   title: Humanities/Social Science/Religious Studies Elective 2
   credits: 3
   tags: []
@@ -602,7 +603,7 @@
   - Any approved Religious Studies course
 
 - id: ENE_WL
-  code: World Lang/Diversity
+  code: WL / Diversity
   title: World Language/Diversity Elective
   credits: 3
   tags: []

@@ -44,7 +44,7 @@
   tags:
   - materials
   prereqs:
-  - CHEM_122
+  - [CHEM_116, CHEM_122]
   coreqs: []
   desc: Structure, bonding, stereochemistry, and reactions of carbon compounds.
 - id: CHEM_222

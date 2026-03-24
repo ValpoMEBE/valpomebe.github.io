@@ -7,15 +7,37 @@
 // ║    COURSES   — { id: { id, code, title, … }, … }            ║
 // ╚══════════════════════════════════════════════════════════════╝
 
+// ── OR-PREREQ HELPERS ─────────────────────────────────────────
+// Prereqs/coreqs can be strings (AND) or arrays (OR groups).
+// resolveReqs picks the OR option present in the current program.
+function resolveReqs(reqs, prog) {
+  return (reqs || []).map(entry => {
+    if (Array.isArray(entry)) {
+      const inProg = entry.find(id => COURSES[id]?.semesters?.[prog]);
+      return inProg || entry[0];
+    }
+    return entry;
+  });
+}
+// flattenReqs returns every ID from all OR branches (for UNLOCKS).
+function flattenReqs(reqs) {
+  const out = [];
+  for (const entry of (reqs || [])) {
+    if (Array.isArray(entry)) entry.forEach(id => out.push(id));
+    else out.push(entry);
+  }
+  return out;
+}
+
 // ── BUILD UNLOCK INDEX (derived — do not edit manually) ────────
 const UNLOCKS = {};
 for (const c of Object.values(COURSES)) {
   if (!UNLOCKS[c.id]) UNLOCKS[c.id] = [];
-  for (const pid of (c.prereqs || [])) {
+  for (const pid of flattenReqs(c.prereqs)) {
     if (!UNLOCKS[pid]) UNLOCKS[pid] = [];
     if (!UNLOCKS[pid].includes(c.id)) UNLOCKS[pid].push(c.id);
   }
-  for (const cid of (c.coreqs || [])) {
+  for (const cid of flattenReqs(c.coreqs)) {
     if (!UNLOCKS[cid]) UNLOCKS[cid] = [];
     if (!UNLOCKS[cid].includes(c.id)) UNLOCKS[cid].push(c.id);
   }
@@ -33,7 +55,7 @@ let STATE = {
 };
 
 function currentProg() {
-  return STATE.program === "ME" ? "ME" : STATE.track;
+  return STATE.program === "BE" ? STATE.track : STATE.program;
 }
 
 
@@ -44,8 +66,17 @@ function buildTagBar() {
   const bar = document.getElementById("tag-bar");
   bar.innerHTML = '<span class="tag-bar-label">Filter:</span>';
 
+  // Collect tags used by courses in the current program
+  const prog = currentProg();
+  const usedTags = new Set();
+  for (const c of Object.values(COURSES)) {
+    if (c.semesters && c.semesters[prog]) {
+      (c.tags || []).forEach(t => usedTags.add(t));
+    }
+  }
+
   const allBtn = document.createElement("button");
-  allBtn.className = "tag-filter-btn active";
+  allBtn.className = "tag-filter-btn" + (!STATE.tag || STATE.tag === "all" ? " active" : "");
   allBtn.textContent = "All";
   allBtn.style.cssText = "background:#5C3000; color:#FFE300;";
   allBtn.dataset.tag = "all";
@@ -53,8 +84,9 @@ function buildTagBar() {
   bar.appendChild(allBtn);
 
   for (const [key, def] of Object.entries(TAGS)) {
+    if (!usedTags.has(key)) continue;
     const btn = document.createElement("button");
-    btn.className = "tag-filter-btn";
+    btn.className = "tag-filter-btn" + (STATE.tag === key ? " active" : "");
     btn.textContent = def.label;
     btn.style.cssText = `background:${def.bg}; color:${def.fg};`;
     btn.dataset.tag = key;
@@ -68,6 +100,7 @@ function buildTagBar() {
 // ║  RENDER                                                      ║
 // ╚══════════════════════════════════════════════════════════════╝
 function render() {
+  buildTagBar();
   const prog = currentProg();
   const fc  = document.getElementById("flowchart");
   const svg = document.getElementById("arrow-svg");
@@ -158,8 +191,8 @@ function selectCourse(id) {
   if (!course) return;
 
   const prog    = currentProg();
-  const prereqs = new Set(course.prereqs || []);
-  const coreqs  = new Set(course.coreqs  || []);
+  const prereqs = new Set(resolveReqs(course.prereqs, prog));
+  const coreqs  = new Set(resolveReqs(course.coreqs, prog));
   const unlocks = new Set(
     (UNLOCKS[id] || []).filter(x => COURSES[x] && COURSES[x].semesters && COURSES[x].semesters[prog])
   );
@@ -259,8 +292,8 @@ function drawArrows() {
     const toPos = cardPos(course.id);
     if (!toPos) continue;
 
-    // Prereq arrows
-    for (const pid of (course.prereqs || [])) {
+    // Prereq arrows (resolve OR groups for current program)
+    for (const pid of resolveReqs(course.prereqs, prog)) {
       if (!COURSES[pid] || !COURSES[pid].semesters || !COURSES[pid].semesters[prog]) continue;
       const key = pid + "->" + course.id;
       if (drawn.has(key)) continue;
@@ -270,8 +303,8 @@ function drawArrows() {
       svg.appendChild(makePath(fromPos, toPos, false, pid, course.id));
     }
 
-    // Coreq arrows
-    for (const cid of (course.coreqs || [])) {
+    // Coreq arrows (resolve OR groups for current program)
+    for (const cid of resolveReqs(course.coreqs, prog)) {
       if (!COURSES[cid] || !COURSES[cid].semesters || !COURSES[cid].semesters[prog]) continue;
       const key = "co:" + [cid, course.id].sort().join("-");
       if (drawn.has(key)) continue;

@@ -33,10 +33,6 @@
   bg: "#006354"
   fg: "#fff"
 
-- key: electrical
-  label: "Electrical"
-  bg: "#A80087"
-  fg: "#fff"
 
 - key: biology
   label: "Biology"
@@ -61,4 +57,93 @@
 - key: lab
   label: "Lab"
   bg: "#5A6068"
+  fg: "#fff"
+
+# ── ECE Domain Tags ──────────────────────────────────────────
+
+- key: circuits
+  label: "Circuits"
+  bg: "#7B2D8E"
+  fg: "#fff"
+
+- key: digital
+  label: "Digital"
+  bg: "#1B3A5C"
+  fg: "#fff"
+
+- key: programming
+  label: "Programming"
+  bg: "#3E2723"
+  fg: "#e8d5b0"
+
+- key: signals
+  label: "Signals"
+  bg: "#00838F"
+  fg: "#fff"
+
+- key: electronics
+  label: "Electronics"
+  bg: "#880E4F"
+  fg: "#fff"
+
+- key: embedded
+  label: "Embedded"
+  bg: "#004D40"
+  fg: "#fff"
+
+- key: power
+  label: "Power"
+  bg: "#8B1A1A"
+  fg: "#fff"
+
+- key: electromagnetics
+  label: "EM Fields"
+  bg: "#4A148C"
+  fg: "#fff"
+
+- key: networks
+  label: "Networks"
+  bg: "#37474F"
+  fg: "#fff"
+
+- key: controls
+  label: "Controls"
+  bg: "#1A237E"
+  fg: "#fff"
+
+# ── CE / ENE Domain Tags ─────────────────────────────────────
+
+- key: structural
+  label: "Structural"
+  bg: "#6D1B1B"
+  fg: "#fff"
+
+- key: geotechnical
+  label: "Geotechnical"
+  bg: "#5D4037"
+  fg: "#fff"
+
+- key: transportation
+  label: "Transportation"
+  bg: "#455A64"
+  fg: "#fff"
+
+- key: waterResources
+  label: "Water Resources"
+  bg: "#00695C"
+  fg: "#fff"
+
+- key: environmental
+  label: "Environmental"
+  bg: "#2E7D32"
+  fg: "#fff"
+
+- key: construction
+  label: "Construction"
+  bg: "#BF360C"
+  fg: "#fff"
+
+- key: sustainability
+  label: "Sustainability"
+  bg: "#558B2F"
   fg: "#fff"

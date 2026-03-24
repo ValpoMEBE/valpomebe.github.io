@@ -19,7 +19,11 @@
     ME:         {{ site.data.curriculum.me | jsonify }},
     BE_Biomech: {{ site.data.curriculum.be_biomech | jsonify }},
     BE_Bioelec: {{ site.data.curriculum.be_bioelec | jsonify }},
-    BE_Biomed:  {{ site.data.curriculum.be_biomed | jsonify }}
+    BE_Biomed:  {{ site.data.curriculum.be_biomed | jsonify }},
+    EE:         {{ site.data.curriculum.ee | jsonify }},
+    CPE:        {{ site.data.curriculum.cpe | jsonify }},
+    CE:         {{ site.data.curriculum.ce | jsonify }},
+    ENE:        {{ site.data.curriculum.ene | jsonify }}
   };
 
   // Versioned curriculum — all catalog years, sorted ascending
@@ -40,6 +44,18 @@
       { year: {{ site.data.curriculum.be_biomed_2022._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.be_biomed_2022 | jsonify }} },
       {% endif %}
       { year: {{ site.data.curriculum.be_biomed._catalog_year | default: 2025 }}, data: {{ site.data.curriculum.be_biomed | jsonify }} },
+    ],
+    EE: [
+      { year: {{ site.data.curriculum.ee._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.ee | jsonify }} },
+    ],
+    CPE: [
+      { year: {{ site.data.curriculum.cpe._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.cpe | jsonify }} },
+    ],
+    CE: [
+      { year: {{ site.data.curriculum.ce._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.ce | jsonify }} },
+    ],
+    ENE: [
+      { year: {{ site.data.curriculum.ene._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.ene | jsonify }} },
     ],
   };
 

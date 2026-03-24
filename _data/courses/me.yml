@@ -29,6 +29,7 @@
   prereqs:
   - GE_109
   - MATH_132
+  - [ME_125, ECE_251]
   - ME_125
   coreqs: []
   offered: Fall
@@ -59,7 +60,7 @@
   title: Analog Circuits Lab
   credits: 0.5
   tags:
-  - electrical
+  - circuits
   - lab
   prereqs: []
   coreqs:
@@ -97,7 +98,8 @@
   tags:
   - materials
   prereqs:
-  - CHEM_115
+  - MATH_132
+  - [CHEM_115, CHEM_121]
   coreqs: []
   offered: Spring
   desc: Crystal structure, defects, mechanical/thermal/electrical properties of metals, polymers, ceramics, and composites.
@@ -245,7 +247,7 @@
   credits: 2
   tags:
   - systems
-  - electrical
+  - circuits
   prereqs:
   - ME_368
   coreqs: []
@@ -277,7 +279,7 @@
   credits: 3
   tags:
   - systems
-  - electrical
+  - circuits
   prereqs:
   - MATH_260
   - MATH_270

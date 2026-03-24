@@ -54,7 +54,7 @@
   title: Bioelectricity
   credits: 3
   tags:
-  - electrical
+  - circuits
   - biology
   prereqs:
   - ME_125
@@ -86,7 +86,8 @@
   - materials
   - biology
   prereqs:
-  - CHEM_115
+  - MATH_132
+  - [CHEM_115, CHEM_121]
   coreqs: []
   offered: Fall
   desc: Structure-property relationships of biomaterials, biocompatibility, implants, and tissue engineering scaffolds.
