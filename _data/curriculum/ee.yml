@@ -1,0 +1,60 @@
+_catalog_year: 2022
+
+# ── Semester 1 ── Freshman Fall ──
+VUE_101: 1
+GE_100: 1
+XS_101: 1
+MATH_131: 1
+PHYS_141: 1
+
+# ── Semester 2 ── Freshman Spring ──
+VUE_102: 2
+ECE_100: 2
+MATH_132: 2
+PHYS_142: 2
+EE_WL: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+ECE_211: 3
+ECE_221: 3
+ECE_251: 3
+ECE_263: 3
+MATH_260: 3
+MATH_270: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+MATH_253: 4
+ECE_212: 4
+EE_ELEC_1: 4
+ECE_264: 4
+REL_100: 4
+
+# ── Semester 5 ── Junior Fall ──
+ECE_340: 5
+ECE_360: 5
+EE_ELEC_2: 5
+EE_HUM_1: 5
+EE_MATHSCI_1: 5
+
+# ── Semester 6 ── Junior Spring ──
+ECE_322: 6
+ECE_341: 6
+GE_311: 6
+GE_312: 6
+EE_HUM_2: 6
+STAT_240: 6
+
+# ── Semester 7 ── Senior Fall ──
+ECE_430: 7
+GE_497: 7
+EE_ELEC_3: 7
+EE_ELEC_4: 7
+EE_MATHSCI_2: 7
+EE_PROF_1: 7
+
+# ── Semester 8 ── Senior Spring ──
+GE_498: 8
+EE_ELEC_5: 8
+EE_MATHSCI_3: 8
+EE_ELEC_6: 8
+EE_PROF_2: 8

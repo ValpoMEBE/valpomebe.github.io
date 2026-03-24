@@ -1,41 +1,92 @@
 <!-- ═══ Upload Panel ═══════════════════════════════════════════ -->
 <section id="scheduler-upload" class="sched-section">
   <h1 class="sched-title">Course Schedule Optimizer</h1>
-  <p class="sched-subtitle">Upload your data files, then generate an optimized schedule.</p>
+  <p class="sched-subtitle">Upload your data files, configure optimization priorities, then generate an optimized schedule.</p>
 
   <div class="upload-grid">
-    <!-- Courses to schedule -->
-    <div class="upload-card">
-      <h3>Courses to Schedule</h3>
-      <p class="upload-desc">CSV with department courses, instructors, sections, and lab links.</p>
-      <label class="upload-btn" for="file-courses">
-        <span class="upload-icon">&#128196;</span> Choose CSV
-        <input type="file" id="file-courses" accept=".csv" hidden>
+    <!-- Master Course List -->
+    <div class="upload-card" id="card-master">
+      <h3><span class="upload-icon">&#128203;</span> Master Course List</h3>
+      <p class="upload-desc">CSV with all course sections, faculty assignments, and scheduling modes. Courses with times pre-filled will be treated as frozen.</p>
+      <label class="upload-btn" for="file-master">
+        Choose CSV
+        <input type="file" id="file-master" accept=".csv" hidden>
       </label>
-      <span class="upload-status" id="status-courses">No file selected</span>
+      <span class="upload-status" id="status-master">No file selected</span>
     </div>
 
-    <!-- External schedules (multiple) -->
-    <div class="upload-card">
-      <h3>External Schedules</h3>
-      <p class="upload-desc">Frozen schedules from other departments (MATH, PHYS, etc.). Select multiple files.</p>
-      <label class="upload-btn" for="file-externals">
-        <span class="upload-icon">&#128197;</span> Choose CSVs
-        <input type="file" id="file-externals" accept=".csv" multiple hidden>
-      </label>
-      <span class="upload-status" id="status-externals">No files selected</span>
-    </div>
-
-    <!-- Time slots -->
-    <div class="upload-card">
-      <h3>Time Slots</h3>
-      <p class="upload-desc">Available class and lab periods for the semester.</p>
+    <!-- Time Slots -->
+    <div class="upload-card" id="card-timeslots">
+      <h3><span class="upload-icon">&#128336;</span> Time Slots</h3>
+      <p class="upload-desc">Available class and lab time periods by format (3x50, 2x75, 1x150, etc.).</p>
       <label class="upload-btn" for="file-timeslots">
-        <span class="upload-icon">&#128336;</span> Choose CSV
+        Choose CSV
         <input type="file" id="file-timeslots" accept=".csv" hidden>
       </label>
       <span class="upload-status" id="status-timeslots">No file selected</span>
     </div>
+
+    <!-- Faculty Preferences (Optional) -->
+    <div class="upload-card" id="card-preferences">
+      <h3><span class="upload-icon">&#128100;</span> Faculty Preferences <span class="optional-badge">(Optional)</span></h3>
+      <p class="upload-desc">Optional. Faculty time preferences (-3 to +3) and special scheduling rules.</p>
+      <label class="upload-btn" for="file-preferences">
+        Choose CSV
+        <input type="file" id="file-preferences" accept=".csv" hidden>
+      </label>
+      <span class="upload-status" id="status-preferences">No file selected</span>
+    </div>
+  </div>
+
+  <!-- Objective Weight Sliders -->
+  <div class="weight-sliders" id="weight-sliders">
+    <h2 class="section-heading">Optimization Priorities</h2>
+
+    <div class="weight-slider-group">
+      <label for="weight-cohort">
+        Cohort Conflict Avoidance
+        <span class="slider-value" id="val-cohort">9</span>
+      </label>
+      <input type="range" id="weight-cohort" min="1" max="10" value="9">
+      <p class="slider-desc">Minimize time overlaps between courses in the same cohort semester.</p>
+    </div>
+
+    <div class="weight-slider-group">
+      <label for="weight-faculty-pref">
+        Faculty Preference Honoring
+        <span class="slider-value" id="val-faculty-pref">8</span>
+      </label>
+      <input type="range" id="weight-faculty-pref" min="1" max="10" value="8">
+      <p class="slider-desc">Respect faculty time-of-day and day-of-week preferences.</p>
+    </div>
+
+    <div class="weight-slider-group">
+      <label for="weight-single-before230">
+        Single-Section Before 2:30 PM
+        <span class="slider-value" id="val-single-before230">10</span>
+      </label>
+      <input type="range" id="weight-single-before230" min="1" max="10" value="10">
+      <p class="slider-desc">Ensure single-section required courses are scheduled before 2:30 PM.</p>
+    </div>
+
+    <div class="weight-slider-group">
+      <label for="weight-back-to-back">
+        Back-to-Back Same-Course Sections
+        <span class="slider-value" id="val-back-to-back">6</span>
+      </label>
+      <input type="range" id="weight-back-to-back" min="1" max="10" value="6">
+      <p class="slider-desc">Schedule multiple sections of the same course in consecutive time slots.</p>
+    </div>
+
+    <div class="weight-slider-group">
+      <label for="weight-special">
+        Special Faculty Constraints
+        <span class="slider-value" id="val-special">10</span>
+      </label>
+      <input type="range" id="weight-special" min="1" max="10" value="10">
+      <p class="slider-desc">Honor hard constraints like "no classes before 10 AM" or specific day-off requests.</p>
+    </div>
+
   </div>
 
   <div class="upload-actions">

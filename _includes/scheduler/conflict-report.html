@@ -1,10 +1,61 @@
-<!-- ═══ Conflict Report ════════════════════════════════════════ -->
+<!-- ═══ Schedule Analysis ══════════════════════════════════════ -->
 <section id="scheduler-conflicts" class="sched-section" hidden>
-  <h2 class="section-heading">Conflict Report</h2>
-  <div id="conflict-summary" class="conflict-summary">
-    <!-- Populated by JS -->
+  <h2 class="section-heading">Schedule Analysis</h2>
+
+  <!-- ── Constraint Satisfaction Report ─────────────────────── -->
+  <div class="constraint-report" id="constraint-report">
+    <h3 class="analysis-subheading">Constraint Satisfaction Report</h3>
+
+    <!-- Overall score gauge -->
+    <div class="overall-score" id="overall-score">
+      <div class="score-gauge">
+        <div class="score-gauge-fill" id="score-gauge-fill" style="width: 0%"></div>
+      </div>
+      <span class="score-label" id="score-label">—</span>
+    </div>
+
+    <!-- Per-objective constraint cards -->
+    <div class="constraint-cards" id="constraint-cards">
+      <!-- JS renders cards like:
+        <div class="constraint-card satisfied|partial|violated">
+          <div class="constraint-card-header">
+            <span class="constraint-name">Cohort Conflict Avoidance</span>
+            <span class="constraint-score">100%</span>
+          </div>
+          <div class="constraint-violations-count">0 violations</div>
+          <div class="constraint-violations" hidden>
+            <ul>...</ul>
+          </div>
+          <button class="constraint-toggle">Show details</button>
+        </div>
+      -->
+    </div>
   </div>
-  <div id="conflict-list" class="conflict-list">
-    <!-- Individual conflict cards rendered by JS -->
+
+  <!-- ── Student Conflict Analysis ─────────────────────────── -->
+  <div class="student-conflict-analysis" id="student-conflict-analysis">
+    <h3 class="analysis-subheading">Student Conflict Analysis</h3>
+
+    <div class="cohort-grid" id="cohort-grid">
+      <!-- JS renders cards like:
+        <div class="cohort-card no-conflicts|has-conflicts">
+          <div class="cohort-card-header">
+            <span class="cohort-year-badge sr">SR</span>
+            <span class="cohort-name">ME Semester 7 — Senior Fall</span>
+          </div>
+          <div class="cohort-courses">
+            <span class="cohort-course">ME 414</span>
+            <span class="cohort-course">ME 497</span>
+            ...
+          </div>
+          <div class="cohort-overlaps">
+            <div class="overlap-pair">
+              <span class="overlap-courses">ME 414 × ME 497</span>
+              <span class="overlap-time">MWF 10:00–10:50</span>
+            </div>
+          </div>
+        </div>
+      -->
+    </div>
   </div>
 </section>

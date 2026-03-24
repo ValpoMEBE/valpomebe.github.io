@@ -8,6 +8,16 @@
   - MATH_131
   coreqs: []
   desc: Atomic structure, bonding, stoichiometry, thermochemistry, and solutions.
+- id: CHEM_116
+  code: CHEM 116
+  title: Applications of Chemistry in Engineering
+  credits: 4
+  tags:
+  - materials
+  prereqs:
+  - CHEM_115
+  coreqs: []
+  desc: Continuation of CHEM 115 with emphasis on analytical chemistry for engineering students. Not open to students with credit for CHEM 122 or CHEM 132.
 - id: CHEM_121
   code: CHEM 121
   title: General Chemistry I

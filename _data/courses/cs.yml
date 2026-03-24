@@ -1,0 +1,116 @@
+# ════════════════════════════════════════════════════════════════
+# Computer Science (CS) — Course Catalog
+# Only courses listed as Computer Engineering elective options
+# Source: Undergraduate Catalog 2025-2026, pages 460-466
+# ════════════════════════════════════════════════════════════════
+
+- id: CS_225
+  code: CS 225
+  title: Programming Languages
+  credits: 3
+  tags:
+  - programming
+  prereqs:
+  - ECE_252
+  coreqs: []
+  desc: Study of programming languages and their differences and similarities. Syntax, translation, execution, design, abstraction, activation, record stack, recursion, and different programming paradigms.
+
+- id: CS_240
+  code: CS 240
+  title: Assembly Language Programming
+  credits: 3
+  tags:
+  - programming
+  prereqs:
+  - ECE_252
+  coreqs: []
+  desc: Fundamentals of digital computer structure and introduction to assembly language programming. Machine instructions, data representation, addressing techniques, and program segmentation and linkage.
+
+- id: CS_250
+  code: CS 250
+  title: Object Oriented Programming
+  credits: 3
+  tags:
+  - programming
+  prereqs:
+  - ECE_252
+  coreqs: []
+  desc: Designing and building applications in an object-oriented language with introduction to software engineering. Philosophy of OOP, software reuse strategies, and effective programming practices.
+
+- id: CS_260
+  code: CS 260
+  title: Mobile Applications
+  credits: 3
+  tags:
+  - programming
+  prereqs:
+  - ECE_251
+  coreqs: []
+  desc: Creating applications in a mobile device environment such as Android, iOS, or Windows Mobile. Model-view-controller paradigm, user interaction, hardware device interaction, and common patterns.
+
+- id: CS_325
+  code: CS 325
+  title: Simulation and Modeling
+  credits: 3
+  tags:
+  - computing
+  prereqs:
+  - ECE_251
+  coreqs: []
+  desc: Introduction to computer simulation of mathematical models of discrete and continuous phenomena. Standard simulations examined and implemented using a simulation language.
+
+- id: CS_330
+  code: CS 330
+  title: Operating Systems
+  credits: 3
+  tags:
+  - programming
+  prereqs:
+  - CS_240
+  coreqs: []
+  desc: Introduction to concepts of modern operating systems. Processes, scheduling, synchronization, address space memory management, threads, locks, semaphores, concurrency, file systems, and security.
+
+- id: CS_335
+  code: CS 335
+  title: Networks
+  credits: 3
+  tags:
+  - networks
+  prereqs:
+  - ECE_251
+  coreqs: []
+  desc: Introduction to computer networks with emphasis on current technologies and protocols. Layered TCP/IP model, software defined networks, and hands-on experience with network analysis and socket programming.
+
+- id: CS_345
+  code: CS 345
+  title: Artificial Intelligence
+  credits: 3
+  tags:
+  - computing
+  prereqs:
+  - ECE_252
+  coreqs: []
+  desc: Introduction to concepts and computational techniques of artificial intelligence. Symbolic, neural, and numerical representations, machine decision-making and machine learning. Interactions between AI applications and society.
+
+- id: CS_365
+  code: CS 365
+  title: Interactive Computer Graphics
+  credits: 3
+  tags:
+  - computing
+  prereqs:
+  - ECE_252
+  coreqs: []
+  desc: Fundamentals of interactive computer graphics systems and software. Geometric transformations, projections, lighting, textures, rasterizing, graphics pipelines, and ray tracing.
+
+- id: CS_372
+  code: CS 372
+  title: Computability and Computational Complexity
+  credits: 4
+  tags:
+  - computing
+  prereqs:
+  - ECE_252
+  - MATH_220
+  coreqs: []
+  desc: Limits of computation and analysis of algorithms. Chomsky hierarchy, automata and language models, uncomputable problems, and various design strategies.

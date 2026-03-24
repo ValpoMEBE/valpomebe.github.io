@@ -1,0 +1,105 @@
+# ════════════════════════════════════════════════════════════════
+# Environmental Engineering (ENE) — Course Catalog
+# Source: Undergraduate Catalog 2025-2026, pages 504-506
+# ════════════════════════════════════════════════════════════════
+
+- id: ENE_210
+  code: ENE 210
+  title: Environmental Toxicology & Risk Assessment
+  credits: 3
+  tags:
+  - environmental
+  - sustainability
+  prereqs:
+  - CHEM_115
+  coreqs: []
+  desc: Fundamental physical, chemical, and biological processes in environmental engineering. Risk analysis, brownfields, solid waste, energy fundamentals, public health, and environmental regulations.
+
+- id: ENE_260
+  code: ENE 260
+  title: Environmental Sustainability
+  credits: 2
+  tags:
+  - sustainability
+  prereqs: []
+  coreqs: []
+  desc: Introduction to fundamental sustainability and green design concepts. Renewable and non-renewable resources, energy cycles, pollution generation, carbon cycle, emissions and sequestering, and life cycle analysis.
+
+- id: ENE_310
+  code: ENE 310
+  title: Chemical Fate and Transport
+  credits: 3
+  tags:
+  - environmental
+  prereqs:
+  - CE_334
+  - ME_270
+  coreqs: []
+  desc: Introduction to solving problems using heat and mass transfer concepts. Evaluating design options for production, clean-up, and control of bioenvironmental systems. Conduction, convection, radiation, and diffusion processes.
+
+- id: ENE_330
+  code: ENE 330
+  title: Environmental Soils
+  credits: 3
+  tags:
+  - geotechnical
+  - environmental
+  - lab
+  prereqs:
+  - CE_213
+  - CE_215
+  coreqs: []
+  desc: Chemical, physical, and biological properties of soils. Origin, classification, properties, and distribution of soils and their influence on hydrological and environmental processes. Management, conservation, and environmental impact of soil disturbance.
+
+- id: ENE_360
+  code: ENE 360
+  title: Environmental Policy and Law
+  credits: 2
+  tags:
+  - sustainability
+  prereqs:
+  - ENE_260
+  coreqs: []
+  desc: Introduction to environmental law and major federal statutes including the Clean Air Act, Clean Water Act, National Environmental Policy Act, Endangered Species Act, and hazardous waste laws. Statutory and regulatory analysis, ethics, politics, and economics.
+
+- id: ENE_440
+  code: ENE 440
+  title: Introduction to Air Pollution
+  credits: 3
+  tags:
+  - environmental
+  prereqs:
+  - CE_334
+  - ENE_210
+  - ME_270
+  coreqs: []
+  desc: Introduction to particulate- and gas-control technologies, dispersion modeling, and pollutant transport. Effects of regulation and legislation on air quality and air pollution control.
+
+- id: ENE_450
+  code: ENE 450
+  title: Hazardous Waste Management
+  credits: 3
+  tags:
+  - environmental
+  prereqs:
+  - ENE_310
+  coreqs: []
+  desc: Overview of remediation of contaminated soil and ground water at hazardous waste sites. Site investigation plans, field investigations, risk assessments, feasibility studies, remedial design techniques. Energy and greenhouse gas emission evaluation.
+
+- id: ENE_490
+  code: ENE 490
+  title: Topics in Environmental Engineering
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Investigation of environmental engineering topics of special interest. Offered upon sufficient demand.
+
+- id: ENE_499
+  code: ENE 499
+  title: Senior Honor Studies in Environmental Engineering
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Independent study of an advanced topic in environmental engineering.

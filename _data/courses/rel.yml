@@ -1,0 +1,13 @@
+# ════════════════════════════════════════════════════════════════
+# Religion (REL) — Course Catalog
+# Source: Undergraduate Catalog 2025-2026
+# ════════════════════════════════════════════════════════════════
+
+- id: REL_100
+  code: REL 100
+  title: Religion and Society
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Study of religion and its relationship to society. Required theology course for CE, ENE, EE, and CPE programs.

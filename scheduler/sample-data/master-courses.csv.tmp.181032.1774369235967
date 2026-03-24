@@ -1,0 +1,78 @@
+Course,Section,Term,Instructor1_Last,Instructor1_First,Instructor2_Last,Instructor2_First,Duration,Pair_Group,Days,Start,End,Student_Credits,Faculty_Credits,Pct_Load,Mode,Alt_Weeks,TLC
+BE-415,A,Fall 2026,Sestito,Lauren,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+BE-490-LS,A,Fall 2026,Sestito,Lauren,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+GE-311,A,Fall 2026,Luke,Bethany,,,7 weeks,GE311_312,T R,,,1.5,1.5,100,2x75,No,
+GE-312,A,Fall 2026,Luke,Bethany,,,7 weeks,GE311_312,T R,,,1.5,1.5,100,2x75,No,
+GE-497,A,Fall 2026,Luke,Bethany,Sestito,Jesse,,14 weeks,,T R,,,3,6,50,2x75,No,
+ME-201,A,Fall 2026,Sestito,Lauren,,,14 weeks,,M T W R F,,,1,1,100,1x50,No,
+ME-201,B,Fall 2026,Sestito,Lauren,,,14 weeks,,M T W R F,,,1,1,100,1x50,No,
+ME-201,C,Fall 2026,Luke,Bethany,,,14 weeks,,M T W R F,,,1,1,100,1x50,No,
+ME-209,A,Fall 2026,Johnson,Reva,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+ME-209,B,Fall 2026,Johnson,Reva,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+ME-251,A,Fall 2026,Campbell,Matt,,,7 weeks,ME251_AB,M,,,1,1,100,1x50,No,
+ME-251,B,Fall 2026,Campbell,Matt,,,7 weeks,ME251_AB,M,,,1,1,100,1x50,No,
+ME-251L,A,Fall 2026,Campbell,Matt,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-251L,B,Fall 2026,Campbell,Matt,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-251L,C,Fall 2026,Campbell,Matt,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-251L,D,Fall 2026,Campbell,Matt,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-251L,E,Fall 2026,Johnson,Pete,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-251L,F,Fall 2026,Johnson,Pete,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-251L,G,Fall 2026,Campbell,Matt,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-251L,H,Fall 2026,Campbell,Matt,,,14 weeks,,T R,,,0,1.5,100,1x150,Yes,2.25
+ME-317,A,Fall 2026,Johnson,Pete,,,14 weeks,,M W,,,2,2,100,2x50,No,
+ME-317,B,Fall 2026,Johnson,Pete,,,14 weeks,,M W,,,2,2,100,2x50,No,
+ME-333,A,Fall 2026,Venstrom,Luke,,,14 weeks,,M W F,,,4,3,100,3x50,No,
+ME-333,B,Fall 2026,Venstrom,Luke,,,14 weeks,,M W F,,,4,3,100,3x50,No,
+ME-333L,A,Fall 2026,Venstrom,Luke,,,14 weeks,,T,,,0,3,100,1x150,No,3
+ME-333L,B,Fall 2026,Krenzke,Peter,,,14 weeks,,M,,,0,3,100,1x150,No,3
+ME-333L,C,Fall 2026,Krenzke,Peter,,,14 weeks,,T,,,0,3,100,1x150,No,3
+ME-333L,D,Fall 2026,Johnson,Pete,,,14 weeks,,T,,,0,3,100,1x150,No,3
+ME-352,A,Fall 2026,Johnson,Reva,,,14 weeks,,T R,,,0.5,1.5,100,1x150,Yes,1.5
+ME-352,B,Fall 2026,Johnson,Reva,,,14 weeks,,T R,,,0.5,1.5,100,1x150,Yes,1.5
+ME-352,C,Fall 2026,Sestito,Jesse,,,14 weeks,,T R,,,0.5,1.5,100,1x150,Yes,1.5
+ME-352,D,Fall 2026,Sestito,Jesse,,,14 weeks,,T R,,,0.5,1.5,100,1x150,Yes,1.5
+ME-355,A,Fall 2026,Sestito,Jesse,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+ME-355,B,Fall 2026,Sestito,Jesse,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+ME-363,A,Fall 2026,Johnson,Pete,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+ME-366,A,Fall 2026,Nudehi,Shahin,,,7 weeks,MECH_366_367,T R,,,1,1,100,1x150,No,1.5
+ME-367,A,Fall 2026,Nudehi,Shahin,,,7 weeks,MECH_366_367,T R,,,1,1,100,1x150,No,1.5
+ME-368,A,Fall 2026,Nudehi,Shahin,,,7 weeks,,T R,,,1,1,100,1x150,No,1.5
+ME-370,A,Fall 2026,Nudehi,Shahin,,,14 weeks,,T R,,,1.5,1.5,100,1x75,No,
+ME-370L,A,Fall 2026,Nudehi,Shahin,,,14 weeks,,T R,,,0.5,1.5,100,1x150,Yes,1.5
+ME-373,A,Fall 2026,Nudehi,Shahin,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+ME-442,A,Fall 2026,Johnson,Reva,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+ME-457,A,Fall 2026,Campbell,Matt,,,14 weeks,,T R,,,1,3,100,1x150,No,1.5
+ME-490-PK,A,Fall 2026,Krenzke,Peter,,,14 weeks,,M W F,,,3,3,100,3x50,No,
+GE-100,A,Fall 2026,Staff,Staff,,,14 weeks,,M,8:00,8:50,2,1,100,1x50,No,
+GE-100,B,Fall 2026,Staff,Staff,,,14 weeks,,M,9:00,9:50,2,1,100,1x50,No,
+GE-100L,A,Fall 2026,Sestito,Lauren,,,14 weeks,,T R,,,0,3,100,2x75,No,3
+GE-100L,B,Fall 2026,Luke,Bethany,,,14 weeks,,T R,,,0,3,100,2x75,No,3
+GE-100L,C,Fall 2026,Staff,Staff,,,14 weeks,,T R,,,0,3,100,2x75,No,3
+GE-100L,D,Fall 2026,Staff,Staff,,,14 weeks,,T R,,,0,3,100,2x75,No,3
+GE-100L,E,Fall 2026,Staff,Staff,,,14 weeks,,T R,,,0,3,100,2x75,No,3
+ECE-281,A,Fall 2026,Staff,Staff,,,14 weeks,,M W F,,,2.5,2.5,100,3x50,No,
+ECE-281,B,Fall 2026,Staff,Staff,,,14 weeks,,M W F,,,2.5,2.5,100,3x50,No,
+PHYS-141,A,Fall 2026,Staff,Staff,,,14 weeks,,M W F,11:30,12:20,3,3,100,3x50,No,
+PHYS-141,B,Fall 2026,Staff,Staff,,,14 weeks,,M W F,12:30,1:20,3,3,100,3x50,No,
+PHYS-141L,A,Fall 2026,Staff,Staff,,,14 weeks,,M T W R,,,1,3,100,1x150,No,1.5
+PHYS-141L,B,Fall 2026,Staff,Staff,,,14 weeks,,M T W R,,,1,3,100,1x150,No,1.5
+PHYS-141L,C,Fall 2026,Staff,Staff,,,14 weeks,,M T W R,,,1,3,100,1x150,No,1.5
+PHYS-141L,D,Fall 2026,Staff,Staff,,,14 weeks,,M T W R,,,1,3,100,1x150,No,1.5
+PHYS-141L,E,Fall 2026,Staff,Staff,,,14 weeks,,M T W R,,,1,3,100,1x150,No,1.5
+PHYS-141L,F,Fall 2026,Staff,Staff,,,14 weeks,,M T W R,,,1,3,100,1x150,No,1.5
+CHEM-115,A,Fall 2026,Smith,Paul,,,14 weeks,,M W F,11:30,12:20,4,3,100,3x50,No,
+CHEM-115L,A,Fall 2026,Smith,Paul,,,14 weeks,,R,8:20,10:50,0,3,100,1x150,No,3
+CHEM-115L,B,Fall 2026,Smith,Paul,,,14 weeks,,R,11:30,2:00,0,3,100,1x150,No,3
+CHEM-115L,C,Fall 2026,Smith,Paul,,,14 weeks,,R,2:30,5:00,0,3,100,1x150,No,3
+MATH-253,A,Fall 2026,Sullivan,Patrick,,,14 weeks,,M T W F,8:00,8:50,4,4,100,4x50,No,
+MATH-253,B,Fall 2026,Sullivan,Patrick,,,14 weeks,,M T W F,9:00,9:50,4,4,100,4x50,No,
+BIO-151,A,Fall 2026,Staff,Staff,,,14 weeks,,M W F,8:00,8:50,4,5,100,3x50,No,
+BIO-151,B,Fall 2026,Staff,Staff,,,14 weeks,,M W F,10:00,10:50,4,5,100,3x50,No,
+BIO-151L,A,Fall 2026,Staff,Staff,,,14 weeks,,T,11:30,2:00,0,3,100,1x150,No,3
+BIO-151L,B,Fall 2026,Staff,Staff,,,14 weeks,,T,2:30,5:00,0,3,100,1x150,No,3
+BIO-151L,C,Fall 2026,Staff,Staff,,,14 weeks,,T,6:30,9:00,0,3,100,1x150,No,3
+BIO-151L,D,Fall 2026,Staff,Staff,,,14 weeks,,W,2:30,5:00,0,3,100,1x150,No,3
+BIO-151L,E,Fall 2026,Staff,Staff,,,14 weeks,,R,11:30,2:00,0,3,100,1x150,No,3
+BIO-151L,F,Fall 2026,Staff,Staff,,,14 weeks,,R,2:30,5:00,0,3,100,1x150,No,3
+BIO-151L,G,Fall 2026,Staff,Staff,,,14 weeks,,R,6:30,9:00,0,3,100,1x150,No,3
+BIO-151L,H,Fall 2026,Staff,Staff,,,14 weeks,,F,11:30,2:00,0,3,100,1x150,No,3

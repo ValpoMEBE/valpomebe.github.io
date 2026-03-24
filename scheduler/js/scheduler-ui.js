@@ -1,22 +1,24 @@
 /* ╔══════════════════════════════════════════════════════════════╗
-   ║  SCHEDULER UI — Upload, grid rendering, filters, export      ║
+   ║  SCHEDULER UI — Upload, grid, filters, reports, export      ║
    ╠══════════════════════════════════════════════════════════════╣
    ║  Depends on: parser.js, optimizer.js, COURSES global         ║
    ╚══════════════════════════════════════════════════════════════╝ */
 
 // ── State ───────────────────────────────────────────────────────
 let STATE = {
-  deptCourses:  null,  // parsed from courses CSV
-  externals:    null,  // parsed from external CSVs (combined)
-  slots:        null,  // parsed from timeslots CSV
+  courses:      null,  // parsed dept courses (need scheduling)
+  frozen:       null,  // parsed frozen/external courses
+  slots:        null,  // parsed time slots
+  facultyPrefs: null,  // parsed faculty preferences (optional)
   result:       null,  // optimizer output
   activeDay:    0,     // which day tab is selected (0-4, or 'all')
-  showExternals: false, // dept-only vs all courses
+  showExternals: false,
+  selectedCourse: null, // for detail panel
 };
 
-const GRID_START_HOUR = 7;   // 7:00 AM
-const GRID_END_HOUR   = 18;  // 6:00 PM
-const PIXELS_PER_MIN  = 1.8; // vertical scale
+const GRID_START_HOUR = 7;
+const GRID_END_HOUR   = 18;
+const PIXELS_PER_MIN  = 1.8;
 
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const DAY_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
@@ -26,7 +28,7 @@ let colorIndex = 0;
 
 function getInstructorColor(name) {
   if (!INSTRUCTOR_COLORS.has(name)) {
-    INSTRUCTOR_COLORS.set(name, colorIndex % 8);
+    INSTRUCTOR_COLORS.set(name, colorIndex % 12);
     colorIndex++;
   }
   return INSTRUCTOR_COLORS.get(name);
@@ -41,8 +43,7 @@ function getYearLevel(courseId) {
   if (!info || !info.semesters) return null;
   const sems = Object.values(info.semesters);
   if (sems.length === 0) return null;
-  const minSem = Math.min(...sems);
-  return semToYear(minSem);
+  return semToYear(Math.min(...sems));
 }
 
 function getPrograms(courseId) {
@@ -63,12 +64,37 @@ function getProgramLabel(prog) {
   return 'GE';
 }
 
+// ── Get display name for instructor ─────────────────────────────
+function getInstructorDisplay(course) {
+  if (!course.instructors || course.instructors.length === 0) return 'TBD';
+  const inst = course.instructors[0];
+  if (inst.last === 'Staff') return 'Staff';
+  return inst.last;
+}
+
+function getFullInstructorDisplay(course) {
+  if (!course.instructors || course.instructors.length === 0) return 'TBD';
+  return course.instructors.map(i => `${i.first} ${i.last}`).join(', ');
+}
+
+// ── Get slider weights from UI ──────────────────────────────────
+function getWeights() {
+  return {
+    cohortConflict:         parseInt(document.getElementById('weight-cohort')?.value || '9', 10),
+    facultyPref:            parseInt(document.getElementById('weight-faculty-pref')?.value || '8', 10),
+    singleSectionAfternoon: parseInt(document.getElementById('weight-single-before230')?.value || '10', 10),
+    backToBack:             parseInt(document.getElementById('weight-back-to-back')?.value || '6', 10),
+    specialConstraints:     parseInt(document.getElementById('weight-special')?.value || '10', 10),
+  };
+}
+
 // ── Init ────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   // File upload handlers
-  document.getElementById('file-courses').addEventListener('change', handleCoursesUpload);
-  document.getElementById('file-externals').addEventListener('change', handleExternalsUpload);
+  document.getElementById('file-master').addEventListener('change', handleMasterUpload);
   document.getElementById('file-timeslots').addEventListener('change', handleTimeslotsUpload);
+  const facInput = document.getElementById('file-preferences');
+  if (facInput) facInput.addEventListener('change', handleFacultyUpload);
 
   // Buttons
   document.getElementById('btn-generate').addEventListener('click', runOptimizer);
@@ -108,38 +134,34 @@ document.addEventListener('DOMContentLoaded', () => {
     renderGrid();
     applyFilters();
   });
+
+  // Weight slider value displays
+  for (const slider of document.querySelectorAll('.weight-slider-group input[type="range"]')) {
+    const display = slider.parentElement.querySelector('.slider-value');
+    if (display) {
+      slider.addEventListener('input', () => { display.textContent = slider.value; });
+    }
+  }
+
+  // Close detail panel
+  const closeBtn = document.getElementById('detail-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeDetailPanel);
 });
 
 // ── File upload handlers ────────────────────────────────────────
-function handleCoursesUpload(e) {
+function handleMasterUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
   file.text().then(text => {
-    STATE.deptCourses = parseCoursesCSV(text);
-    const el = document.getElementById('status-courses');
-    el.textContent = `${file.name} — ${STATE.deptCourses.length} course-sections`;
+    const parsed = parseMasterCSV(text);
+    STATE.courses = parsed.courses;
+    STATE.frozen  = parsed.frozen;
+    const el = document.getElementById('status-master');
+    const total = parsed.courses.length + parsed.frozen.length;
+    el.textContent = `${file.name} — ${parsed.courses.length} to schedule, ${parsed.frozen.length} frozen (${total} total)`;
     el.classList.add('loaded');
     checkReady();
   });
-}
-
-function handleExternalsUpload(e) {
-  const files = e.target.files;
-  if (!files.length) return;
-  STATE.externals = [];
-  let loaded = 0;
-  for (const file of files) {
-    file.text().then(text => {
-      STATE.externals.push(...parseExternalCSV(text));
-      loaded++;
-      if (loaded === files.length) {
-        const el = document.getElementById('status-externals');
-        el.textContent = `${files.length} file(s) — ${STATE.externals.length} external sections`;
-        el.classList.add('loaded');
-        checkReady();
-      }
-    });
-  }
 }
 
 function handleTimeslotsUpload(e) {
@@ -154,8 +176,21 @@ function handleTimeslotsUpload(e) {
   });
 }
 
+function handleFacultyUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  file.text().then(text => {
+    STATE.facultyPrefs = parseFacultyPrefsCSV(text);
+    const el = document.getElementById('status-preferences');
+    const count = STATE.facultyPrefs.preferences.size;
+    const rules = STATE.facultyPrefs.specialRules.length;
+    el.textContent = `${file.name} — ${count} faculty, ${rules} special rules`;
+    el.classList.add('loaded');
+  });
+}
+
 function checkReady() {
-  const ready = STATE.deptCourses && STATE.externals && STATE.slots;
+  const ready = STATE.courses && STATE.slots;
   document.getElementById('btn-generate').disabled = !ready;
 }
 
@@ -164,23 +199,25 @@ async function loadSampleData() {
   const base = document.querySelector('meta[name="baseurl"]')?.content ||
                (location.pathname.startsWith('/dev') ? '/dev' : '');
   try {
-    const [coursesText, mathText, physText, slotsText] = await Promise.all([
-      fetch(`${base}/scheduler/sample-data/courses-to-schedule.csv`).then(r => r.text()),
-      fetch(`${base}/scheduler/sample-data/external-math.csv`).then(r => r.text()),
-      fetch(`${base}/scheduler/sample-data/external-physics.csv`).then(r => r.text()),
+    const [masterText, slotsText, facText] = await Promise.all([
+      fetch(`${base}/scheduler/sample-data/master-courses.csv`).then(r => r.text()),
       fetch(`${base}/scheduler/sample-data/timeslots.csv`).then(r => r.text()),
+      fetch(`${base}/scheduler/sample-data/faculty-preferences.csv`).then(r => r.text()),
     ]);
 
-    STATE.deptCourses = parseCoursesCSV(coursesText);
-    STATE.externals   = [...parseExternalCSV(mathText), ...parseExternalCSV(physText)];
-    STATE.slots       = parseTimeslotsCSV(slotsText);
+    const parsed = parseMasterCSV(masterText);
+    STATE.courses = parsed.courses;
+    STATE.frozen  = parsed.frozen;
+    STATE.slots   = parseTimeslotsCSV(slotsText);
+    STATE.facultyPrefs = parseFacultyPrefsCSV(facText);
 
-    document.getElementById('status-courses').textContent = `Sample — ${STATE.deptCourses.length} course-sections`;
-    document.getElementById('status-courses').classList.add('loaded');
-    document.getElementById('status-externals').textContent = `Sample — ${STATE.externals.length} external sections`;
-    document.getElementById('status-externals').classList.add('loaded');
+    const total = parsed.courses.length + parsed.frozen.length;
+    document.getElementById('status-master').textContent = `Sample — ${parsed.courses.length} to schedule, ${parsed.frozen.length} frozen (${total} total)`;
+    document.getElementById('status-master').classList.add('loaded');
     document.getElementById('status-timeslots').textContent = `Sample — ${STATE.slots.length} slots`;
     document.getElementById('status-timeslots').classList.add('loaded');
+    document.getElementById('status-preferences').textContent = `Sample — ${STATE.facultyPrefs.preferences.size} faculty, ${STATE.facultyPrefs.specialRules.length} rules`;
+    document.getElementById('status-preferences').classList.add('loaded');
 
     checkReady();
   } catch (err) {
@@ -191,26 +228,41 @@ async function loadSampleData() {
 
 // ── Run optimizer ───────────────────────────────────────────────
 function runOptimizer() {
-  if (!STATE.deptCourses || !STATE.externals || !STATE.slots) return;
+  if (!STATE.courses || !STATE.slots) return;
 
-  const t0 = performance.now();
-  STATE.result = optimizeSchedule(STATE.deptCourses, STATE.externals, STATE.slots);
-  const dt = (performance.now() - t0).toFixed(1);
+  const weights = getWeights();
+  const prefs = STATE.facultyPrefs || { preferences: new Map(), specialRules: [] };
 
-  console.log(`Optimizer: ${dt}ms, ${STATE.result.iterations} iterations, score=${STATE.result.score}`);
+  // Show a brief "working" state
+  const btn = document.getElementById('btn-generate');
+  const prevText = btn.textContent;
+  btn.textContent = 'Optimizing...';
+  btn.disabled = true;
 
-  // Show result sections
-  document.getElementById('scheduler-results').hidden = false;
-  document.getElementById('scheduler-conflicts').hidden = false;
-  document.getElementById('scheduler-loads').hidden = false;
+  // Use setTimeout to allow UI to update before blocking computation
+  setTimeout(() => {
+    const t0 = performance.now();
+    STATE.result = optimizeSchedule(STATE.courses, STATE.frozen || [], STATE.slots, prefs, weights);
+    const dt = (performance.now() - t0).toFixed(1);
 
-  // Populate instructor filter
-  populateInstructorFilter();
+    console.log(`Optimizer: ${dt}ms, ${STATE.result.iterations} iterations, score=${STATE.result.score}`);
 
-  // Render
-  renderGrid();
-  renderConflicts();
-  renderLoads();
+    btn.textContent = prevText;
+    btn.disabled = false;
+
+    // Show result sections
+    document.getElementById('scheduler-results').hidden = false;
+    document.getElementById('scheduler-conflicts').hidden = false;
+    document.getElementById('scheduler-loads').hidden = false;
+
+    // Populate instructor filter
+    populateInstructorFilter();
+
+    // Render everything
+    renderGrid();
+    renderAnalysis();
+    renderLoads();
+  }, 50);
 }
 
 // ── Populate instructor dropdown ────────────────────────────────
@@ -218,7 +270,9 @@ function populateInstructorFilter() {
   const select = document.getElementById('filter-instructor');
   const instructors = new Set();
   for (const item of STATE.result.scheduled) {
-    if (!item.course.isExternal) instructors.add(item.course.instructor);
+    if (!item.course.isExternal) {
+      instructors.add(getInstructorKey(item.course) || getInstructorDisplay(item.course));
+    }
   }
   select.innerHTML = '<option value="all">All</option>';
   for (const name of [...instructors].sort()) {
@@ -226,6 +280,55 @@ function populateInstructorFilter() {
     opt.value = name;
     opt.textContent = name;
     select.appendChild(opt);
+  }
+}
+
+// ── Overlap layout algorithm ────────────────────────────────────
+function layoutOverlaps(entries) {
+  if (entries.length === 0) return;
+  entries.sort((a, b) => a.startMin - b.startMin || b.endMin - a.endMin);
+
+  const columns = [];
+  for (const entry of entries) {
+    let placed = false;
+    for (let c = 0; c < columns.length; c++) {
+      if (columns[c] <= entry.startMin) {
+        entry.col = c;
+        columns[c] = entry.endMin;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      entry.col = columns.length;
+      columns.push(entry.endMin);
+    }
+  }
+
+  const clusters = [];
+  let clusterStart = 0;
+  let clusterEnd = entries[0].endMin;
+
+  for (let i = 1; i < entries.length; i++) {
+    if (entries[i].startMin < clusterEnd) {
+      clusterEnd = Math.max(clusterEnd, entries[i].endMin);
+    } else {
+      clusters.push({ from: clusterStart, to: i });
+      clusterStart = i;
+      clusterEnd = entries[i].endMin;
+    }
+  }
+  clusters.push({ from: clusterStart, to: entries.length });
+
+  for (const cluster of clusters) {
+    let maxCol = 0;
+    for (let i = cluster.from; i < cluster.to; i++) {
+      maxCol = Math.max(maxCol, entries[i].col);
+    }
+    const totalCols = maxCol + 1;
+    for (let i = cluster.from; i < cluster.to; i++) {
+      entries[i].totalCols = totalCols;
+    }
   }
 }
 
@@ -237,13 +340,8 @@ function renderGrid() {
   const singleDay = STATE.activeDay !== 'all';
   const daysToShow = singleDay ? [STATE.activeDay] : [0, 1, 2, 3, 4];
 
-  // Set grid mode
   grid.classList.toggle('single-day', singleDay);
-  if (!singleDay) {
-    grid.style.gridTemplateColumns = `60px repeat(5, 1fr)`;
-  } else {
-    grid.style.gridTemplateColumns = `70px 1fr`;
-  }
+  grid.style.gridTemplateColumns = singleDay ? '70px 1fr' : '60px repeat(5, 1fr)';
 
   // Header row
   const cornerHeader = document.createElement('div');
@@ -283,8 +381,10 @@ function renderGrid() {
   const conflictSet = new Set();
   if (STATE.result) {
     for (const c of STATE.result.conflicts) {
-      for (let i = 0; i < c.courses.length; i++) {
-        conflictSet.add(`${c.courses[i]}-${c.sections[i]}`);
+      if (c.courses) {
+        for (let i = 0; i < c.courses.length; i++) {
+          conflictSet.add(`${c.courses[i]}-${c.sections ? c.sections[i] : ''}`);
+        }
       }
     }
   }
@@ -296,14 +396,12 @@ function renderGrid() {
     col.style.position = 'relative';
     col.style.height = `${colHeight}px`;
 
-    // Hour grid lines
     for (let h = GRID_START_HOUR; h <= GRID_END_HOUR; h++) {
       const line = document.createElement('div');
       line.className = `grid-line${h !== GRID_START_HOUR ? ' hour' : ''}`;
       line.style.top = `${(h - GRID_START_HOUR) * 60 * pxPerMin}px`;
       col.appendChild(line);
     }
-    // Half-hour lines
     for (let h = GRID_START_HOUR; h < GRID_END_HOUR; h++) {
       const line = document.createElement('div');
       line.className = 'grid-line';
@@ -311,21 +409,32 @@ function renderGrid() {
       col.appendChild(line);
     }
 
-    // Place course blocks
     if (STATE.result) {
+      const dayEntries = [];
       for (const item of STATE.result.scheduled) {
+        if (!item.slot || !item.slot.days) continue;
         if (!item.slot.days.includes(d)) continue;
-
-        // Dept-only toggle: skip externals if showExternals is false
         if (!STATE.showExternals && item.course.isExternal) continue;
 
-        const block = createCourseBlock(item, conflictSet);
         const startMin = timeToMinutes(item.slot.startTime) - GRID_START_HOUR * 60;
         const endMin   = timeToMinutes(item.slot.endTime) - GRID_START_HOUR * 60;
-        const height   = (endMin - startMin) * pxPerMin;
+        if (startMin < 0 || endMin <= startMin) continue;
+        dayEntries.push({ item, startMin, endMin, col: 0, totalCols: 1 });
+      }
 
-        block.style.top    = `${startMin * pxPerMin}px`;
+      layoutOverlaps(dayEntries);
+
+      const GAP = 2;
+      for (const entry of dayEntries) {
+        const block = createCourseBlock(entry.item, conflictSet);
+        const height = (entry.endMin - entry.startMin) * pxPerMin;
+
+        block.style.top    = `${entry.startMin * pxPerMin}px`;
         block.style.height = `${height}px`;
+
+        const colWidth = 100 / entry.totalCols;
+        block.style.left  = `calc(${entry.col * colWidth}% + ${GAP}px)`;
+        block.style.width = `calc(${colWidth}% - ${GAP * 2}px)`;
 
         col.appendChild(block);
       }
@@ -339,7 +448,8 @@ function renderGrid() {
 function createCourseBlock(item, conflictSet) {
   const block = document.createElement('div');
   const c = item.course;
-  const colorClass = `color-${getInstructorColor(c.instructor)}`;
+  const instrName = getInstructorDisplay(c);
+  const colorClass = `color-${getInstructorColor(instrName) % 12}`;
   block.className = `course-block ${colorClass}`;
 
   if (c.isExternal) block.classList.add('external');
@@ -351,7 +461,7 @@ function createCourseBlock(item, conflictSet) {
   // Data attributes for filtering
   const year = getYearLevel(c.courseId);
   const progs = getPrograms(c.courseId);
-  block.dataset.instructor = c.instructor;
+  block.dataset.instructor = (typeof getInstructorKey === 'function' ? getInstructorKey(c) : null) || instrName;
   block.dataset.year = year || '';
   block.dataset.programs = progs.join(',');
   block.dataset.code = c.code;
@@ -360,7 +470,7 @@ function createCourseBlock(item, conflictSet) {
   // Content
   block.innerHTML = `
     <div class="block-code">${c.code} §${c.section}</div>
-    <div class="block-instructor">${c.instructor}</div>
+    <div class="block-instructor">${instrName}</div>
     <div class="block-time">${item.slot.startTime}–${item.slot.endTime}</div>
     <div class="block-tags">
       ${year ? `<span class="block-tag ${YEAR_TAG_CLASS[year]}">${YEAR_LABELS[year]}</span>` : ''}
@@ -370,18 +480,215 @@ function createCourseBlock(item, conflictSet) {
     </div>
   `;
 
-  // Click to lock/unlock (not external)
+  // Click to open detail panel (not external)
   if (!c.isExternal) {
-    block.addEventListener('click', () => toggleLock(c, block));
+    block.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openDetailPanel(item);
+    });
   }
 
   return block;
 }
 
-// ── Toggle lock on a course ─────────────────────────────────────
-function toggleLock(course, blockEl) {
-  course.locked = !course.locked;
-  blockEl.classList.toggle('locked', course.locked);
+// ── Course detail panel (minimal-impact change) ─────────────────
+function openDetailPanel(item) {
+  STATE.selectedCourse = item;
+  const panel = document.getElementById('course-detail-panel');
+  if (!panel) return;
+
+  const c = item.course;
+  const instrDisplay = getFullInstructorDisplay(c);
+  const year = getYearLevel(c.courseId);
+  const yearLabel = year ? YEAR_LABELS[year] : '—';
+
+  // Find available alternative slots
+  const alternatives = findAlternativeSlots(item);
+
+  panel.querySelector('.detail-course-code').textContent = `${c.code} §${c.section}`;
+  panel.querySelector('.detail-instructor').textContent = instrDisplay;
+  panel.querySelector('.detail-current-time').textContent = `${item.slot.startTime} – ${item.slot.endTime} (${item.slot.dayPattern || ''})`;
+  panel.querySelector('.detail-mode').textContent = c.mode || '—';
+  panel.querySelector('.detail-year').textContent = yearLabel;
+  panel.querySelector('.detail-credits').textContent = `${c.studentCredits || '—'} student / ${c.facultyCredits || '—'} faculty`;
+
+  // Lock/unlock button
+  const lockBtn = panel.querySelector('.detail-lock-btn');
+  lockBtn.textContent = c.locked ? 'Unlock' : 'Lock';
+  lockBtn.onclick = () => {
+    c.locked = !c.locked;
+    lockBtn.textContent = c.locked ? 'Unlock' : 'Lock';
+    renderGrid();
+    applyFilters();
+  };
+
+  // Re-optimize this course button
+  const reoptBtn = panel.querySelector('.detail-reopt-btn');
+  reoptBtn.onclick = () => {
+    reoptimizeSingleCourse(item);
+  };
+
+  // Alternative slots list
+  const altList = panel.querySelector('.detail-alternatives');
+  altList.innerHTML = '';
+
+  if (alternatives.length === 0) {
+    altList.innerHTML = '<div class="move-option" style="color: var(--light-gray);">No alternative slots available</div>';
+  } else {
+    for (const alt of alternatives.slice(0, 10)) {
+      const div = document.createElement('div');
+      div.className = `move-option${alt.conflicts === 0 ? ' best' : ''}`;
+      div.innerHTML = `
+        <div class="move-time">${alt.slot.startTime} – ${alt.slot.endTime} <span style="opacity:.6">${alt.slot.dayPattern}</span></div>
+        <div class="move-impact">
+          ${alt.conflicts === 0
+            ? '<span class="impact-good">No new conflicts</span>'
+            : `<span class="impact-bad">${alt.conflicts} conflict(s)</span>`
+          }
+          ${alt.prefScore !== undefined ? `<span class="impact-pref">Pref: ${alt.prefScore > 0 ? '+' : ''}${alt.prefScore}</span>` : ''}
+        </div>
+      `;
+      div.addEventListener('click', () => {
+        moveCourseToSlot(item, alt.slot);
+        closeDetailPanel();
+      });
+      altList.appendChild(div);
+    }
+  }
+
+  panel.classList.add('open');
+}
+
+function closeDetailPanel() {
+  const panel = document.getElementById('course-detail-panel');
+  if (panel) panel.classList.remove('open');
+  STATE.selectedCourse = null;
+}
+
+// ── Find alternative time slots for a course ────────────────────
+function findAlternativeSlots(item) {
+  const c = item.course;
+  const currentSlot = item.slot;
+  const alternatives = [];
+
+  // Get compatible slots (matching format)
+  const compatibleSlots = STATE.slots.filter(s => s.format === c.mode);
+
+  for (const slot of compatibleSlots) {
+    // Skip current slot
+    if (slot.startTime === currentSlot.startTime &&
+        slot.endTime === currentSlot.endTime &&
+        slot.dayPattern === currentSlot.dayPattern) continue;
+
+    // Count conflicts this slot would create
+    let conflicts = 0;
+    for (const other of STATE.result.scheduled) {
+      if (other === item) continue;
+      if (!other.slot || !other.slot.days) continue;
+
+      // Instructor conflict
+      if (c.instructors && other.course.instructors) {
+        const cKeys = c.instructors.filter(i => i.last !== 'Staff').map(i => `${i.last}_${i.first}`);
+        const oKeys = other.course.instructors.filter(i => i.last !== 'Staff').map(i => `${i.last}_${i.first}`);
+        if (cKeys.some(k => oKeys.includes(k))) {
+          if (timesOverlap(slot.days, slot.startTime, slot.endTime,
+                           other.slot.days, other.slot.startTime, other.slot.endTime)) {
+            conflicts++;
+          }
+        }
+      }
+
+      // Same-course section conflict
+      if (other.course.code === c.code && other.course.section !== c.section) {
+        if (timesOverlap(slot.days, slot.startTime, slot.endTime,
+                         other.slot.days, other.slot.startTime, other.slot.endTime)) {
+          conflicts++;
+        }
+      }
+    }
+
+    // Faculty preference score for this slot
+    let prefScore = 0;
+    if (STATE.facultyPrefs) {
+      prefScore = matchFacultyPrefForSlot(c, slot);
+    }
+
+    alternatives.push({ slot, conflicts, prefScore });
+  }
+
+  // Sort: fewest conflicts first, then best preference
+  alternatives.sort((a, b) => a.conflicts - b.conflicts || b.prefScore - a.prefScore);
+  return alternatives;
+}
+
+// ── Match faculty pref for a specific slot ──────────────────────
+function matchFacultyPrefForSlot(course, slot) {
+  if (!STATE.facultyPrefs || !course.instructors) return 0;
+  const inst = course.instructors[0];
+  if (!inst || inst.last === 'Staff') return 0;
+
+  // Try to find faculty key
+  const keys = [inst.last, `${inst.last}_${(inst.first || '')[0]}`];
+  for (const key of keys) {
+    const prefs = STATE.facultyPrefs.preferences.get(key);
+    if (!prefs) continue;
+
+    for (const p of prefs) {
+      if (p.format === slot.format &&
+          p.start === slot.startTime) {
+        return p.pref;
+      }
+    }
+  }
+  return 0;
+}
+
+// ── Move course to a new slot ───────────────────────────────────
+function moveCourseToSlot(item, newSlot) {
+  // Update the course's slot assignment
+  item.slot = newSlot;
+  item.course.slotIndex = newSlot.index;
+
+  // Re-detect conflicts
+  if (STATE.result) {
+    const semesterMap = buildSemesterMap();
+    const conflictGraph = buildConflictGraph(semesterMap);
+    STATE.result.conflicts = detectConflicts(STATE.result.scheduled, conflictGraph);
+  }
+
+  renderGrid();
+  applyFilters();
+  renderAnalysis();
+}
+
+// ── Re-optimize a single course ─────────────────────────────────
+function reoptimizeSingleCourse(item) {
+  // Lock all courses except this one
+  const prevLocked = new Map();
+  for (const c of STATE.courses) {
+    prevLocked.set(c, c.locked);
+    if (c !== item.course) c.locked = true;
+  }
+
+  // Clear this course's assignment
+  item.course.locked = false;
+  item.course.slotIndex = null;
+
+  // Run optimizer
+  const weights = getWeights();
+  const prefs = STATE.facultyPrefs || { preferences: new Map(), specialRules: [] };
+  STATE.result = optimizeSchedule(STATE.courses, STATE.frozen || [], STATE.slots, prefs, weights);
+
+  // Restore lock states
+  for (const [c, wasLocked] of prevLocked) {
+    c.locked = wasLocked;
+  }
+
+  renderGrid();
+  applyFilters();
+  renderAnalysis();
+  renderLoads();
+  closeDetailPanel();
 }
 
 // ── Apply filter dropdowns ──────────────────────────────────────
@@ -395,12 +702,14 @@ function applyFilters() {
     let visible = true;
 
     if (instructor !== 'all' && block.dataset.instructor !== instructor) {
-      // Always show external courses regardless of instructor filter
       if (!block.classList.contains('external')) visible = false;
     }
 
-    if (year !== 'all' && block.dataset.year !== year) {
-      if (!block.classList.contains('external')) visible = false;
+    if (year !== 'all') {
+      const yearValues = year.split(',');
+      if (!yearValues.includes(block.dataset.year) && !block.classList.contains('external')) {
+        visible = false;
+      }
     }
 
     if (program !== 'all') {
@@ -414,63 +723,173 @@ function applyFilters() {
   }
 }
 
-// ── Render conflict report ──────────────────────────────────────
-function renderConflicts() {
+// ── Render analysis (constraint report + student conflicts) ─────
+function renderAnalysis() {
   const result = STATE.result;
+
+  // ── Summary stats ──
   const summaryEl = document.getElementById('conflict-summary');
-  const listEl    = document.getElementById('conflict-list');
+  if (summaryEl) {
+    const studentConflicts    = result.conflicts.filter(c => c.type === 'student');
+    const instructorConflicts = result.conflicts.filter(c => c.type === 'instructor');
 
-  const studentConflicts    = result.conflicts.filter(c => c.type === 'student');
-  const instructorConflicts = result.conflicts.filter(c => c.type === 'instructor');
+    summaryEl.innerHTML = `
+      <div class="conflict-stat ${result.conflicts.length === 0 ? 'good' : 'bad'}">
+        ${result.conflicts.length === 0 ? 'No conflicts' : `${result.conflicts.length} conflict(s)`}
+      </div>
+      <div class="conflict-stat ${studentConflicts.length === 0 ? 'good' : 'bad'}">
+        ${studentConflicts.length} student
+      </div>
+      <div class="conflict-stat ${instructorConflicts.length === 0 ? 'good' : 'bad'}">
+        ${instructorConflicts.length} instructor
+      </div>
+      <div class="conflict-stat ${result.unscheduled.length === 0 ? 'good' : 'warn'}">
+        ${result.unscheduled.length} unscheduled
+      </div>
+      <div class="conflict-stat good">
+        Score: ${result.score} <span style="opacity:.6">(${result.iterations.toLocaleString()} iter)</span>
+      </div>
+    `;
+  }
 
-  // Summary stats
-  summaryEl.innerHTML = `
-    <div class="conflict-stat ${result.conflicts.length === 0 ? 'good' : 'bad'}">
-      ${result.conflicts.length === 0 ? 'No conflicts' : `${result.conflicts.length} conflict(s)`}
-    </div>
-    <div class="conflict-stat ${studentConflicts.length === 0 ? 'good' : 'bad'}">
-      ${studentConflicts.length} student conflict(s)
-    </div>
-    <div class="conflict-stat ${instructorConflicts.length === 0 ? 'good' : 'bad'}">
-      ${instructorConflicts.length} instructor conflict(s)
-    </div>
-    <div class="conflict-stat ${result.unscheduled.length === 0 ? 'good' : 'warn'}">
-      ${result.unscheduled.length} unscheduled course(s)
-    </div>
-    <div class="conflict-stat good">
-      Score: ${result.score} (${result.iterations.toLocaleString()} iterations)
-    </div>
-  `;
+  // ── Constraint satisfaction report ──
+  const reportEl = document.getElementById('constraint-cards');
+  if (reportEl && result.constraintReport) {
+    const cr = result.constraintReport;
+    const prefPct = cr.facultyPrefMax > 0
+      ? Math.round((cr.facultyPrefScore / cr.facultyPrefMax) * 100)
+      : 100;
 
-  // Conflict cards
-  listEl.innerHTML = '';
+    reportEl.innerHTML = `
+      <div class="constraint-card ${cr.cohortConflicts.length === 0 ? 'satisfied' : 'violated'}">
+        <div class="constraint-header">
+          <span class="constraint-name">Cohort Conflict Avoidance</span>
+          <span class="constraint-score">${cr.cohortConflicts.length === 0 ? 'All clear' : `${cr.cohortConflicts.length} conflict(s)`}</span>
+        </div>
+        ${cr.cohortConflicts.length > 0 ? `
+          <div class="constraint-violations">
+            ${cr.cohortConflicts.slice(0, 5).map(c =>
+              `<div class="violation-item">${c.courseA} / ${c.courseB} — ${c.program} Sem ${c.semester}</div>`
+            ).join('')}
+            ${cr.cohortConflicts.length > 5 ? `<div class="violation-item" style="opacity:.6">+ ${cr.cohortConflicts.length - 5} more</div>` : ''}
+          </div>
+        ` : ''}
+      </div>
 
-  if (result.unscheduled.length > 0) {
-    for (const c of result.unscheduled) {
+      <div class="constraint-card ${prefPct >= 80 ? 'satisfied' : prefPct >= 50 ? 'partial' : 'violated'}">
+        <div class="constraint-header">
+          <span class="constraint-name">Faculty Preference Honoring</span>
+          <span class="constraint-score">${prefPct}%</span>
+        </div>
+      </div>
+
+      <div class="constraint-card ${cr.singleSectionViolations.length === 0 ? 'satisfied' : 'violated'}">
+        <div class="constraint-header">
+          <span class="constraint-name">Single-Section Before 2:30 PM</span>
+          <span class="constraint-score">${cr.singleSectionViolations.length === 0 ? 'All clear' : `${cr.singleSectionViolations.length} violation(s)`}</span>
+        </div>
+        ${cr.singleSectionViolations.length > 0 ? `
+          <div class="constraint-violations">
+            ${cr.singleSectionViolations.map(v =>
+              `<div class="violation-item">${v.course} scheduled at ${v.time}</div>`
+            ).join('')}
+          </div>
+        ` : ''}
+      </div>
+
+      <div class="constraint-card satisfied">
+        <div class="constraint-header">
+          <span class="constraint-name">Back-to-Back Same-Course Sections</span>
+          <span class="constraint-score">${cr.backToBackPairs.filter(p => p.status === 'achieved').length}/${cr.backToBackPairs.length} achieved</span>
+        </div>
+      </div>
+
+      <div class="constraint-card ${cr.specialRuleViolations.length === 0 ? 'satisfied' : 'violated'}">
+        <div class="constraint-header">
+          <span class="constraint-name">Special Faculty Constraints</span>
+          <span class="constraint-score">${cr.specialRuleViolations.length === 0 ? 'All met' : `${cr.specialRuleViolations.length} violation(s)`}</span>
+        </div>
+        ${cr.specialRuleViolations.length > 0 ? `
+          <div class="constraint-violations">
+            ${cr.specialRuleViolations.map(v =>
+              `<div class="violation-item">${v.detail}</div>`
+            ).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  // ── Student conflict analysis ──
+  const studentEl = document.getElementById('cohort-grid');
+  if (studentEl && result.studentAnalysis) {
+    const cohorts = result.studentAnalysis.cohorts || [];
+    // Sort: senior first, then by conflict count
+    cohorts.sort((a, b) => b.year - a.year || b.conflicts.length - a.conflicts.length);
+
+    studentEl.innerHTML = cohorts.map(cohort => {
+      const yearLabel = YEAR_LABELS[cohort.year] || '?';
+      const hasConflicts = cohort.conflicts.length > 0;
+      return `
+        <div class="cohort-card ${hasConflicts ? 'has-conflicts' : 'no-conflicts'}">
+          <div class="cohort-header">
+            <span class="cohort-year-badge tag-${yearLabel.toLowerCase()}">${yearLabel}</span>
+            <span class="cohort-name">${cohort.program} Semester ${cohort.semester}</span>
+            <span class="cohort-status">${hasConflicts ? `${cohort.conflicts.length} conflict(s)` : 'Clear'}</span>
+          </div>
+          <div class="cohort-courses">
+            ${cohort.courses.map(c => {
+              const label = typeof c === 'string' ? c.replace(/_/g, ' ') : (c.code || c.courseId || '').replace(/_/g, ' ');
+              return `<span class="cohort-course-tag">${label}</span>`;
+            }).join('')}
+          </div>
+          ${hasConflicts ? `
+            <div class="cohort-conflicts">
+              ${cohort.conflicts.map(c => {
+                const a = typeof c.courseA === 'string' ? c.courseA.replace(/_/g, ' ') : (c.courseA?.code || c.courseA || '');
+                const b = typeof c.courseB === 'string' ? c.courseB.replace(/_/g, ' ') : (c.courseB?.code || c.courseB || '');
+                return `<div class="cohort-conflict-item">${a} overlaps ${b}</div>`;
+              }).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Conflict list (unscheduled + individual conflicts) ──
+  const listEl = document.getElementById('conflict-list');
+  if (listEl) {
+    listEl.innerHTML = '';
+
+    if (result.unscheduled.length > 0) {
+      for (const c of result.unscheduled) {
+        const card = document.createElement('div');
+        card.className = 'conflict-card';
+        const instrName = getInstructorDisplay(c);
+        card.innerHTML = `
+          <div class="conflict-type">Unscheduled</div>
+          <div class="conflict-detail">${c.code} §${c.section} (${instrName}) — could not be placed</div>
+          <div class="conflict-reason">All valid time slots blocked by hard constraints.</div>
+        `;
+        listEl.appendChild(card);
+      }
+    }
+
+    for (const conflict of result.conflicts) {
       const card = document.createElement('div');
       card.className = 'conflict-card';
       card.innerHTML = `
-        <div class="conflict-type">Unscheduled</div>
-        <div class="conflict-detail">${c.code} §${c.section} (${c.instructor}) — could not be placed in any available slot</div>
-        <div class="conflict-reason">All valid time slots are blocked by hard constraints.</div>
+        <div class="conflict-type">${conflict.type === 'student' ? 'Student Conflict' : 'Instructor Conflict'}</div>
+        <div class="conflict-detail">${conflict.detail}</div>
+        ${conflict.instructor ? `<div class="conflict-reason">Instructor: ${conflict.instructor}</div>` : ''}
       `;
       listEl.appendChild(card);
     }
-  }
 
-  for (const conflict of result.conflicts) {
-    const card = document.createElement('div');
-    card.className = 'conflict-card';
-    card.innerHTML = `
-      <div class="conflict-type">${conflict.type === 'student' ? 'Student Conflict' : 'Instructor Conflict'}</div>
-      <div class="conflict-detail">${conflict.detail}</div>
-      ${conflict.instructor ? `<div class="conflict-reason">Instructor: ${conflict.instructor}</div>` : ''}
-    `;
-    listEl.appendChild(card);
-  }
-
-  if (result.conflicts.length === 0 && result.unscheduled.length === 0) {
-    listEl.innerHTML = '<p style="color: var(--light-blue); font-size: .85rem;">All courses scheduled without conflicts.</p>';
+    if (result.conflicts.length === 0 && result.unscheduled.length === 0) {
+      listEl.innerHTML = '<p style="color: var(--light-blue); font-size: .85rem;">All courses scheduled without conflicts.</p>';
+    }
   }
 }
 
@@ -478,6 +897,7 @@ function renderConflicts() {
 function renderLoads() {
   const loads = computeFacultyLoads(STATE.result.scheduled);
   const tbody = document.getElementById('load-tbody');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
   const avgCredits = loads.reduce((s, l) => s + l.credits, 0) / (loads.length || 1);
@@ -486,12 +906,36 @@ function renderLoads() {
     const tr = document.createElement('tr');
     const creditClass = load.credits > avgCredits * 1.3 ? 'load-high' :
                         load.credits < avgCredits * 0.7 ? 'load-low' : '';
+
+    // Compute preference satisfaction for this instructor
+    let prefPct = '—';
+    if (STATE.facultyPrefs && STATE.result) {
+      const instrItems = STATE.result.scheduled.filter(item =>
+        !item.course.isExternal && (getInstructorKey(item.course) || getInstructorDisplay(item.course)) === load.instructor
+      );
+      let totalPref = 0, maxPref = 0;
+      for (const item of instrItems) {
+        const pVal = matchFacultyPrefForSlot(item.course, item.slot);
+        totalPref += Math.max(0, pVal);
+        maxPref += 3; // max possible per slot
+      }
+      prefPct = maxPref > 0 ? `${Math.round((totalPref / maxPref) * 100)}%` : '—';
+    }
+
+    const balanceIcon = load.credits > avgCredits * 1.3 ? '&#9650;' :
+                        load.credits < avgCredits * 0.7 ? '&#9660;' : '&#9644;';
+    const balanceClass = load.credits > avgCredits * 1.3 ? 'load-high' :
+                         load.credits < avgCredits * 0.7 ? 'load-low' : '';
+
     tr.innerHTML = `
       <td>${load.instructor}</td>
       <td class="${creditClass}">${load.credits}</td>
+      <td>${(load.tlc || 0).toFixed(1)}</td>
       <td>${load.contactHours.toFixed(1)}</td>
       <td>${load.preps}</td>
-      <td style="font-family: var(--font-mono); font-size: .7rem;">${load.courses.join(', ')}</td>
+      <td style="font-family: var(--font-mono); font-size: .65rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis;">${load.courses.join(', ')}</td>
+      <td>${prefPct}</td>
+      <td class="${balanceClass}">${balanceIcon}</td>
     `;
     tbody.appendChild(tr);
   }
@@ -501,20 +945,21 @@ function renderLoads() {
 function exportCSV() {
   if (!STATE.result) return;
 
-  const rows = [['Course', 'Section', 'Instructor', 'Day Pattern', 'Start', 'End', 'Is Lab', 'Credits']];
+  const rows = [['Course', 'Section', 'Instructor', 'Day Pattern', 'Start', 'End', 'Mode', 'Student Credits', 'Faculty Credits', 'Duration']];
 
   for (const item of STATE.result.scheduled) {
     if (item.course.isExternal) continue;
-    const info = item.info;
     rows.push([
       item.course.code,
       item.course.section,
-      item.course.instructor,
+      getFullInstructorDisplay(item.course),
       item.slot.dayPattern,
       item.slot.startTime,
       item.slot.endTime,
-      item.course.isLab ? 'Yes' : 'No',
-      info ? info.credits : '',
+      item.course.mode || '',
+      item.course.studentCredits || '',
+      item.course.facultyCredits || '',
+      item.course.duration || '',
     ]);
   }
 
@@ -532,16 +977,17 @@ function exportExcel() {
   const data = [];
   for (const item of STATE.result.scheduled) {
     if (item.course.isExternal) continue;
-    const info = item.info;
     data.push({
-      'Course':       item.course.code,
-      'Section':      item.course.section,
-      'Instructor':   item.course.instructor,
-      'Day Pattern':  item.slot.dayPattern,
-      'Start':        item.slot.startTime,
-      'End':          item.slot.endTime,
-      'Is Lab':       item.course.isLab ? 'Yes' : 'No',
-      'Credits':      info ? info.credits : '',
+      'Course':          item.course.code,
+      'Section':         item.course.section,
+      'Instructor':      getFullInstructorDisplay(item.course),
+      'Day Pattern':     item.slot.dayPattern,
+      'Start':           item.slot.startTime,
+      'End':             item.slot.endTime,
+      'Mode':            item.course.mode || '',
+      'Student Credits': item.course.studentCredits || '',
+      'Faculty Credits': item.course.facultyCredits || '',
+      'Duration':        item.course.duration || '',
     });
   }
 
@@ -560,6 +1006,19 @@ function exportExcel() {
   }));
   const ws2 = XLSX.utils.json_to_sheet(loadData);
   XLSX.utils.book_append_sheet(wb, ws2, 'Faculty Loads');
+
+  // Constraint report sheet
+  if (STATE.result.constraintReport) {
+    const cr = STATE.result.constraintReport;
+    const reportData = [
+      { 'Constraint': 'Cohort Conflicts', 'Count': cr.cohortConflicts.length, 'Status': cr.cohortConflicts.length === 0 ? 'Met' : 'Violated' },
+      { 'Constraint': 'Faculty Pref %', 'Count': cr.facultyPrefMax > 0 ? Math.round((cr.facultyPrefScore / cr.facultyPrefMax) * 100) : 100, 'Status': 'Score' },
+      { 'Constraint': 'Single-Section Afternoon', 'Count': cr.singleSectionViolations.length, 'Status': cr.singleSectionViolations.length === 0 ? 'Met' : 'Violated' },
+      { 'Constraint': 'Special Rules', 'Count': cr.specialRuleViolations.length, 'Status': cr.specialRuleViolations.length === 0 ? 'Met' : 'Violated' },
+    ];
+    const ws3 = XLSX.utils.json_to_sheet(reportData);
+    XLSX.utils.book_append_sheet(wb, ws3, 'Constraint Report');
+  }
 
   XLSX.writeFile(wb, 'schedule.xlsx');
 }

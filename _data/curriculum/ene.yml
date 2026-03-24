@@ -1,0 +1,63 @@
+_catalog_year: 2022
+
+# ── Semester 1 ── Freshman Fall ──
+VUE_101: 1
+GE_100: 1
+XS_101: 1
+MATH_131: 1
+PHYS_141: 1
+
+# ── Semester 2 ── Freshman Spring ──
+CE_151: 2
+VUE_102: 2
+GE_109: 2
+ENE_HUM_1: 2
+MATH_132: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+CE_215: 3
+CHEM_115: 3
+MATH_260: 3
+MATH_270: 3
+STAT_240: 3
+REL_100: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+# Note: PDF degree map lists ENE 360 here, but prereq chain
+# (ENE 260 → ENE 360) indicates this should be ENE 260.
+CE_213: 4
+CE_351: 4
+CHEM_116: 4
+ENE_260: 4
+MATH_253: 4
+ME_270: 4
+
+# ── Semester 5 ── Junior Fall ──
+CE_334: 5
+CE_364: 5
+CHEM_221: 5
+ENE_210: 5
+ENE_PROF_ELEC: 5
+
+# ── Semester 6 ── Junior Spring ──
+BIO_215: 6
+CE_335: 6
+CE_365: 6
+ENE_310: 6
+ENE_330: 6
+ENE_360: 6
+
+# ── Semester 7 ── Senior Fall ──
+CE_493: 7
+GE_311: 7
+GE_312: 7
+ENE_450: 7
+ENE_ELEC_1: 7
+ENE_WL: 7
+
+# ── Semester 8 ── Senior Spring ──
+CE_281: 8
+CE_494: 8
+ENE_440: 8
+ENE_ELEC_2: 8
+ENE_HUM_2: 8

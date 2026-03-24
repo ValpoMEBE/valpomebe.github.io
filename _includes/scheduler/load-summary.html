@@ -7,13 +7,27 @@
         <tr>
           <th>Instructor</th>
           <th>Credit Hours</th>
+          <th>TLCs</th>
           <th>Contact Hours/Week</th>
           <th>Preps</th>
           <th>Courses</th>
+          <th>Pref Score</th>
+          <th>Balance</th>
         </tr>
       </thead>
       <tbody id="load-tbody">
-        <!-- Rows rendered by JS -->
+        <!-- Rows rendered by JS — sorted by credits descending.
+             Each row:
+             <tr>
+               <td>Last, First</td>
+               <td>12</td>
+               <td>15</td>
+               <td>3</td>
+               <td>ME 312, ME 312, ME 414</td>
+               <td><span class="pref-score high">92%</span></td>
+               <td><span class="balance-indicator above">+2 cr above avg</span></td>
+             </tr>
+        -->
       </tbody>
     </table>
   </div>

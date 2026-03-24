@@ -17,6 +17,16 @@
   - MATH_131
   coreqs: []
   desc: Techniques and applications of integration, sequences and series.
+- id: MATH_220
+  code: MATH 220
+  title: Discrete Mathematics
+  credits: 3
+  tags:
+  - math
+  prereqs: []
+  coreqs:
+  - MATH_131
+  desc: Introduction to mathematical reasoning, algorithm analysis, and foundations for computer science. Sets, logic, proof techniques including mathematical induction, counting, recurrences, RSA cryptography, and graph algorithms.
 - id: MATH_253
   code: MATH 253
   title: Calculus III

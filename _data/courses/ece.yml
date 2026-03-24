@@ -1,95 +1,734 @@
-- id: ECE_281
-  code: ECE 281
-  title: Fundamentals of Electrical Engr.
-  credits: 2.5
+# ════════════════════════════════════════════════════════════════
+# Electrical & Computer Engineering (ECE) — Course Catalog
+# Source: Undergraduate Catalog 2025-2026, pages 483-492
+# ════════════════════════════════════════════════════════════════
+
+# ── Foundational Courses ─────────────────────────────────────
+
+- id: ECE_100
+  code: ECE 100
+  title: Fundamentals of Electrical & Computer Engineering
+  credits: 3
   tags:
-  - electrical
+  - circuits
+  - digital
   prereqs:
-  - PHYS_142
+  - MATH_131
   coreqs: []
-  offered: Fall
-  desc: Circuit analysis, AC/DC circuits, operational amplifiers, and introductory electronics.
+  desc: Introduction to principles of Electrical and Computer Engineering. Computer tools, DC circuit analysis, and digital circuit analysis and design.
+
+- id: ECE_211
+  code: ECE 211
+  title: Technical Writing for ECE
+  credits: 1
+  tags: []
+  prereqs: []
+  coreqs:
+  - ECE_263
+  desc: Introduction to technical writing in electrical and computer engineering. Writing impactful sentences and paragraphs, designing figures, charts, graphs, and tables. (WIC)
+
+- id: ECE_212
+  code: ECE 212
+  title: The Design Process for ECE
+  credits: 1
+  tags: []
+  prereqs:
+  - ECE_221
+  - ECE_251
+  - ECE_263
+  coreqs: []
+  desc: Study of the design process in electrical and computer engineering. Incremental projects and a comprehensive design project integrating technical design constraints.
+
 - id: ECE_221
   code: ECE 221
   title: Digital Logic Design
   credits: 3
   tags:
-  - electrical
-  - computing
-  prereqs:
-  - ECE_281
+  - digital
+  prereqs: []
   coreqs: []
   offered: Fall
-  desc: Boolean algebra, logic gates, combinational and sequential circuits, memory, and microprocessors.
+  desc: Introduction to digital logic concepts, including analysis and design of combinational and sequential digital circuits.
+
+- id: ECE_222
+  code: ECE 222
+  title: Advanced Logic Design
+  credits: 3
+  tags:
+  - digital
+  prereqs:
+  - ECE_221
+  coreqs: []
+  desc: Continuation of ECE 221. Design of MSI and LSI digital circuits using VHDL. Designs implemented in programmable logic devices (PALs, CPLDs).
+
 - id: ECE_251
   code: ECE 251
   title: Engineering Programming I
   credits: 3
   tags:
-  - computing
-  - electrical
-  prereqs:
-  - ME_125
+  - programming
+  prereqs: []
   coreqs: []
   offered: Fall
-  desc: 'Structured programming for engineering: algorithms, data structures, and ECE applications.'
-- id: ECE_360
-  code: ECE 360
-  title: Signals & Systems
+  desc: Fundamental programming constructs, algorithms, and data structures using industry-standard software. Programming strategies and computer algorithms for engineering and mathematics.
+
+- id: ECE_252
+  code: ECE 252
+  title: Engineering Programming II
   credits: 3
   tags:
-  - electrical
-  - systems
+  - programming
   prereqs:
-  - ECE_281
-  coreqs: []
-  offered: Fall
-  desc: Continuous and discrete-time signals, Fourier analysis, sampling, filtering, and system response.
-- id: ECE_322
-  code: ECE 322
-  title: Embedded Microcontrollers
-  credits: 3
-  tags:
-  - electrical
-  - systems
-  prereqs:
-  - ECE_221
   - ECE_251
   coreqs: []
-  offered: Fall
-  desc: Microcontroller architecture, assembly/C programming, I/O interfacing, and real-time systems.
-- id: ECE_422
-  code: ECE 422
-  title: Embedded Microcontrollers II
-  credits: 3
-  tags:
-  - electrical
-  - systems
-  prereqs:
-  - ECE_322
-  coreqs: []
-  offered: Spring
-  desc: Advanced microcontroller programming, real-time operating systems, and embedded system design.
+  desc: Continuation of ECE 251. Abstract data types and standard algorithms with applications to contemporary engineering problems. Linked lists, queues, trees, stacks, sets, and sorting algorithms. Introduction to object orientation.
+
 - id: ECE_263
   code: ECE 263
   title: Linear Circuit Theory I
   credits: 4
   tags:
-  - electrical
+  - circuits
+  prereqs: []
+  coreqs:
+  - MATH_132
+  offered: Fall
+  desc: Fundamental methods and theorems of electric circuit analysis. Steady state and transient analysis of DC and transient circuits with resistors, capacitors, inductors, and operational amplifiers.
+
+- id: ECE_264
+  code: ECE 264
+  title: Linear Circuit Theory II
+  credits: 4
+  tags:
+  - circuits
   prereqs:
-  - PHYS_142
+  - ECE_263
+  coreqs:
+  - MATH_270
+  desc: Continuation of ECE 263. AC circuits, power computations, transformers, frequency response, filters, Laplace transforms, and Fourier series.
+
+- id: ECE_281
+  code: ECE 281
+  title: Fundamentals of Electrical Engr.
+  credits: 2.5
+  tags:
+  - circuits
+  prereqs:
+  - MATH_131
   coreqs: []
   offered: Fall
-  desc: DC and AC circuit analysis, Thevenin/Norton equivalents, superposition, and op-amp circuits.
+  desc: Fundamental methods and theorems of electrical circuit analysis. Steady-state and transient analysis of DC and AC circuits with resistors, capacitors, inductors, and operational amplifiers. Also offered as PHYS 281.
+
+# ── Core Upper-Division Courses ──────────────────────────────
+
+- id: ECE_322
+  code: ECE 322
+  title: Embedded Microcontrollers
+  credits: 3
+  tags:
+  - embedded
+  prereqs:
+  - ECE_221
+  - ECE_251
+  coreqs: []
+  offered: Fall
+  desc: Application of microcontrollers in embedded system design. Integrated development environments, CPUs, program and data memories, interrupts, digital I/O, timer peripherals, serial interfaces, and ADC peripherals. Also offered as PHYS 322.
+
+- id: ECE_340
+  code: ECE 340
+  title: Electronics I
+  credits: 3
+  tags:
+  - electronics
+  prereqs:
+  - ECE_263
+  coreqs: []
+  desc: Introduction to semiconductor theory and design/analysis of electronic circuits. Diodes, field-effect and bipolar transistors, CMOS logic circuits, single-stage discrete transistor amplifiers, and multistage IC amplifiers. (WID)
+
+- id: ECE_341
+  code: ECE 341
+  title: Electronics II
+  credits: 3
+  tags:
+  - electronics
+  prereqs:
+  - ECE_340
+  coreqs: []
+  desc: Power amplifiers, DC power supplies, data converters, feedback, oscillators, switched-capacitor circuits, and transistor memory units.
+
+- id: ECE_360
+  code: ECE 360
+  title: Signals & Systems
+  credits: 3
+  tags:
+  - signals
+  prereqs:
+  - ECE_281
+  coreqs: []
+  offered: Fall
+  desc: Continuous and discrete systems and signals in time and frequency domains. Fourier series, Fourier transforms, Laplace transforms, discrete Fourier transform, Z-transform, sampling, quantization, and filtering.
+
+- id: ECE_422
+  code: ECE 422
+  title: Embedded Microcontrollers II
+  credits: 3
+  tags:
+  - embedded
+  prereqs:
+  - ECE_322
+  coreqs: []
+  offered: Spring
+  desc: Assembly language, low power modes, clock systems, real-time operating systems, and hardware/software co-design.
+
+- id: ECE_424
+  code: ECE 424
+  title: Computer Architecture
+  credits: 3
+  tags:
+  - digital
+  prereqs:
+  - ECE_222
+  coreqs: []
+  desc: Description, organization, and design of computer elements. Instruction set design, caches, pipelining, and microprogramming.
+
+- id: ECE_430
+  code: ECE 430
+  title: Electromagnetic Field Theory
+  credits: 3
+  tags:
+  - electromagnetics
+  prereqs:
+  - MATH_253
+  - PHYS_142
+  coreqs: []
+  desc: Fundamental laws of static and dynamic electric and magnetic fields using vector methods. Transmission lines, Maxwell's equations, and electromagnetic radiation.
+
+- id: ECE_450
+  code: ECE 450
+  title: Network and Data Communications
+  credits: 3
+  tags:
+  - networks
+  prereqs:
+  - ECE_221
+  - ECE_251
+  coreqs: []
+  desc: Theory of interconnected digital systems including information flow control by packet and circuit-switching techniques and standards for communication between network nodes.
+
 - id: ECE_452
   code: ECE 452
   title: Digital Signal Processing
   credits: 3
   tags:
-  - electrical
-  - systems
+  - signals
   prereqs:
   - ECE_360
   coreqs: []
   offered: Spring
-  desc: Discrete-time systems, DFT, FFT, FIR/IIR filter design, and biomedical signal processing.
+  desc: Overview of theory and techniques of digital signal processing. Design of FIR and IIR filters, real-time and off-line signal processing algorithms, analog-digital relationships, and real-time hardware.
+
+# ── EE / CPE Elective Courses ────────────────────────────────
+
+- id: ECE_323
+  code: ECE 323
+  title: Industrial Automation Controls
+  credits: 2
+  tags:
+  - controls
+  - embedded
+  prereqs:
+  - ECE_263
+  - ECE_251
+  coreqs: []
+  desc: Introduction to design of industrial automation control systems. Programmable logic controllers (PLCs), industrial computers, embedded systems, standards, and best practices.
+
+- id: ECE_324
+  code: ECE 324
+  title: Industrial Automation Field Experience
+  credits: 1
+  tags:
+  - controls
+  prereqs: []
+  coreqs:
+  - ECE_323
+  desc: One or more field experiences to accompany ECE 323.
+
+- id: ECE_425
+  code: ECE 425
+  title: Machine Learning
+  credits: 3
+  tags:
+  - programming
+  prereqs:
+  - ECE_251
+  - MATH_260
+  coreqs: []
+  desc: Introduction to machine learning concepts including regression, decision trees, naive Bayesian, neural networks, nearest neighbor, clustering, and anomaly detection.
+
+- id: ECE_429
+  code: ECE 429
+  title: Integrated Circuit Fabrication & Design
+  credits: 3
+  tags:
+  - electronics
+  - digital
+  prereqs:
+  - ECE_221
+  - ECE_340
+  coreqs: []
+  desc: Introduction to fundamental principles of CMOS digital integrated circuit design. Extensive use of CAD tools for layout and simulation. Speed and size tradeoff techniques.
+
+- id: ECE_453
+  code: ECE 453
+  title: Communication Systems
+  credits: 3
+  tags:
+  - signals
+  prereqs:
+  - ECE_360
+  coreqs:
+  - STAT_240
+  desc: Methods of transmission of information by electrical signals through bandwidth-limited, noisy channels. AM, FM, PAM, and PCM modulation schemes and their channel requirements.
+
+- id: ECE_455
+  code: ECE 455
+  title: Image Processing & Computer Vision
+  credits: 3
+  tags:
+  - signals
+  - programming
+  prereqs:
+  - ECE_251
+  - MATH_260
+  coreqs: []
+  desc: Image processing concepts such as filtering, enhancement, and manipulation. Computer vision processes including image segmentation, feature extraction, and pattern recognition.
+
+- id: ECE_456
+  code: ECE 456
+  title: Fiber-Optic Communication
+  credits: 3
+  tags:
+  - electromagnetics
+  prereqs:
+  - ECE_340
+  coreqs: []
+  desc: Study of optical fiber communication systems and networks. Light wave propagation, single/multimode optical fibers, LEDs, laser diodes, PIN and avalanche photodetectors, filters, and multiplexers.
+
+- id: ECE_460
+  code: ECE 460
+  title: Control System Design
+  credits: 3
+  tags:
+  - controls
+  prereqs:
+  - ECE_360
+  coreqs: []
+  desc: Application of feedback analysis and design in frequency and time domains. Root-locus and frequency response methods. Introduction to modern control (state-space representation and pole placement) and Luenberger observers.
+
+- id: ECE_464
+  code: ECE 464
+  title: Autonomous Mobile Robots
+  credits: 2
+  tags:
+  - controls
+  - embedded
+  prereqs:
+  - ECE_263
+  - ECE_322
+  coreqs: []
+  desc: Basic principles of autonomous mobile robots. Locomotion dynamics, sensors and perception, localization, planning and navigation, feedback control, programming, and hardware integration.
+
+- id: ECE_471
+  code: ECE 471
+  title: Power Electronics
+  credits: 3
+  tags:
+  - power
+  - electronics
+  prereqs:
+  - ECE_340
+  coreqs: []
+  desc: Application and design of power semiconductor circuits. Rectifiers, AC controllers, inverters, and switched mode power supplies.
+
+- id: ECE_472
+  code: ECE 472
+  title: Power Systems Analysis
+  credits: 3
+  tags:
+  - power
+  prereqs:
+  - ECE_264
+  coreqs: []
+  desc: Principles of power system analysis through development of models of major components of a modern electric power grid. Power flow and fault analysis.
+
+- id: ECE_473
+  code: ECE 473
+  title: Electric Machinery
+  credits: 3
+  tags:
+  - power
+  prereqs:
+  - ECE_264
+  coreqs: []
+  desc: Study of different types of electric machines, including DC, induction, and synchronous motors and generators and the power electronic circuits that control them.
+
+- id: ECE_490
+  code: ECE 490
+  title: Topics in Electrical and Computer Engineering
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Investigation of electrical engineering or computer engineering topics of special interest.
+
+- id: ECE_499
+  code: ECE 499
+  title: Senior Honor Studies in ECE
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Independent study of an advanced topic in electrical engineering. Available by invitation only.
+
+# ── EE Placeholder Courses (Elective Slots) ──────────────────
+
+- id: EE_ELEC_1
+  code: EE Elective
+  title: Electrical Engineering Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 18 total credits required from EE elective courses.
+  eligible:
+  - ECE 222 – Advanced Logic Design
+  - ECE 252 – Engineering Programming II
+  - ECE 323 – Industrial Automation Controls
+  - ECE 324 – Industrial Automation Field Experience
+  - ECE 422 – Embedded Microcontrollers II
+  - ECE 424 – Computer Architecture
+  - ECE 425 – Machine Learning
+  - ECE 429 – IC Fabrication & Design
+  - ECE 450 – Network and Data Communications
+  - ECE 452 – Digital Signal Processing
+  - ECE 453 – Communication Systems
+  - ECE 455 – Image Processing & Computer Vision
+  - ECE 456 – Fiber-Optic Communication
+  - ECE 460 – Control System Design
+  - ECE 464 – Autonomous Mobile Robots
+  - ECE 471 – Power Electronics
+  - ECE 472 – Power Systems Analysis
+  - ECE 473 – Electric Machinery
+  - ECE 490 – Topics in ECE
+  - ECE 499 – Senior Honor Studies
+
+- id: EE_ELEC_2
+  code: EE Elective
+  title: Electrical Engineering Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 18 total credits required from EE elective courses.
+  eligible:
+  - See EE Elective 1 for approved list
+
+- id: EE_ELEC_3
+  code: EE Elective
+  title: Electrical Engineering Elective 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 18 total credits required from EE elective courses.
+  eligible:
+  - See EE Elective 1 for approved list
+
+- id: EE_ELEC_4
+  code: EE Elective
+  title: Electrical Engineering Elective 4
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 18 total credits required from EE elective courses.
+  eligible:
+  - See EE Elective 1 for approved list
+
+- id: EE_ELEC_5
+  code: EE Elective
+  title: Electrical Engineering Elective 5
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 18 total credits required from EE elective courses.
+  eligible:
+  - See EE Elective 1 for approved list
+
+- id: EE_ELEC_6
+  code: EE Elective
+  title: Electrical Engineering Elective 6
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 18 total credits required from EE elective courses.
+  eligible:
+  - See EE Elective 1 for approved list
+
+- id: EE_MATHSCI_1
+  code: Math/Science Elective
+  title: Mathematics/Science Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 9 total credits from approved math/science elective courses.
+  eligible:
+  - Any approved Mathematics/Science elective
+
+- id: EE_MATHSCI_2
+  code: Math/Science Elective
+  title: Mathematics/Science Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 9 total credits from approved math/science elective courses.
+  eligible:
+  - Any approved Mathematics/Science elective
+
+- id: EE_MATHSCI_3
+  code: Math/Science Elective
+  title: Mathematics/Science Elective 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 9 total credits from approved math/science elective courses.
+  eligible:
+  - Any approved Mathematics/Science elective
+
+- id: EE_PROF_1
+  code: Professional Elective
+  title: Professional Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved professional elective courses.
+  eligible:
+  - Any approved professional elective course
+
+- id: EE_PROF_2
+  code: Professional Elective
+  title: Professional Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved professional elective courses.
+  eligible:
+  - Any approved professional elective course
+
+- id: EE_HUM_1
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: EE_HUM_2
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: EE_WL
+  code: World Lang/Diversity
+  title: World Language/Diversity Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from world languages at the 102 level or above, or from the diversity list.
+  eligible:
+  - Any World Language at 102 level or above
+  - Any approved Cultural Diversity course
+
+# ── CPE Placeholder Courses (Elective Slots) ─────────────────
+
+- id: CPE_ELEC_1
+  code: CPE Elective
+  title: Computer Engineering Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 13 total credits required from Computer Engineering elective courses.
+  eligible:
+  - CS 225 – Programming Languages
+  - CS 240 – Assembly Language Programming
+  - CS 250 – Object Oriented Programming
+  - CS 260 – Mobile Applications
+  - CS 325 – Simulation and Modeling
+  - CS 330 – Operating Systems
+  - CS 335 – Networks
+  - CS 345 – Artificial Intelligence
+  - CS 365 – Interactive Computer Graphics
+  - CS 372 – Computability and Computational Complexity
+  - ECE 264 – Linear Circuit Theory II
+  - ECE 323 – Industrial Automation Controls
+  - ECE 324 – Industrial Automation Field Experience
+  - ECE 341 – Electronics II
+  - ECE 425 – Machine Learning
+  - ECE 429 – IC Fabrication & Design
+  - ECE 430 – Electromagnetic Field Theory
+  - ECE 455 – Image Processing & Computer Vision
+  - ECE 456 – Fiber-Optic Communication
+  - ECE 460 – Control System Design
+  - ECE 464 – Autonomous Mobile Robots
+  - ECE 490 – Topics in ECE
+  - ECE 499 – Senior Honor Studies
+
+- id: CPE_ELEC_2
+  code: CPE Elective
+  title: Computer Engineering Elective 2
+  credits: 4
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 13 total credits required from Computer Engineering elective courses.
+  eligible:
+  - See CPE Elective 1 for approved list
+
+- id: CPE_ELEC_3
+  code: CPE Elective
+  title: Computer Engineering Elective 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 13 total credits required from Computer Engineering elective courses.
+  eligible:
+  - See CPE Elective 1 for approved list
+
+- id: CPE_ELEC_4
+  code: CPE Elective
+  title: Computer Engineering Elective 4
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 13 total credits required from Computer Engineering elective courses.
+  eligible:
+  - See CPE Elective 1 for approved list
+
+- id: CPE_MATHSCI_1
+  code: Math/Science Elective
+  title: Mathematics/Science Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved math/science elective courses.
+  eligible:
+  - Any approved Mathematics/Science elective
+
+- id: CPE_MATHSCI_2
+  code: Math/Science Elective
+  title: Mathematics/Science Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved math/science elective courses.
+  eligible:
+  - Any approved Mathematics/Science elective
+
+- id: CPE_PROF
+  code: Professional Elective
+  title: Professional Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from approved professional elective courses.
+  eligible:
+  - Any approved professional elective course
+
+- id: CPE_HUM_1
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: CPE_HUM_2
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: CPE_WL
+  code: World Lang/Diversity
+  title: World Language/Diversity Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from world languages at the 102 level or above, or from the diversity list.
+  eligible:
+  - Any World Language at 102 level or above
+  - Any approved Cultural Diversity course

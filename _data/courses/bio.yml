@@ -1,3 +1,13 @@
+- id: BIO_215
+  code: BIO 215
+  title: Fundamental Microbiology for Engineers
+  credits: 3
+  tags:
+  - biology
+  prereqs:
+  - CHEM_115
+  coreqs: []
+  desc: Fundamental study of the structure, function, and growth of microorganisms. Roles of microorganisms in industry and the environment.
 - id: BIO_151
   code: BIO 151
   title: Anatomy & Physiology I

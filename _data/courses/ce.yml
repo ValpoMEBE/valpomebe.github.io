@@ -1,0 +1,615 @@
+# ════════════════════════════════════════════════════════════════
+# Civil Engineering (CE) — Course Catalog
+# Source: Undergraduate Catalog 2025-2026, pages 433-443
+# ════════════════════════════════════════════════════════════════
+
+# ── Required Courses ──────────────────────────────────────────
+
+- id: CE_151
+  code: CE 151
+  title: Introduction to Computer-Aided Drafting
+  credits: 1
+  tags:
+  - construction
+  prereqs: []
+  coreqs: []
+  desc: Basic understanding of features and operation of a computer-aided drafting (CAD) system. Drafting standards and practices in the context of civil engineering disciplines.
+
+- id: CE_212
+  code: CE 212
+  title: Materials Engineering
+  credits: 3
+  tags:
+  - materials
+  - lab
+  prereqs: []
+  coreqs:
+  - CE_213
+  desc: Study of composition, production, properties, and behavior of structural materials such as aggregate, concrete, steel, and timber. Laboratory exercises include aggregate properties, concrete mixture design, and properties of hardened concrete and ductile metals.
+
+- id: CE_213
+  code: CE 213
+  title: Technical and Professional Writing in Civil & Environmental Engineering
+  credits: 1
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Introduction to technical writing in civil and environmental engineering, with a focus on laboratory reports, and professional writing such as memoranda and business letters. (WIC)
+
+- id: CE_215
+  code: CE 215
+  title: Mechanics of Materials
+  credits: 3
+  tags:
+  - structural
+  prereqs:
+  - GE_109
+  coreqs: []
+  desc: Concepts of stress and strain, stress-strain relationships, states of plane stress and strain; analysis of stress distributions and deformations for axial loading, torsional loading, and beam bending; combined loading; elastic-plastic action. Also offered as ME 215 and PHYS 215.
+
+- id: CE_216
+  code: CE 216
+  title: Introduction to Structural Engineering
+  credits: 3
+  tags:
+  - structural
+  prereqs:
+  - CE_215
+  coreqs: []
+  desc: Introduction to behavior, analysis, and design of structures. Design criteria, loads, analysis of structural members and systems using classical hand methods and computer software, and design with steel, concrete, timber, and masonry.
+
+- id: CE_252
+  code: CE 252
+  title: Introduction to Transportation Engineering
+  credits: 3
+  tags:
+  - transportation
+  prereqs:
+  - STAT_240
+  coreqs: []
+  desc: Transportation system characteristics, demand, planning, engineering studies, human and vehicle design factors, traffic flow and operations, signing and marking, and safety. Covers highway, rail, air, and water modes.
+
+- id: CE_281
+  code: CE 281
+  title: Geology for Civil and Environmental Engineers
+  credits: 3
+  tags:
+  - geotechnical
+  prereqs: []
+  coreqs: []
+  desc: Study of the structure of the Earth, including minerals, igneous, sedimentary, and metamorphic rocks. Plate tectonics, volcanoes, earthquakes, and mountain building. Application of geology to civil engineering projects.
+
+- id: CE_317
+  code: CE 317
+  title: Design of Reinforced Concrete Structures
+  credits: 3
+  tags:
+  - structural
+  prereqs:
+  - CE_216
+  coreqs: []
+  desc: Design of reinforced concrete members and structures. Design for compression, flexure and shear, deflections, bond and anchorage, and footings. ACI strength design methods.
+
+- id: CE_318
+  code: CE 318
+  title: Design of Steel Structures
+  credits: 3
+  tags:
+  - structural
+  prereqs:
+  - CE_216
+  coreqs: []
+  desc: Design of steel members and structures. Design for tension, compression, flexure and shear, and simple connections. Composite members and steel frames. LRFD methods.
+
+- id: CE_320
+  code: CE 320
+  title: Soil Mechanics
+  credits: 4
+  tags:
+  - geotechnical
+  - lab
+  prereqs:
+  - CE_215
+  coreqs: []
+  desc: Study of index, mechanical, and hydraulic properties of soils. Soil identification, compaction, shear strength, consolidation, vertical stress distribution, and flow through porous media. Laboratory identification and testing of soils. Site investigation and in situ testing.
+
+- id: CE_322
+  code: CE 322
+  title: Soil and Foundation Engineering
+  credits: 3
+  tags:
+  - geotechnical
+  prereqs:
+  - CE_320
+  coreqs: []
+  desc: Continuation of CE 320. Lateral earth pressures, retaining wall design, elastic stress distribution, settlement, bearing capacity. Sizing of shallow and deep foundation systems.
+
+- id: CE_334
+  code: CE 334
+  title: Fluid Mechanics
+  credits: 4
+  tags:
+  - waterResources
+  - lab
+  prereqs:
+  - MATH_132
+  - CE_213
+  - CE_215
+  coreqs: []
+  desc: Fluid properties, fluids at rest and in motion. Conservation of mass, energy and momentum principles, dimensional analysis and similitude. Pumps, flow in conduits, lift and drag, pipe networks, and hydraulic model studies. (WID)
+
+- id: CE_335
+  code: CE 335
+  title: Hydrology
+  credits: 3
+  tags:
+  - waterResources
+  prereqs:
+  - CE_334
+  coreqs: []
+  desc: Introduction to surface water hydrology. Hydrologic cycle, precipitation, evaporation, infiltration, runoff, rainfall-runoff relationships, uniform flow in open channels, stream flow measurements, hydrologic routing and modeling, storm water management and storm sewer design.
+
+- id: CE_351
+  code: CE 351
+  title: Programming and Numerical Methods
+  credits: 2
+  tags:
+  - computing
+  prereqs: []
+  coreqs: []
+  desc: Programming, numerical methods, and computer modeling for engineering applications. MATLAB programming for numerical solutions including root finding, numerical integration, arrays and matrices, systems of linear equations, finite difference methods, and Runge-Kutta methods.
+
+- id: CE_354
+  code: CE 354
+  title: Design of Transportation Facilities
+  credits: 3
+  tags:
+  - transportation
+  prereqs:
+  - CE_151
+  - CE_252
+  coreqs: []
+  desc: Infrastructure and associated needs for transportation facilities. Highway geometric design, rail and airport design, pavement design, and incorporation of safety into the design process.
+
+- id: CE_364
+  code: CE 364
+  title: Environmental Engineering I
+  credits: 4
+  tags:
+  - environmental
+  - lab
+  prereqs:
+  - CHEM_116
+  coreqs:
+  - CE_334
+  desc: Introductory study of water treatment practices common to urban areas. Laboratory principles and methods for safety, sampling, data analysis, and measurement of physical, chemical, and biological characteristics of water and wastewater.
+
+- id: CE_365
+  code: CE 365
+  title: Environmental Engineering II
+  credits: 3
+  tags:
+  - environmental
+  prereqs:
+  - CE_364
+  coreqs: []
+  desc: Introductory study of physical, chemical, and biological processes for treatment of domestic wastewater and design of wastewater treatment unit operations.
+
+- id: CE_493
+  code: CE 493
+  title: 'Senior Design I: Project Planning and Management'
+  credits: 3
+  tags:
+  - construction
+  prereqs: []
+  coreqs: []
+  desc: Introduction to professional practice issues such as contracts, project proposals, and project management including scheduling, estimating, and project control. Student teams plan integrated, realistic civil engineering projects.
+
+- id: CE_494
+  code: CE 494
+  title: 'Senior Design II: Project Development and Design'
+  credits: 3
+  tags:
+  - construction
+  prereqs:
+  - CE_493
+  coreqs: []
+  desc: Student teams participate in design of integrated and realistic civil engineering projects. Ethical, legal, societal, economic, and environmental aspects are incorporated. Oral and written reports required.
+
+# ── CE Elective Courses ──────────────────────────────────────
+
+- id: CE_202
+  code: CE 202
+  title: Statistical Applications in Civil Engineering
+  credits: 3
+  tags:
+  - computing
+  prereqs:
+  - MATH_132
+  coreqs: []
+  desc: Introduction to statistical and probabilistic models for collection and interpretation of civil engineering data. Summary techniques, regression models, Central Limit Theorem, confidence intervals, recurrence intervals, and Monte Carlo simulation.
+
+- id: CE_415
+  code: CE 415
+  title: Advanced Structural Analysis
+  credits: 3
+  tags:
+  - structural
+  prereqs:
+  - CE_216
+  coreqs: []
+  desc: Analysis of statically indeterminate structures using energy and/or matrix methods. Direct stiffness and flexibility methods. Structural analysis software including response to time-dependent loading such as blasts and earthquakes.
+
+- id: CE_418
+  code: CE 418
+  title: Design of Masonry Structures
+  credits: 3
+  tags:
+  - structural
+  prereqs:
+  - CE_216
+  coreqs: []
+  desc: Analysis and design of masonry structural system components. Use of appropriate specifications in design.
+
+- id: CE_419
+  code: CE 419
+  title: Prestressed Concrete
+  credits: 3
+  tags:
+  - structural
+  prereqs:
+  - CE_317
+  coreqs: []
+  desc: Analysis and design of prestressed concrete members and structures. Flexural stresses, flexural strength, shear strength, loss of prestress, and deflections.
+
+- id: CE_421
+  code: CE 421
+  title: Geotechnical Aspects of Earthquake Engineering
+  credits: 3
+  tags:
+  - geotechnical
+  prereqs:
+  - CE_320
+  coreqs: []
+  desc: Causative mechanisms of earthquakes, magnitudes, ground motion, effect of local soil conditions. Response of soils to seismic loading, liquefaction phenomena, laboratory and in-situ testing for seismic loading.
+
+- id: CE_422
+  code: CE 422
+  title: Advanced Soil Mechanics
+  credits: 3
+  tags:
+  - geotechnical
+  prereqs:
+  - CE_320
+  coreqs: []
+  desc: Behavior of soil from a fundamental perspective. Methods of testing to define soil strength and response for clays, sands, and silts. Rationale for choosing shear strength and deformation parameters for design application.
+
+- id: CE_436
+  code: CE 436
+  title: Water Resources Engineering
+  credits: 3
+  tags:
+  - waterResources
+  prereqs:
+  - CE_334
+  coreqs: []
+  desc: Application of fluid mechanics principles to analysis and design of water resources projects. Branching pipes, water towers, manifolds, open-channel hydraulics, culvert design, water hammer, reservoirs, and wells.
+
+- id: CE_437
+  code: CE 437
+  title: Urban Stormwater Management
+  credits: 3
+  tags:
+  - waterResources
+  - environmental
+  prereqs: []
+  coreqs:
+  - CE_335
+  desc: Effect of urbanization on quantity and quality of stormwater runoff. Urban hydrology for small watersheds and management of stormwater quality and quantity.
+
+- id: CE_442
+  code: CE 442
+  title: Construction Engineering
+  credits: 3
+  tags:
+  - construction
+  prereqs: []
+  coreqs: []
+  desc: Introduction to construction management issues such as project delivery systems, construction scheduling, estimating, project documents, and legal issues.
+
+- id: CE_456
+  code: CE 456
+  title: Railroad Design and Operations
+  credits: 3
+  tags:
+  - transportation
+  prereqs:
+  - CE_354
+  coreqs: []
+  desc: Essential elements of railroad facility design and operations. Route location, track structure, terminal facilities, maintenance-of-way, bridges, drainage, train handling, dispatching, yard operations, and signaling.
+
+- id: CE_457
+  code: CE 457
+  title: Traffic Engineering
+  credits: 3
+  tags:
+  - transportation
+  prereqs:
+  - CE_252
+  coreqs: []
+  desc: Fundamental traits and behavior of road users and vehicles. Free-flowing traffic stream characteristics, capacity and level of service, signals and signalized intersection capacity, speeds, volumes, signing and marking, accidents and safety.
+
+- id: CE_458
+  code: CE 458
+  title: Urban Transportation Planning
+  credits: 3
+  tags:
+  - transportation
+  prereqs:
+  - CE_354
+  coreqs: []
+  desc: Fundamentals of urban transportation planning. Traditional 4-step planning process, data collection and statistical techniques, demand forecasting, interaction with land use and urban planning, traffic impact studies, and environmental studies.
+
+- id: CE_459
+  code: CE 459
+  title: Transportation Economics
+  credits: 3
+  tags:
+  - transportation
+  prereqs:
+  - CE_354
+  - GE_311
+  coreqs: []
+  desc: Basics of transportation economics. Fixed costs, incremental costs, elasticities, direct and indirect costs, subsidies, economies of scale for highway, transit, rail, air, and water modes.
+
+- id: CE_466
+  code: CE 466
+  title: Hazardous Waste Management
+  credits: 3
+  tags:
+  - environmental
+  prereqs: []
+  coreqs: []
+  desc: Overview of remediation of contaminated soil and ground water at hazardous waste sites. Site investigation plans, field investigations, environmental risk assessments, feasibility studies, and remedial design techniques.
+
+- id: CE_467
+  code: CE 467
+  title: Biological Wastewater Treatment
+  credits: 3
+  tags:
+  - environmental
+  prereqs: []
+  coreqs:
+  - CE_364
+  desc: Biological treatment of domestic and industrial wastewaters for removal of organics and nutrients. Kinetic expressions of biological growth and fluid transport through treatment reactors.
+
+- id: CE_490
+  code: CE 490
+  title: Topics in Civil Engineering
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Investigation of civil engineering topics of special interest. Offered upon sufficient demand.
+
+- id: CE_499
+  code: CE 499
+  title: Senior Honor Studies in Civil Engineering
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  desc: Independent study of an advanced topic in civil engineering. Available by invitation only.
+
+# ── CE Placeholder Courses (Elective Slots) ──────────────────
+
+- id: CE_ELEC_1
+  code: CE Elective
+  title: Civil Engineering Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 9 total credits required from CE elective courses.
+  eligible:
+  - CE 415 – Advanced Structural Analysis
+  - CE 418 – Design of Masonry Structures
+  - CE 419 – Prestressed Concrete
+  - CE 421 – Geotechnical Aspects of Earthquake Engineering
+  - CE 422 – Advanced Soil Mechanics
+  - CE 436 – Water Resources Engineering
+  - CE 437 – Urban Stormwater Management
+  - CE 442 – Construction Engineering
+  - CE 456 – Railroad Design and Operations
+  - CE 457 – Traffic Engineering
+  - CE 458 – Urban Transportation Planning
+  - CE 459 – Transportation Economics
+  - CE 466 – Hazardous Waste Management
+  - CE 467 – Biological Wastewater Treatment
+  - CE 490 – Topics in Civil Engineering
+
+- id: CE_ELEC_2
+  code: CE Elective
+  title: Civil Engineering Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 9 total credits required from CE elective courses.
+  eligible:
+  - See CE Elective 1 for approved list
+
+- id: CE_ELEC_3
+  code: CE Elective
+  title: Civil Engineering Elective 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 9 total credits required from CE elective courses.
+  eligible:
+  - See CE Elective 1 for approved list
+
+- id: CE_TECH_ELEC
+  code: Technical Elective
+  title: Technical Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from an approved list of technical elective courses.
+  eligible:
+  - Any approved technical elective course
+
+- id: CE_SCI_ELEC
+  code: Science Elective
+  title: Science Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from an approved list of science elective courses.
+  eligible:
+  - Any approved science elective course
+
+- id: CE_PROF_ELEC
+  code: Professional Elective
+  title: Professional Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from the approved professional elective list on the College of Engineering Electives page.
+  eligible:
+  - Any approved professional elective course
+
+- id: CE_HUM_1
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: CE_HUM_2
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: CE_WL
+  code: World Lang/Diversity
+  title: World Language/Diversity Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from world languages at the 102 level or above, or from the diversity list.
+  eligible:
+  - Any World Language at 102 level or above
+  - Any approved Cultural Diversity course
+
+# ── ENE Placeholder Courses (Elective Slots) ─────────────────
+
+- id: ENE_ELEC_1
+  code: ENE Elective
+  title: Environmental Engineering Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from ENE elective courses.
+  eligible:
+  - ENE 310 – Chemical Fate and Transport
+  - ENE 330 – Environmental Soils
+  - ENE 360 – Environmental Policy and Law
+  - ENE 440 – Introduction to Air Pollution
+  - ENE 450 – Hazardous Waste Management
+  - ENE 490 – Topics in Environmental Engineering
+
+- id: ENE_ELEC_2
+  code: ENE Elective
+  title: Environmental Engineering Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from ENE elective courses.
+  eligible:
+  - See ENE Elective 1 for approved list
+
+- id: ENE_PROF_ELEC
+  code: Professional Elective
+  title: Professional Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from the approved professional elective list on the College of Engineering Electives page.
+  eligible:
+  - Any approved professional elective course
+
+- id: ENE_HUM_1
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: ENE_HUM_2
+  code: Humanities/SS/RS Elective
+  title: Humanities/Social Science/Religious Studies Elective 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 6 total credits from approved Humanities, Social Sciences, or Religious Studies courses.
+  eligible:
+  - Any approved Humanities course
+  - Any approved Social Sciences course
+  - Any approved Religious Studies course
+
+- id: ENE_WL
+  code: World Lang/Diversity
+  title: World Language/Diversity Elective
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from world languages at the 102 level or above, or from the diversity list.
+  eligible:
+  - Any World Language at 102 level or above
+  - Any approved Cultural Diversity course

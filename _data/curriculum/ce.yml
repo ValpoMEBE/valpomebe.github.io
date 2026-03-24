@@ -1,0 +1,60 @@
+_catalog_year: 2022
+
+# ── Semester 1 ── Freshman Fall ──
+VUE_101: 1
+GE_100: 1
+XS_101: 1
+MATH_131: 1
+PHYS_141: 1
+
+# ── Semester 2 ── Freshman Spring ──
+VUE_102: 2
+CE_151: 2
+GE_109: 2
+CE_HUM_1: 2
+MATH_132: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+CE_215: 3
+CHEM_115: 3
+MATH_253: 3
+STAT_240: 3
+CE_WL: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+CE_212: 4
+CE_213: 4
+CE_216: 4
+CE_252: 4
+CHEM_116: 4
+MATH_260: 4
+MATH_270: 4
+
+# ── Semester 5 ── Junior Fall ──
+CE_317: 5
+CE_320: 5
+CE_334: 5
+CE_364: 5
+
+# ── Semester 6 ── Junior Spring ──
+CE_318: 6
+CE_322: 6
+CE_335: 6
+CE_354: 6
+CE_365: 6
+GE_311: 6
+GE_312: 6
+
+# ── Semester 7 ── Senior Fall ──
+CE_493: 7
+REL_100: 7
+CE_ELEC_1: 7
+CE_ELEC_2: 7
+CE_PROF_ELEC: 7
+
+# ── Semester 8 ── Senior Spring ──
+CE_494: 8
+CE_ELEC_3: 8
+CE_TECH_ELEC: 8
+CE_SCI_ELEC: 8
+CE_HUM_2: 8

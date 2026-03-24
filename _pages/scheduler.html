@@ -10,3 +10,41 @@ extra_css:
 {% include scheduler/results-grid.html %}
 {% include scheduler/conflict-report.html %}
 {% include scheduler/load-summary.html %}
+
+<!-- Course Detail Panel (slide-in from right) -->
+<div id="course-detail-panel" class="course-detail-panel">
+  <button class="panel-close" id="detail-close">&times;</button>
+  <h3>Course Details</h3>
+  <div class="detail-row">
+    <span class="detail-label">Course</span>
+    <span class="detail-value detail-course-code">—</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Instructor</span>
+    <span class="detail-value detail-instructor">—</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Current Time</span>
+    <span class="detail-value detail-current-time">—</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Mode</span>
+    <span class="detail-value detail-mode">—</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Year Level</span>
+    <span class="detail-value detail-year">—</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Credits</span>
+    <span class="detail-value detail-credits">—</span>
+  </div>
+  <div style="display:flex; gap:.5rem; margin-top:.8rem;">
+    <button class="action-btn secondary detail-lock-btn" style="flex:1;">Lock</button>
+    <button class="action-btn primary detail-reopt-btn" style="flex:1;">Re-optimize</button>
+  </div>
+  <div class="move-options-heading">Available Alternative Slots</div>
+  <div class="detail-alternatives">
+    <!-- Populated by JS -->
+  </div>
+</div>
