@@ -1,0 +1,12 @@
+# CAPS Blanket Substitutions
+# Department-wide approved course substitutions via the
+# Course Approval Petition System (CAPS).
+# These are applied as additional code aliases during transcript audit.
+
+- from: "CC 300"
+  to: "GE 312"
+  note: "Per CAPS blanket petition 10/2024, CC 300 (Science, Technology, & Society) substitutes for GE 312"
+
+- from: "CHEM 121"
+  to: "CHEM 115"
+  note: "Per CAPS, CHEM 121 covers CHEM 115 for transfer or AP credit only"

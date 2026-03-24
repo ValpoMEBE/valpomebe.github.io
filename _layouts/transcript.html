@@ -30,7 +30,12 @@ layout: default
     world_languages:         {{ site.data.transcript.world_languages | jsonify }},
     theology:                {{ site.data.transcript.theology | jsonify }},
     professional_electives:  {{ site.data.transcript.professional_electives | jsonify }},
+    core1:                   {{ site.data.transcript.core1 | jsonify }},
+    core2:                   {{ site.data.transcript.core2 | jsonify }},
   };
+
+  // ── CAPS blanket substitutions ───────────────────────────
+  const CAPS_DATA = {{ site.data.transcript.caps_substitutions | jsonify }};
 
   // ── Minor definitions ─────────────────────────────────
   const MINORS_DATA = {

@@ -15,3 +15,27 @@
   prereqs: []
   coreqs: []
   desc: 'Valparaiso University Experience: Finding Your Voice. Continuation of the VUE sequence.'
+- id: CORE_1_SLOT
+  code: Core I
+  title: Exploring Values
+  credits: 4
+  isPlaceholder: true
+  tags: []
+  prereqs: []
+  coreqs: []
+  eligible:
+    - "CORE 110 – Exploring Values"
+    - "CC 110A/B/L – Texts & Contexts"
+  desc: 'Core I requirement. Fulfilled by CORE 110, CORE 120, or CC 110A+B+L.'
+- id: CORE_2_SLOT
+  code: Core II
+  title: Finding Your Voice
+  credits: 4
+  isPlaceholder: true
+  tags: []
+  prereqs: []
+  coreqs: []
+  eligible:
+    - "CORE 115 – Finding Your Voice"
+    - "CC 115A/B/L – Texts & Contexts"
+  desc: 'Core II requirement. Fulfilled by CORE 115 or CC 115A+B+L.'

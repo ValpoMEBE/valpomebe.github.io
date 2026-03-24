@@ -12,12 +12,12 @@ const GRADE_POINTS = {
   'D+': 1.3, 'D':  1.0, 'D-': 0.7,
   'F':  0.0
 };
-const NON_GPA_GRADES = ['TR', 'CR', 'W', 'U', ''];
+const NON_GPA_GRADES = ['TR', 'CR', 'S', 'W', 'U', ''];
 const ALL_GRADES = Object.keys(GRADE_POINTS).concat(NON_GPA_GRADES);
 
 // Regex to match a grade token (longest-first so A- matches before A)
 // Trailing lookahead (?![+\-\w]) prevents matching "B" when "B+" follows
-const GRADE_RE = /\b(A-|B\+|B-|C\+|C-|D\+|D-|TR|CR|A|B|C|D|F|W|U)(?![+\-\w])/;
+const GRADE_RE = /\b(A-|B\+|B-|C\+|C-|D\+|D-|TR|CR|A|B|C|D|F|S|W|U)(?![+\-\w])/;
 
 // ── Configure pdf.js worker ────────────────────────────────────
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -122,6 +122,19 @@ function parseTranscriptLines(lines) {
       }
     }
 
+    // In-progress courses have no numeric columns.
+    // Labs (L suffix) are always 1cr and predictable, so estimate them.
+    // Non-lab IP courses have unknown credits (0.5–4cr) — leave as 0
+    // so the audit displays "- cr" for advisors to verify.
+    if (credits === 0 && !numbersInRest && num.endsWith('L')) {
+      credits = 1;
+    }
+
+    // AAA (study abroad) courses show 0cr on transcript but satisfy diversity requirements.
+    if (dept === 'AAA' && credits === 0) {
+      credits = 3;
+    }
+
     // Extract date range
     const dateMatch = rest.match(DATE_RE);
     let endDate = null;
@@ -158,12 +171,21 @@ function parseTranscriptLines(lines) {
 }
 
 // ── Retake resolution ──────────────────────────────────────────
+// Courses that can be taken multiple times for credit (independent research,
+// topics courses, symposia). These are NOT treated as retakes.
+const REPEATABLE_COURSES = new Set([
+  'BE 490', 'BE 499', 'ME 490', 'ME 499', 'GE 490', 'ECE 490',
+  'CC 201', 'CC 499',
+]);
+
 function resolveRetakes(entries) {
-  // Group by course code
+  // Group by course code — but repeatable courses get unique keys
   const grouped = {};
+  let repeatIdx = 0;
   for (const e of entries) {
-    if (!grouped[e.code]) grouped[e.code] = [];
-    grouped[e.code].push(e);
+    const key = REPEATABLE_COURSES.has(e.code) ? e.code + '#' + (repeatIdx++) : e.code;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(e);
   }
 
   const resolved = [];
@@ -180,8 +202,10 @@ function resolveRetakes(entries) {
     const active = passing || attempts[0];
     if (active.grade === 'W') continue;
 
+    // Use original course code (strip #N suffix from repeatable grouping key)
+    const originalCode = code.includes('#') ? code.split('#')[0] : code;
     resolved.push({
-      code,
+      code: originalCode,
       active,
       attempts,
       hasRetakes: attempts.length > 1,
@@ -195,6 +219,7 @@ function resolveRetakes(entries) {
 function getCourseStatus(grade) {
   if (!grade || grade === '') return 'no-grade';
   if (grade === 'TR' || grade === 'CR') return 'transfer';
+  if (grade === 'S') return 'completed'; // Satisfactory (pass/no-credit)
   if (grade === 'U')  return 'no-grade';
   if (grade === 'F')  return 'failed';
   if (grade === 'D-') return 'completed'; // D- is technically passing

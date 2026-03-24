@@ -1,0 +1,38 @@
+id: mechatronics
+name: "Mechatronics"
+min_credits: 31
+requirements:
+  - label: "Required Courses"
+    type: required
+    courses: ["ECE 221", "ECE 251", "ECE 322", "GE 109", "ME 209", "ME 215", "ME 368", "ME 370"]
+    substitutions:
+      "ME 369": "ME 370"
+
+  - label: "Circuit Theory"
+    type: pick
+    pick: 1
+    course_groups:
+      - ["ECE 263"]
+      - ["ECE 281", "ME 261"]
+
+  - label: "PLC / Sensor Elective"
+    type: pick
+    pick: 1
+    courses: ["ECE 323", "ME 367"]
+
+  - label: "Major-Specific Electives (ME/BE)"
+    type: credits
+    credits: 6
+    approved_extras:
+      - "ECE 222"
+      - "ECE 252"
+      - "ECE 264"
+      - "ECE 340"
+      - "ECE 341"
+      - "ECE 360"
+      - "ECE 422"
+      - "ECE 464"
+      - "ECE 471"
+      - "BE 468"
+      - "ECE 460"
+      - "ME 442"

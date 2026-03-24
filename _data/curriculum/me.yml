@@ -2,6 +2,7 @@
 # ME — Mechanical Engineering (126 credits)
 # Maps course IDs to their semester placement (1–8)
 # ════════════════════════════════════════════════════════════════
+_catalog_year: 2022
 
 # ── Semester 1 ── Freshman Fall ──
 GE_100: 1

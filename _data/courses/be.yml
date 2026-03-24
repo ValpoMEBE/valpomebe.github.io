@@ -116,6 +116,19 @@
   - BE 200, BE 468
   - ME 361–ME 369, ME 453–ME 467
   - BE 490, ME 490, BE 499, ME 499
+- id: BE_ELEC_S4_BD
+  code: BE Elective
+  title: BE Elective (2022 Catalog)
+  credits: 1
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Extra BE elective slot for 2022–2024 catalog (replaces BE 210 requirement).
+  eligible:
+  - BE 200, BE 468
+  - ME 361–ME 369, ME 453–ME 467
+  - BE 490, ME 490, BE 499, ME 499
 - id: BE_ELEC_S7_BD
   code: BE Elective
   title: BE Elective

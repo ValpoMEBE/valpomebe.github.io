@@ -239,6 +239,18 @@
   coreqs: []
   offered: Spring
   desc: Conduction, convection, and radiation heat transfer; heat exchangers.
+- id: ME_370
+  code: ME 370
+  title: Robotics and Automation
+  credits: 2
+  tags:
+  - systems
+  - electrical
+  prereqs:
+  - ME_368
+  coreqs: []
+  offered: Spring
+  desc: Integration of sensors, actuators, and microcontrollers for robotic and automated systems. Combines former ME 361 and ME 369.
 - id: ME_ELEC_1
   code: ME Elective
   title: ME Technical Elective 1

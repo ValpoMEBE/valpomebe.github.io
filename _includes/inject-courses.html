@@ -1,7 +1,8 @@
 {%- comment -%}
   inject-courses.html — Aggregates course data from _data/courses/ and merges
   per-program semester placements from _data/curriculum/ into each course object.
-  Provides: COURSES_ARRAY (array) and COURSES (keyed object by id).
+  Provides: COURSES_ARRAY (array), COURSES (keyed object by id),
+  _CURRICULUM_VERSIONS (versioned curriculum for catalog year support).
 {%- endcomment -%}
 <script>
   {%- assign all_courses = "" | split: "" -%}
@@ -13,7 +14,7 @@
   const COURSES = {};
   COURSES_ARRAY.forEach(c => { COURSES[c.id] = c; });
 
-  // Per-program semester placements (from _data/curriculum/*.yml)
+  // Per-program semester placements — latest version (used by degree map)
   const _CURRICULUM = {
     ME:         {{ site.data.curriculum.me | jsonify }},
     BE_Biomech: {{ site.data.curriculum.be_biomech | jsonify }},
@@ -21,12 +22,72 @@
     BE_Biomed:  {{ site.data.curriculum.be_biomed | jsonify }}
   };
 
-  // Merge semesters onto each course object
-  for (const [prog, map] of Object.entries(_CURRICULUM)) {
-    for (const [cid, sem] of Object.entries(map)) {
-      if (COURSES[cid]) {
-        if (!COURSES[cid].semesters) COURSES[cid].semesters = {};
-        COURSES[cid].semesters[prog] = sem;
+  // Versioned curriculum — all catalog years, sorted ascending
+  // Resolution: for a given student year, use the file with highest year <= student year.
+  // If no year-specific file exists for a program, the single entry covers all years.
+  const _CURRICULUM_VERSIONS = {
+    ME: [
+      { year: {{ site.data.curriculum.me._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.me | jsonify }} },
+    ],
+    BE_Biomech: [
+      { year: {{ site.data.curriculum.be_biomech._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.be_biomech | jsonify }} },
+    ],
+    BE_Bioelec: [
+      { year: {{ site.data.curriculum.be_bioelec._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.be_bioelec | jsonify }} },
+    ],
+    BE_Biomed: [
+      {% if site.data.curriculum.be_biomed_2022 %}
+      { year: {{ site.data.curriculum.be_biomed_2022._catalog_year | default: 2022 }}, data: {{ site.data.curriculum.be_biomed_2022 | jsonify }} },
+      {% endif %}
+      { year: {{ site.data.curriculum.be_biomed._catalog_year | default: 2025 }}, data: {{ site.data.curriculum.be_biomed | jsonify }} },
+    ],
+  };
+
+  // Merge latest semesters onto each course object (default view)
+  function _mergeCurriculum(currMap) {
+    for (const [prog, map] of Object.entries(currMap)) {
+      for (const [cid, sem] of Object.entries(map)) {
+        if (cid.startsWith('_')) continue; // skip metadata keys
+        if (COURSES[cid]) {
+          if (!COURSES[cid].semesters) COURSES[cid].semesters = {};
+          COURSES[cid].semesters[prog] = sem;
+        }
+      }
+    }
+  }
+  _mergeCurriculum(_CURRICULUM);
+
+  /**
+   * Switch a program's curriculum to a specific catalog year.
+   * Clears existing semester data for that program, then re-merges
+   * from the best-matching version (<= catalogYear).
+   */
+  function applyCurriculum(program, catalogYear) {
+    // Clear existing semesters for this program
+    for (const c of COURSES_ARRAY) {
+      if (c.semesters) delete c.semesters[program];
+    }
+
+    // Find best version: highest year <= catalogYear
+    const versions = _CURRICULUM_VERSIONS[program] || [];
+    let best = null;
+    for (const v of versions) {
+      if (v.year <= catalogYear && (!best || v.year > best.year)) {
+        best = v;
+      }
+    }
+    // Fallback: if no version <= catalogYear, use the earliest available
+    if (!best && versions.length > 0) {
+      best = versions[0];
+    }
+
+    if (best) {
+      for (const [cid, sem] of Object.entries(best.data)) {
+        if (cid.startsWith('_')) continue; // skip metadata
+        if (COURSES[cid]) {
+          if (!COURSES[cid].semesters) COURSES[cid].semesters = {};
+          COURSES[cid].semesters[program] = sem;
+        }
       }
     }
   }

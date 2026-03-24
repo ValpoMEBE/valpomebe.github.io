@@ -7,6 +7,7 @@
 // ── State ──────────────────────────────────────────────────────
 let AUDIT_STATE = {
   program: 'ME',
+  catalogYear: 2022,
   file: null,
   selectedMinors: [],
   // Stored after parsing so we can re-audit on program change
@@ -18,9 +19,8 @@ let AUDIT_STATE = {
 
 // ── Course code aliases (transcript → courses.yml id) ──────────
 const CODE_ALIASES = {
-  'CORE 110':  'VUE_101',
-  'CORE 115':  'VUE_102',
-  'CORE 120':  'VUE_101',  // fallback
+  // Core I/II courses are now handled by ELECTIVE_GROUPS (core1/core2 approved lists)
+  // — no aliases needed for CORE 110, CORE 120, CC 110A, CC 115A, etc.
   'GE 100L':   'GE_100',   // lab bundled with GE 100
   'PHYS 141L': 'PHYS_141', // lab bundled
   'PHYS 142L': 'PHYS_142', // lab bundled
@@ -32,20 +32,63 @@ const CODE_ALIASES = {
   'ME 333L':   'ME_333',    // lab bundled with ME 333
   'CHEM 115L': 'CHEM_115',  // lab bundled with CHEM 115
   'ME 251L':   'ME_251',    // lab bundled with ME 251
+  'BIO 151L':  'BIO_151',   // lab bundled with BIO 151
+  'BIO 152L':  'BIO_152',   // lab bundled with BIO 152
+  'CC 215':    'THEO_GE',   // CC Christian Tradition → Theology requirement
+  // ECE lab courses bundled with lecture
+  'ECE 221L':  'ECE_221',   // lab bundled
+  'ECE 322L':  'ECE_322',   // lab bundled
+  'ECE 422L':  'ECE_422',   // lab bundled
 };
 
 // ── Elective group definitions ─────────────────────────────────
 // Each group maps placeholder IDs → a combined card with tally.
 // totalCredits is computed at runtime from the courses that exist
 // in the active program, so it stays correct automatically.
+// Core I/II group definitions shared across all programs
+const CORE_GROUPS = [
+  {
+    key: 'core1',
+    label: 'Core I',
+    ids: ['CORE_1_SLOT'],
+    approvedLists: ['core1'],
+    blanketDepts: [],
+    maxCourses: 3,
+    fixedSemester: 1,
+    fixedCredits: 4,
+    showAll: true,  // show all matching courses (multi-section Core)
+  },
+  {
+    key: 'core2',
+    label: 'Core II',
+    ids: ['CORE_2_SLOT'],
+    approvedLists: ['core2'],
+    blanketDepts: [],
+    maxCourses: 3,
+    fixedSemester: 2,
+    fixedCredits: 4,
+    showAll: true,
+  },
+];
+
 const ELECTIVE_GROUPS = {
   ME: [
+    ...CORE_GROUPS,
     {
       key: 'me_elec',
       label: 'ME Electives',
       ids: ['ME_ELEC_1', 'ME_ELEC_2', 'ME_ELEC_3', 'ME_ELEC_4'],
       approvedLists: ['me_electives'],
       blanketDepts: [], checkWorldLang: false,
+    },
+    {
+      key: 'me_wl',
+      label: 'WL / Diversity',
+      ids: ['ME_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: ['AAA'],
+      checkWorldLang: true,
+      maxCourses: 1,
     },
     {
       key: 'me_prof',
@@ -57,24 +100,15 @@ const ELECTIVE_GROUPS = {
       maxCourses: 1,
     },
     {
-      key: 'me_wl',
-      label: 'WL / Diversity',
-      ids: ['ME_WL'],
-      approvedLists: ['world_languages', 'cultural_diversity'],
-      blanketDepts: [],
-      checkWorldLang: true,
-      maxCourses: 1,
-    },
-    {
       key: 'me_humssrs',
       label: 'Hum / SS / RS',
       ids: ['ME_HUM_1', 'ME_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
-      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
-      maxCourses: 2,
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
     },
   ],
   BE_Biomech: [
+    ...CORE_GROUPS,
     {
       key: 'be_elec',
       label: 'BE Electives',
@@ -87,7 +121,7 @@ const ELECTIVE_GROUPS = {
       label: 'WL / Diversity',
       ids: ['BE_WL'],
       approvedLists: ['world_languages', 'cultural_diversity'],
-      blanketDepts: [],
+      blanketDepts: ['AAA'],
       checkWorldLang: true,
       maxCourses: 1,
     },
@@ -96,11 +130,11 @@ const ELECTIVE_GROUPS = {
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
-      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
-      maxCourses: 2,
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
     },
   ],
   BE_Bioelec: [
+    ...CORE_GROUPS,
     {
       key: 'be_elec',
       label: 'BE Electives',
@@ -113,7 +147,7 @@ const ELECTIVE_GROUPS = {
       label: 'WL / Diversity',
       ids: ['BE_WL'],
       approvedLists: ['world_languages', 'cultural_diversity'],
-      blanketDepts: [],
+      blanketDepts: ['AAA'],
       checkWorldLang: true,
       maxCourses: 1,
     },
@@ -122,15 +156,15 @@ const ELECTIVE_GROUPS = {
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
-      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
-      maxCourses: 2,
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
     },
   ],
   BE_Biomed: [
+    ...CORE_GROUPS,
     {
       key: 'be_elec',
       label: 'BE Electives',
-      ids: ['BE_ELEC_S7_BD', 'BE_ELEC_S8_1'],
+      ids: ['BE_ELEC_S4_BD', 'BE_ELEC_S7_BD', 'BE_ELEC_S8_1'],
       approvedLists: ['be_electives_biomed'],
       blanketDepts: [],
     },
@@ -139,7 +173,7 @@ const ELECTIVE_GROUPS = {
       label: 'WL / Diversity',
       ids: ['BE_WL'],
       approvedLists: ['world_languages', 'cultural_diversity'],
-      blanketDepts: [],
+      blanketDepts: ['AAA'],
       checkWorldLang: true,
       maxCourses: 1,
     },
@@ -148,11 +182,30 @@ const ELECTIVE_GROUPS = {
       label: 'Hum / SS / Theo',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
-      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC'],
-      maxCourses: 2,
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
     },
   ],
 };
+
+// ── Detect catalog year from transcript entries ─────────────────
+// Uses the earliest non-transfer course date to infer when the student started.
+function detectCatalogYear(entries) {
+  let earliestDate = null;
+  for (const e of entries) {
+    // Skip transfer/AP credits (grade TR or CR with no real semester)
+    if (e.grade === 'TR' || e.grade === 'CR') continue;
+    if (!e.endDate) continue;
+    const d = new Date(e.endDate);
+    if (isNaN(d)) continue;
+    if (!earliestDate || d < earliestDate) earliestDate = d;
+  }
+  if (!earliestDate) return null;
+  // Academic year: Fall starts in Aug. If earliest date is Aug-Dec, catalog year = that year.
+  // If Jan-Jul, catalog year = previous year (they started the prior fall).
+  const month = earliestDate.getMonth(); // 0-indexed
+  const year = earliestDate.getFullYear();
+  return month >= 7 ? year : year - 1; // Aug(7)+ = current year, before Aug = prior year
+}
 
 // ── Build lookup index from COURSES_ARRAY ──────────────────────
 function buildCodeIndex() {
@@ -178,6 +231,17 @@ function buildCodeIndex() {
   // Add manual aliases
   for (const [code, id] of Object.entries(CODE_ALIASES)) {
     index[code.toUpperCase()] = id;
+  }
+
+  // Apply CAPS blanket substitutions (data-driven aliases)
+  if (typeof CAPS_DATA !== 'undefined' && Array.isArray(CAPS_DATA)) {
+    for (const cap of CAPS_DATA) {
+      const fromCode = cap.from.toUpperCase();
+      const toId = cap.to.replace(/\s+/g, '_').toUpperCase();
+      if (!index[fromCode] && index[toId]) {
+        index[fromCode] = index[toId];
+      }
+    }
   }
 
   return index;
@@ -242,16 +306,24 @@ function matchCourses(resolvedCourses, codeIndex) {
 
 // ── Compute audit results ──────────────────────────────────────
 function computeAudit(matched, program, codeIndex, unmatched) {
-  const required = COURSES_ARRAY.filter(c => c.semesters && c.semesters[program]);
+  // VUE_101/VUE_102 are handled by Core I/II group cards — exclude from required list
+  const coreGroupIds = new Set(['VUE_101', 'VUE_102']);
+  const required = COURSES_ARRAY
+    .filter(c => c.semesters && c.semesters[program])
+    .filter(c => !coreGroupIds.has(c.id));
 
   const completedIds = new Set();
   const courseGrades = {};
   const courseStatuses = {};
+  const courseFilledBy = {}; // track original transcript code for aliased courses
 
+  // Only mark required courses as completed — non-required matched courses
+  // (e.g., BE 415 in ME program) stay available for elective group filling.
+  const requiredIds = new Set(required.map(c => c.id));
   const STATUS_PRIORITY = { completed: 3, transfer: 2, 'no-grade': 1, failed: 0 };
   for (const m of matched) {
     const status = getCourseStatus(m.active.grade);
-    if (status === 'completed' || status === 'transfer') {
+    if ((status === 'completed' || status === 'transfer') && requiredIds.has(m.courseId)) {
       completedIds.add(m.courseId);
     }
     // Don't let a lab alias (no grade) overwrite a real grade
@@ -260,6 +332,11 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     if (incoming > existing) {
       courseGrades[m.courseId] = m.active.grade;
       courseStatuses[m.courseId] = status;
+      // Track filledBy when transcript code differs from course ID (aliased/CC courses)
+      const normalizedCode = m.code.replace(/\s+/g, '_').toUpperCase();
+      if (normalizedCode !== m.courseId) {
+        courseFilledBy[m.courseId] = m.code;
+      }
     }
   }
 
@@ -272,7 +349,8 @@ function computeAudit(matched, program, codeIndex, unmatched) {
 
   // ── Phase 1: Fill grouped elective cards FIRST ───────────────
   // Groups get priority so they can claim courses before single placeholders
-  const usedForGroups = new Set(); // track transcript courses used for group filling
+  const usedForGroups = new Set(); // track transcript course codes for display filtering
+  const usedRefs = new Set();     // track by object reference (handles repeatable courses)
   const groupCards = [];
 
   for (const g of groups) {
@@ -281,15 +359,18 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     let creditsFilled = 0;
 
     // Compute totalCredits and semester from courses that exist in this program
-    let earliestSem = 99;
-    let latestSem = 0;
-    let totalCredits = 0;
-    for (const id of g.ids) {
-      const course = COURSES[id];
-      if (course && course.semesters && course.semesters[program]) {
-        earliestSem = Math.min(earliestSem, course.semesters[program]);
-        latestSem = Math.max(latestSem, course.semesters[program]);
-        totalCredits += course.credits || 0;
+    // fixedSemester/fixedCredits override for groups not tied to curriculum placeholders (Core I/II)
+    let earliestSem = g.fixedSemester || 99;
+    let latestSem = g.fixedSemester || 0;
+    let totalCredits = g.fixedCredits || 0;
+    if (!g.fixedCredits) {
+      for (const id of g.ids) {
+        const course = COURSES[id];
+        if (course && course.semesters && course.semesters[program]) {
+          earliestSem = Math.min(earliestSem, course.semesters[program]);
+          latestSem = Math.max(latestSem, course.semesters[program]);
+          totalCredits += course.credits || 0;
+        }
       }
     }
 
@@ -297,7 +378,14 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     // (most specific courses — fewest alternative slots — fill first)
     const candidates = [];
     for (const m of matched) {
-      if (usedForGroups.has(m.code) || completedIds.has(m.courseId)) continue;
+      // Allow CAPS-consumed courses to also fill elective groups: if the transcript
+      // code differs from the courseId, the course was aliased to fill a required slot
+      // but its original identity may qualify as an elective too.
+      // EXCEPT: if the aliased course fills a required degree slot (CODE_ALIASES like
+      // CC 215 → THEO_GE), block it from groups to prevent double-counting.
+      const isAliased = m.code.replace(/\s+/g, '_').toUpperCase() !== m.courseId;
+      if (usedRefs.has(m) || (completedIds.has(m.courseId) && !isAliased)) continue;
+      if (isAliased && requiredIds.has(m.courseId)) continue;
       const status = getCourseStatus(m.active.grade);
       if (status === 'failed') continue;
       if (!isApprovedElective(m.code, approvedSet, g.blanketDepts, g.checkWorldLang)) continue;
@@ -306,7 +394,7 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     }
     if (unmatched) {
       for (const u of unmatched) {
-        if (usedForGroups.has(u.code) || completedIds.has('unmatched:' + u.code)) continue;
+        if (usedRefs.has(u) || completedIds.has('unmatched:' + u.code)) continue;
         const status = getCourseStatus(u.active.grade);
         if (status === 'failed') continue;
         if (!isApprovedElective(u.code, approvedSet, g.blanketDepts, g.checkWorldLang)) continue;
@@ -320,13 +408,21 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     );
 
     for (const c of candidates) {
-      if (usedForGroups.has(c.code)) continue; // may have been claimed by earlier iteration
+      if (usedRefs.has(c.ref)) continue; // may have been claimed by earlier iteration
       filledCourses.push({ code: c.code, grade: c.grade, credits: c.credits });
       creditsFilled += c.credits;
-      usedForGroups.add(c.code);
-      if (c.source === 'unmatched') completedIds.add('unmatched:' + c.code);
-      if (g.maxCourses && filledCourses.length >= g.maxCourses) break;
-      if (creditsFilled >= totalCredits) break;
+      if (!g.showAll) {
+        usedRefs.add(c.ref);      // only lock for non-Core groups; Core courses can double-count
+      }
+      usedForGroups.add(c.code); // always filter from unmatched display
+      if (!g.showAll) {
+        if (c.source === 'unmatched') completedIds.add('unmatched:' + c.code);
+      }
+      if (!g.showAll) {
+        const creditCourseCount = filledCourses.filter(fc => fc.credits > 0).length;
+        if (g.maxCourses && creditCourseCount >= g.maxCourses) break;
+        if (creditsFilled >= totalCredits) break;
+      }
     }
 
     const allIP = filledCourses.length > 0 && filledCourses.every(c => !c.grade);
@@ -342,6 +438,7 @@ function computeAudit(matched, program, codeIndex, unmatched) {
       creditsFilled,
       filledCourses,
       groupStatus,
+      showAll: g.showAll || false,
       semester: g.ids.length > 1 ? latestSem : earliestSem,
     });
   }
@@ -358,6 +455,7 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     if (courseStatuses[course.id]) {
       status = courseStatuses[course.id];
       grade = courseGrades[course.id];
+      if (courseFilledBy[course.id]) filledBy = courseFilledBy[course.id];
     }
 
     // For non-grouped placeholder slots, try to fill from matched
@@ -392,6 +490,37 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     });
   }
 
+  // ── Phase 2b: CAPS fallback — fill remaining reqs via substitution ──
+  // CAPS entries say "course X counts as course Y". The student may have X on
+  // their transcript matched to its own catalog entry, but the program requires Y.
+  // We look for ANY matched transcript course whose original code matches the
+  // CAPS "from" code, regardless of whether it already filled another slot.
+  if (typeof CAPS_DATA !== 'undefined' && Array.isArray(CAPS_DATA)) {
+    for (const entry of audit) {
+      if (entry.status !== 'remaining') continue;
+
+      for (const cap of CAPS_DATA) {
+        const toId = cap.to.replace(/\s+/g, '_').toUpperCase();
+        if (toId !== entry.id) continue;
+
+        // Look for a matched OR unmatched transcript course with the "from" code
+        const fromNorm = cap.from.toUpperCase();
+        const allCourses = [...matched, ...(unmatched || [])];
+        for (const m of allCourses) {
+          if (m.code.toUpperCase() !== fromNorm) continue;
+          const st = getCourseStatus(m.active.grade);
+          if (st !== 'completed' && st !== 'transfer') continue;
+
+          entry.status = st;
+          entry.grade = m.active.grade;
+          entry.filledBy = m.code + ' (CAPS)';
+          break;
+        }
+        if (entry.status !== 'remaining') break;
+      }
+    }
+  }
+
   return { audit, groupCards, usedForGroups };
 }
 
@@ -407,11 +536,11 @@ function tryFillElective(placeholder, matched, completedIds, codeIndex) {
   for (const m of matched) {
     if (completedIds.has(m.courseId)) continue;
     const status = getCourseStatus(m.active.grade);
-    if (status !== 'completed' && status !== 'transfer') continue;
+    if (status === 'failed') continue;
 
     if (eligibleCodes.includes(m.code.toUpperCase())) {
       completedIds.add(m.courseId);
-      return { status, grade: m.active.grade, filledBy: m.code };
+      return { status: status === 'no-grade' ? 'ip' : status, grade: m.active.grade, filledBy: m.code };
     }
   }
   return null;
@@ -448,11 +577,11 @@ function tryFillFromUnmatched(course, program, unmatchedList, completedIds, used
     if (completedIds.has('unmatched:' + u.code)) continue;
     if (usedForGroups && usedForGroups.has(u.code)) continue;
     const status = getCourseStatus(u.active.grade);
-    if (status !== 'completed' && status !== 'transfer') continue;
+    if (status === 'failed') continue;
 
     if (isApprovedElective(u.code, approvedSet, mapping.blanketDepts, mapping.checkWorldLang)) {
       completedIds.add('unmatched:' + u.code);
-      return { status, grade: u.active.grade, filledBy: u.code };
+      return { status: status === 'no-grade' ? 'ip' : status, grade: u.active.grade, filledBy: u.code };
     }
   }
   return null;
@@ -614,7 +743,7 @@ function createAuditCard(course) {
     '</div>' +
     '<div class="audit-title">' + course.title + '</div>' +
     '<div class="audit-card-bottom">' +
-      '<span class="audit-credits">' + (course.credits || '?') + ' cr</span>' +
+      '<span class="audit-credits">' + (course.status === 'no-grade' ? '- cr' : (course.credits || '?') + ' cr') + '</span>' +
       (statusIcon ? '<span class="audit-status-icon">' + statusIcon + '</span>' : '') +
     '</div>';
 
@@ -641,7 +770,7 @@ function createGroupCard(gc) {
     } else {
       badge = '<span class="grade-badge grade-' + gradeClass(fc.grade) + '">' + fc.grade + '</span>';
     }
-    const crLabel = (!fc.grade && !fc.credits) ? '- cr' : fc.credits + ' cr';
+    const crLabel = !fc.grade ? '- cr' : fc.credits + ' cr';
     coursesHtml +=
       '<div class="group-course-item">' +
         '<span class="group-course-code">' + fc.code + '</span>' +
@@ -653,7 +782,7 @@ function createGroupCard(gc) {
   card.innerHTML =
     '<div class="group-header">' +
       '<span class="group-name">' + gc.label + '</span>' +
-      '<span class="group-tally">' + gc.creditsFilled + ' / ' + gc.totalCredits + ' cr</span>' +
+      '<span class="group-tally">' + (gc.showAll ? gc.creditsFilled + ' cr' : gc.creditsFilled + ' / ' + gc.totalCredits + ' cr') + '</span>' +
     '</div>' +
     '<div class="group-progress-wrap">' +
       '<div class="group-progress-bar" style="width:' + pct + '%"></div>' +
@@ -980,6 +1109,9 @@ function selectProgram(prog, btn) {
   } else {
     trackSel.classList.remove('visible');
   }
+  if (typeof applyCurriculum === 'function') {
+    applyCurriculum(AUDIT_STATE.program, AUDIT_STATE.catalogYear);
+  }
   rerunAudit();
 }
 
@@ -987,6 +1119,18 @@ function selectTrack(track, btn) {
   AUDIT_STATE.program = track;
   document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  if (typeof applyCurriculum === 'function') {
+    applyCurriculum(AUDIT_STATE.program, AUDIT_STATE.catalogYear);
+  }
+  rerunAudit();
+}
+
+function selectCatalogYear(year) {
+  AUDIT_STATE.catalogYear = year;
+  // Re-apply curriculum for the active program with the new catalog year
+  if (typeof applyCurriculum === 'function') {
+    applyCurriculum(AUDIT_STATE.program, year);
+  }
   rerunAudit();
 }
 
@@ -1076,6 +1220,22 @@ async function parseTranscript() {
 
     // 3. Resolve retakes (W-only courses are excluded)
     const resolved = resolveRetakes(entries);
+
+    // 3b. Auto-detect catalog year from earliest non-transfer course
+    const detectedYear = detectCatalogYear(entries);
+    if (detectedYear) {
+      AUDIT_STATE.catalogYear = detectedYear;
+      const sel = document.getElementById('catalog-year-select');
+      if (sel) {
+        sel.value = String(detectedYear);
+        const autoLabel = document.getElementById('catalog-year-auto');
+        if (autoLabel) autoLabel.style.display = 'inline';
+      }
+      // Apply the detected catalog year curriculum
+      if (typeof applyCurriculum === 'function') {
+        applyCurriculum(AUDIT_STATE.program, detectedYear);
+      }
+    }
 
     // 4. Match against degree requirements
     const codeIndex = buildCodeIndex();

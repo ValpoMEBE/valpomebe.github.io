@@ -24,6 +24,16 @@
   display: flex; justify-content: center;
   padding: .75rem 1.5rem 0;
 }
+.catalog-year-bar { padding-top: .25rem; }
+.catalog-year-select {
+  background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.2);
+  color: #eee; font-size: .75rem; padding: .25rem .5rem; border-radius: 6px;
+  cursor: pointer; margin-left: .25rem;
+}
+.catalog-year-select:focus { outline: none; border-color: var(--gold); }
+.catalog-year-auto {
+  font-size: .65rem; color: var(--gold); margin-left: .4rem; font-style: italic;
+}
 
 /* ── UPLOAD SECTION ─────────────────────────────────────────── */
 .upload-section {
@@ -223,6 +233,10 @@
   border-color: var(--magenta);
   background: linear-gradient(135deg, #f5e0ef 0%, var(--parchment) 100%);
 }
+.audit-card.status-no-grade {
+  border-color: var(--yellow);
+  background: linear-gradient(135deg, #fef9e7 0%, var(--parchment) 100%);
+}
 .audit-card.status-remaining {
   opacity: .5;
   border-style: dashed;
@@ -283,7 +297,7 @@
 .grade-f  { background: #a80087; color: #fff; }
 .grade-tr { background: var(--light-blue); color: var(--dark-brown); }
 .grade-w  { background: var(--orange); color: #fff; }
-.grade-ip { background: #475569; color: #e2e8f0; font-style: italic; }
+.grade-ip { background: var(--yellow); color: var(--dark-brown); font-style: italic; }
 
 
 /* ── UNMATCHED SECTION ──────────────────────────────────────── */
@@ -583,7 +597,7 @@
 .minor-grade.grade-d  { color: var(--orange); }
 .minor-grade.grade-f  { color: #f87171; }
 .minor-grade.grade-tr { color: #a78bfa; }
-.minor-grade.grade-ip { color: #94a3b8; font-style: italic; }
+.minor-grade.grade-ip { color: var(--yellow); font-style: italic; }
 .minor-need {
   font-size: .72rem; color: var(--orange); font-style: italic;
 }

@@ -6,3 +6,5 @@ _site/
 .bundle/
 vendor/
 /_site
+/test-transcripts
+/ReferenceDocuments/TranscriptTests

@@ -58,6 +58,29 @@
   coreqs: []
   offered: Fall
   desc: Microcontroller architecture, assembly/C programming, I/O interfacing, and real-time systems.
+- id: ECE_422
+  code: ECE 422
+  title: Embedded Microcontrollers II
+  credits: 3
+  tags:
+  - electrical
+  - systems
+  prereqs:
+  - ECE_322
+  coreqs: []
+  offered: Spring
+  desc: Advanced microcontroller programming, real-time operating systems, and embedded system design.
+- id: ECE_263
+  code: ECE 263
+  title: Linear Circuit Theory I
+  credits: 4
+  tags:
+  - electrical
+  prereqs:
+  - PHYS_142
+  coreqs: []
+  offered: Fall
+  desc: DC and AC circuit analysis, Thevenin/Norton equivalents, superposition, and op-amp circuits.
 - id: ECE_452
   code: ECE 452
   title: Digital Signal Processing

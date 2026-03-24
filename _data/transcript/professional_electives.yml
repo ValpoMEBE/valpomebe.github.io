@@ -4,6 +4,7 @@
 # Listed here are specific courses; dept-wide approvals handled in JS.
 
 # Specific courses
+- code: "CC 300"
 - code: "GE 493"
 - code: "ECON 221"
 - code: "ECON 222"
@@ -23,6 +24,10 @@
 - code: "MET 215"
 - code: "MET 216"
 - code: "MET 240"
+- code: "ECE 203"
+- code: "ECE 221"
+- code: "ECE 251"
+- code: "ECE 422"
 
 # Blanket department approvals (handled via dept prefix in JS):
 # ACC: any course

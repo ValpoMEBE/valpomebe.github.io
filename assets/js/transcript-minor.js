@@ -17,19 +17,33 @@ function parseCourseCode(code) {
 function buildTranscriptPool(matched, unmatched) {
   const pool = [];
   const seen = new Set();
+  const poolByCode = {};
 
   for (const m of matched) {
     const status = getCourseStatus(m.active.grade);
     if (status === 'failed') continue;          // skip F grades
     const code = m.code;
+
+    // Bundled labs (e.g. ECE 221L → ECE 221): add lab credits to parent entry
+    if (typeof CODE_ALIASES !== 'undefined' && CODE_ALIASES[code]) {
+      const parentCode = CODE_ALIASES[code].replace(/_/g, ' ');
+      if (parentCode !== code && poolByCode[parentCode]) {
+        poolByCode[parentCode].credits += m.active.credits || 0;
+        seen.add(code);
+        continue;
+      }
+    }
+
     if (seen.has(code)) continue;
     seen.add(code);
-    pool.push({
+    const entry = {
       code,
       credits: m.active.credits || (m.courseData ? m.courseData.credits : 3),
       grade: m.active.grade,
       status,
-    });
+    };
+    pool.push(entry);
+    poolByCode[code] = entry;
   }
 
   for (const u of (unmatched || [])) {
@@ -38,12 +52,14 @@ function buildTranscriptPool(matched, unmatched) {
     const code = u.code;
     if (seen.has(code)) continue;
     seen.add(code);
-    pool.push({
+    const entry = {
       code,
       credits: u.active.credits || 3,
       grade: u.active.grade,
       status,
-    });
+    };
+    pool.push(entry);
+    poolByCode[code] = entry;
   }
   return pool;
 }
@@ -109,10 +125,35 @@ function evalRequired(req, pool, usedCodes) {
   for (const courseCode of req.courses) {
     // Check substitutions
     let matchCode = courseCode;
+    let multiSubFilled = false;
     if (req.substitutions) {
       for (const [sub, target] of Object.entries(req.substitutions)) {
-        if (target === courseCode) {
-          // Check if substitute is in pool
+        if (target !== courseCode) continue;
+
+        if (sub.includes('+')) {
+          // Multi-course substitution: ALL courses must be present
+          const subCodes = sub.split('+').map(s => s.trim());
+          const subEntries = [];
+          let allFound = true;
+          for (const sc of subCodes) {
+            const entry = pool.find(p => p.code === sc && !usedCodes.has(p.code));
+            if (entry) {
+              subEntries.push(entry);
+            } else {
+              allFound = false;
+              break;
+            }
+          }
+          if (allFound) {
+            for (const se of subEntries) {
+              filled.push({ code: se.code, grade: se.grade, credits: se.credits });
+              usedCodes.add(se.code);
+            }
+            multiSubFilled = true;
+            break;
+          }
+        } else {
+          // Single-course substitution
           const subEntry = pool.find(p => p.code === sub && !usedCodes.has(p.code));
           if (subEntry) {
             matchCode = sub;
@@ -122,12 +163,14 @@ function evalRequired(req, pool, usedCodes) {
       }
     }
 
-    const entry = pool.find(p => p.code === matchCode && !usedCodes.has(p.code));
-    if (entry) {
-      filled.push({ code: entry.code, grade: entry.grade, credits: entry.credits });
-      usedCodes.add(entry.code);
-    } else {
-      missing.push(courseCode);
+    if (!multiSubFilled) {
+      const entry = pool.find(p => p.code === matchCode && !usedCodes.has(p.code));
+      if (entry) {
+        filled.push({ code: entry.code, grade: entry.grade, credits: entry.credits });
+        usedCodes.add(entry.code);
+      } else {
+        missing.push(courseCode);
+      }
     }
   }
 
@@ -145,6 +188,34 @@ function evalPick(req, pool, usedCodes) {
   const needed = req.pick || 1;
   const filled = [];
 
+  // course_groups: each element is an array of courses that must ALL be present
+  // e.g. [["ECE 263"], ["ECE 281", "ME 261"]] means ECE 263 alone OR both ECE 281 + ME 261
+  if (req.course_groups) {
+    for (const group of req.course_groups) {
+      if (filled.length >= needed) break;
+      // Check if ALL courses in this group are available in pool
+      const groupEntries = [];
+      let allFound = true;
+      for (const code of group) {
+        const entry = pool.find(e => e.code === code && !usedCodes.has(e.code));
+        if (entry) {
+          groupEntries.push(entry);
+        } else {
+          allFound = false;
+          break;
+        }
+      }
+      if (allFound && groupEntries.length === group.length) {
+        for (const entry of groupEntries) {
+          filled.push({ code: entry.code, grade: entry.grade, credits: entry.credits });
+          usedCodes.add(entry.code);
+        }
+        break; // One group match satisfies one pick
+      }
+    }
+  }
+
+  // Standard flat course list matching (if no course_groups or not enough filled)
   for (const entry of pool) {
     if (filled.length >= needed) break;
     if (usedCodes.has(entry.code)) continue;
@@ -166,10 +237,13 @@ function evalPick(req, pool, usedCodes) {
     }
   }
 
+  // For course_groups, count filled groups not individual courses
+  const metCount = req.course_groups ? (filled.length > 0 ? 1 : 0) : filled.length;
+
   return {
     label: req.label,
     type: req.type,
-    met: filled.length >= needed,
+    met: metCount >= needed,
     filled,
     missing: [],
     needed,
