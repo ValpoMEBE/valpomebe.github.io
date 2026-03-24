@@ -75,24 +75,15 @@ function buildMajorUsedSet(auditResult, program, pool) {
     used.add(c.code);
     if (c.filledBy) used.add(c.filledBy);
   }
-  // Group card fills (elective courses matched to grouped slots)
+  // Courses actually filled into elective groups
   for (const gc of auditResult.groupCards) {
     for (const fc of gc.filledCourses) {
       used.add(fc.code);
     }
   }
-  // Any transcript course that qualifies for an elective group in this program
-  // could be presented for the degree, so it can't serve as above-and-beyond
-  const groups = ELECTIVE_GROUPS[program] || [];
-  for (const g of groups) {
-    const approvedSet = buildApprovedSet(g.approvedLists);
-    for (const entry of pool) {
-      if (used.has(entry.code)) continue;
-      if (isApprovedElective(entry.code, approvedSet, g.blanketDepts || [], g.checkWorldLang)) {
-        used.add(entry.code);
-      }
-    }
-  }
+  // Only courses actually consumed by the major are "presented for the degree."
+  // Courses that could theoretically qualify for an elective group but weren't
+  // used should remain available for minor above-and-beyond credit.
   return used;
 }
 
@@ -299,6 +290,7 @@ function evalCredits(req, pool, usedCodes) {
   }
 
   // Check sub_requirements (e.g., chemistry "8 credits at 200+")
+  // If sub_requirements aren't met, continue filling from pool to satisfy them
   let subReqMet = true;
   let subReqInfo = null;
   if (req.sub_requirements) {
@@ -311,8 +303,23 @@ function evalCredits(req, pool, usedCodes) {
         }
       }
       if (subTotal < sub.credits) {
-        subReqMet = false;
-        subReqInfo = { label: sub.label, have: subTotal, need: sub.credits };
+        // Continue filling courses that satisfy this sub_requirement
+        for (const entry of pool) {
+          if (subTotal >= sub.credits) break;
+          if (usedCodes.has(entry.code)) continue;
+          if (isExcluded(entry.code, req.exclude)) continue;
+          const parsed = parseCourseCode(entry.code);
+          if (!parsed) continue;
+          if (!(req.depts && req.depts.includes(parsed.dept) && parsed.num >= (sub.min_level || 0))) continue;
+          filled.push({ code: entry.code, grade: entry.grade, credits: entry.credits });
+          total += entry.credits;
+          subTotal += entry.credits;
+          usedCodes.add(entry.code);
+        }
+        if (subTotal < sub.credits) {
+          subReqMet = false;
+          subReqInfo = { label: sub.label, have: subTotal, need: sub.credits };
+        }
       }
     }
   }
@@ -399,9 +406,15 @@ function checkAboveAndBeyond(reqResults, pool, majorUsedSet, otherAboveBeyondCod
     if (otherAboveBeyondCodes.has(entry.code)) continue;
 
     // Check if this course is related to the minor's department areas
+    // by matching against any filled course's department
     let related = false;
+    const entryDept = parsed.dept;
     for (const r of reqResults) {
-      if (r.filled.some(f => f.code === entry.code)) { related = true; break; }
+      for (const f of r.filled) {
+        const fp = parseCourseCode(f.code);
+        if (fp && fp.dept === entryDept) { related = true; break; }
+      }
+      if (related) break;
     }
     if (!related) continue;
     return { met: true, course: entry.code };

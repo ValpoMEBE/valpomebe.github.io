@@ -34,7 +34,7 @@ const CODE_ALIASES = {
   'ME 251L':   'ME_251',    // lab bundled with ME 251
   'BIO 151L':  'BIO_151',   // lab bundled with BIO 151
   'BIO 152L':  'BIO_152',   // lab bundled with BIO 152
-  'CC 215':    'THEO_GE',   // CC Christian Tradition → Theology requirement
+  // CC 215 handled by THEO_GROUP approved list (theology.yml), no alias needed
   // ECE lab courses bundled with lecture
   'ECE 221L':  'ECE_221',   // lab bundled
   'ECE 322L':  'ECE_322',   // lab bundled
@@ -71,9 +71,19 @@ const CORE_GROUPS = [
   },
 ];
 
+const THEO_GROUP = {
+  key: 'theo',
+  label: 'Theology / Religion',
+  ids: ['THEO_GE'],
+  approvedLists: ['theology'],
+  blanketDepts: [],
+  maxCourses: 1,
+};
+
 const ELECTIVE_GROUPS = {
   ME: [
     ...CORE_GROUPS,
+    THEO_GROUP,
     {
       key: 'me_elec',
       label: 'ME Electives',
@@ -109,6 +119,7 @@ const ELECTIVE_GROUPS = {
   ],
   BE_Biomech: [
     ...CORE_GROUPS,
+    THEO_GROUP,
     {
       key: 'be_elec',
       label: 'BE Electives',
@@ -135,6 +146,7 @@ const ELECTIVE_GROUPS = {
   ],
   BE_Bioelec: [
     ...CORE_GROUPS,
+    THEO_GROUP,
     {
       key: 'be_elec',
       label: 'BE Electives',
@@ -161,6 +173,7 @@ const ELECTIVE_GROUPS = {
   ],
   BE_Biomed: [
     ...CORE_GROUPS,
+    THEO_GROUP,
     {
       key: 'be_elec',
       label: 'BE Electives',
@@ -307,7 +320,7 @@ function matchCourses(resolvedCourses, codeIndex) {
 // ── Compute audit results ──────────────────────────────────────
 function computeAudit(matched, program, codeIndex, unmatched) {
   // VUE_101/VUE_102 are handled by Core I/II group cards — exclude from required list
-  const coreGroupIds = new Set(['VUE_101', 'VUE_102']);
+  const coreGroupIds = new Set(['VUE_101', 'VUE_102', 'THEO_GE']);
   const required = COURSES_ARRAY
     .filter(c => c.semesters && c.semesters[program])
     .filter(c => !coreGroupIds.has(c.id));
