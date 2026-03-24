@@ -1,0 +1,20 @@
+---
+layout: default
+---
+
+{%- comment -%}
+  Prerequisite Web Layout
+  Injects YAML data as JSON globals, then loads the prereq-web JS engine.
+  Used by _pages/prereq-web.html
+{%- endcomment -%}
+
+{%- include inject-courses.html -%}
+<script>
+  const TAGS_DATA = {{ site.data.tags | jsonify }};
+  const TAGS = {};
+  TAGS_DATA.forEach(t => { TAGS[t.key] = { label: t.label, bg: t.bg, fg: t.fg }; });
+</script>
+
+{{ content }}
+
+<script src="{{ '/assets/js/prereq-web.js' | relative_url }}"></script>

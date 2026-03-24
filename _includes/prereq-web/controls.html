@@ -1,0 +1,14 @@
+<div class="pw-controls">
+  <span class="pw-label">Program:</span>
+  <button class="pw-btn active" onclick="pwSetProgram('ALL', this)">All</button>
+  <button class="pw-btn"        onclick="pwSetProgram('ME', this)">ME</button>
+  <button class="pw-btn"        onclick="pwSetProgram('BE_Biomech', this)">BE Biomech</button>
+  <button class="pw-btn"        onclick="pwSetProgram('BE_Bioelec', this)">BE Bioelec</button>
+  <button class="pw-btn"        onclick="pwSetProgram('BE_Biomed', this)">BE Biomed</button>
+  <div class="pw-zoom">
+    <button class="zoom-btn" onclick="pwZoomOut()" title="Zoom out">&minus;</button>
+    <span class="zoom-level" id="pw-zoom-level">100%</span>
+    <button class="zoom-btn" onclick="pwZoomIn()" title="Zoom in">&#x2b;</button>
+    <button class="zoom-btn" onclick="pwFitView()" title="Fit to view" style="font-size:.65rem;width:auto;padding:0 .5rem;">Fit</button>
+  </div>
+</div>

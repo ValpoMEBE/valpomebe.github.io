@@ -25,4 +25,10 @@ permalink: /
     <span class="card-arrow">Build schedule &rarr;</span>
   </a>
 
+  <a href="{{ '/prereq-web/' | relative_url }}" class="card-link">
+    <h2>Prerequisite Web</h2>
+    <p>Visualize how courses connect through prerequisites and co-requisites. Explore the dependency chains that shape your path through the ME and BE programs.</p>
+    <span class="card-arrow">Explore web &rarr;</span>
+  </a>
+
 </div>
