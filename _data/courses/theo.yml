@@ -6,7 +6,7 @@
   prereqs: []
   coreqs: []
   isPlaceholder: true
-  desc: REL 100 (ME) or THEO 100/200 (BE). Satisfies the theology/religion general education requirement.
+  desc: REL 100 – Religion and Society. Satisfies the theology/religion general education requirement for all programs.
   eligible:
   - REL 100 – Religion and Society
   - THEO 100 – The Christian Tradition (Intro)
