@@ -190,6 +190,7 @@ function parseMasterCSV(text) {
 
     const tlcRaw = row['TLC'] || '';
     const tlc = tlcRaw ? parseFloat(tlcRaw) : null;
+    const timePref = (row['Time_Pref'] || '').trim() || null;
 
     const isLab = /L$/.test(code);
     const linkedTo = isLab ? code.replace(/L$/, '') : '';
@@ -226,6 +227,7 @@ function parseMasterCSV(text) {
         duration:       duration,
         pairGroup:      pairGroup,
         dayPattern:     dayPattern,
+        days:           expandDayPattern(dayPattern),
         mode:           mode,
         altWeeks:       altWeeks,
         studentCredits: studentCredits,
@@ -236,6 +238,7 @@ function parseMasterCSV(text) {
         isLab:          isLab,
         linkedTo:       linkedTo,
         tlc:            tlc,
+        timePref:       timePref,
       });
     }
   }

@@ -1,0 +1,17 @@
+---
+layout: default
+---
+
+{%- comment -%}
+  Scheduler Test Harness Layout
+  Loads course data + scheduler scripts + test harness.
+{%- endcomment -%}
+
+{%- include inject-courses.html -%}
+
+{{ content }}
+
+<link rel="stylesheet" href="{{ '/scheduler/css/test-harness.css' | relative_url }}">
+<script src="{{ '/scheduler/js/parser.js' | relative_url }}"></script>
+<script src="{{ '/scheduler/js/optimizer.js' | relative_url }}"></script>
+<script src="{{ '/scheduler/js/test-harness.js' | relative_url }}"></script>

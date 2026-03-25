@@ -239,13 +239,32 @@ function runOptimizer() {
   btn.textContent = 'Optimizing...';
   btn.disabled = true;
 
-  // Use setTimeout to allow UI to update before blocking computation
-  setTimeout(() => {
-    const t0 = performance.now();
-    STATE.result = optimizeSchedule(STATE.courses, STATE.frozen || [], STATE.slots, prefs, weights);
-    const dt = (performance.now() - t0).toFixed(1);
+  // Serialize the preferences Map for worker transfer
+  const serializedPrefs = {
+    preferences: prefs.preferences instanceof Map ? [...prefs.preferences.entries()] : [],
+    specialRules: prefs.specialRules || [],
+  };
 
-    console.log(`Optimizer: ${dt}ms, ${STATE.result.iterations} iterations, score=${STATE.result.score}`);
+  // Resolve worker script path (handle /dev/ baseurl)
+  const basePath = document.querySelector('script[src*="scheduler-ui"]')?.src?.replace(/js\/scheduler-ui\.js.*/, 'js/') || '/scheduler/js/';
+  const workerUrl = basePath + 'optimizer-worker.js';
+
+  const worker = new Worker(workerUrl);
+
+  worker.onmessage = function(e) {
+    worker.terminate();
+
+    if (e.data.type === 'error') {
+      console.error('Optimizer CRASHED:', e.data.message, e.data.stack);
+      btn.textContent = prevText;
+      btn.disabled = false;
+      alert('Optimizer error: ' + e.data.message);
+      return;
+    }
+
+    const { result, elapsed } = e.data;
+    STATE.result = result;
+    console.log(`Optimizer: ${elapsed.toFixed(1)}ms, ${result.iterations} iterations, score=${result.score}`);
 
     btn.textContent = prevText;
     btn.disabled = false;
@@ -262,7 +281,26 @@ function runOptimizer() {
     renderGrid();
     renderAnalysis();
     renderLoads();
-  }, 50);
+  };
+
+  worker.onerror = function(err) {
+    worker.terminate();
+    console.error('Worker error:', err);
+    btn.textContent = prevText;
+    btn.disabled = false;
+    alert('Optimizer worker error: ' + (err.message || 'Unknown error'));
+  };
+
+  // Post data to worker (COURSES global is needed for semester/conflict data)
+  worker.postMessage({
+    courses: STATE.courses,
+    frozen: STATE.frozen || [],
+    slots: STATE.slots,
+    facultyPrefs: serializedPrefs,
+    weights: weights,
+    seed: null,
+    coursesGlobal: typeof COURSES !== 'undefined' ? COURSES : {},
+  });
 }
 
 // ── Populate instructor dropdown ────────────────────────────────
@@ -491,7 +529,7 @@ function createCourseBlock(item, conflictSet) {
   return block;
 }
 
-// ── Course detail panel (minimal-impact change) ─────────────────
+// ── Course detail panel (UniTime-style suggestion search) ───────
 function openDetailPanel(item) {
   STATE.selectedCourse = item;
   const panel = document.getElementById('course-detail-panel');
@@ -501,9 +539,6 @@ function openDetailPanel(item) {
   const instrDisplay = getFullInstructorDisplay(c);
   const year = getYearLevel(c.courseId);
   const yearLabel = year ? YEAR_LABELS[year] : '—';
-
-  // Find available alternative slots
-  const alternatives = findAlternativeSlots(item);
 
   panel.querySelector('.detail-course-code').textContent = `${c.code} §${c.section}`;
   panel.querySelector('.detail-instructor').textContent = instrDisplay;
@@ -522,173 +557,181 @@ function openDetailPanel(item) {
     applyFilters();
   };
 
-  // Re-optimize this course button
-  const reoptBtn = panel.querySelector('.detail-reopt-btn');
-  reoptBtn.onclick = () => {
-    reoptimizeSingleCourse(item);
-  };
-
-  // Alternative slots list
+  // Suggestion list — show spinner while worker computes
   const altList = panel.querySelector('.detail-alternatives');
-  altList.innerHTML = '';
-
-  if (alternatives.length === 0) {
-    altList.innerHTML = '<div class="move-option" style="color: var(--light-gray);">No alternative slots available</div>';
-  } else {
-    for (const alt of alternatives.slice(0, 10)) {
-      const div = document.createElement('div');
-      div.className = `move-option${alt.conflicts === 0 ? ' best' : ''}`;
-      div.innerHTML = `
-        <div class="move-time">${alt.slot.startTime} – ${alt.slot.endTime} <span style="opacity:.6">${alt.slot.dayPattern}</span></div>
-        <div class="move-impact">
-          ${alt.conflicts === 0
-            ? '<span class="impact-good">No new conflicts</span>'
-            : `<span class="impact-bad">${alt.conflicts} conflict(s)</span>`
-          }
-          ${alt.prefScore !== undefined ? `<span class="impact-pref">Pref: ${alt.prefScore > 0 ? '+' : ''}${alt.prefScore}</span>` : ''}
-        </div>
-      `;
-      div.addEventListener('click', () => {
-        moveCourseToSlot(item, alt.slot);
-        closeDetailPanel();
-      });
-      altList.appendChild(div);
-    }
-  }
+  altList.innerHTML = '<div class="suggestion-spinner">Computing suggestions...</div>';
 
   panel.classList.add('open');
-}
 
-function closeDetailPanel() {
-  const panel = document.getElementById('course-detail-panel');
-  if (panel) panel.classList.remove('open');
-  STATE.selectedCourse = null;
-}
+  // ── Send suggestion request to worker ─────────────────────
+  const targetKey = `${c.code}:${c.section}`;
+  const weights = getWeights();
+  const prefs = STATE.facultyPrefs || { preferences: new Map(), specialRules: [] };
 
-// ── Find alternative time slots for a course ────────────────────
-function findAlternativeSlots(item) {
-  const c = item.course;
-  const currentSlot = item.slot;
-  const alternatives = [];
+  const serializedPrefs = {
+    preferences: prefs.preferences instanceof Map ? [...prefs.preferences.entries()] : [],
+    specialRules: prefs.specialRules || [],
+  };
 
-  // Get compatible slots (matching format)
-  const compatibleSlots = STATE.slots.filter(s => s.format === c.mode);
+  const basePath = document.querySelector('script[src*="scheduler-ui"]')?.src?.replace(/js\/scheduler-ui\.js.*/, 'js/') || '/scheduler/js/';
+  const workerUrl = basePath + 'optimizer-worker.js';
+  const worker = new Worker(workerUrl);
 
-  for (const slot of compatibleSlots) {
-    // Skip current slot
-    if (slot.startTime === currentSlot.startTime &&
-        slot.endTime === currentSlot.endTime &&
-        slot.dayPattern === currentSlot.dayPattern) continue;
+  worker.onmessage = function(e) {
+    worker.terminate();
 
-    // Count conflicts this slot would create
-    let conflicts = 0;
-    for (const other of STATE.result.scheduled) {
-      if (other === item) continue;
-      if (!other.slot || !other.slot.days) continue;
-
-      // Instructor conflict
-      if (c.instructors && other.course.instructors) {
-        const cKeys = c.instructors.filter(i => i.last !== 'Staff').map(i => `${i.last}_${i.first}`);
-        const oKeys = other.course.instructors.filter(i => i.last !== 'Staff').map(i => `${i.last}_${i.first}`);
-        if (cKeys.some(k => oKeys.includes(k))) {
-          if (timesOverlap(slot.days, slot.startTime, slot.endTime,
-                           other.slot.days, other.slot.startTime, other.slot.endTime)) {
-            conflicts++;
-          }
-        }
-      }
-
-      // Same-course section conflict
-      if (other.course.code === c.code && other.course.section !== c.section) {
-        if (timesOverlap(slot.days, slot.startTime, slot.endTime,
-                         other.slot.days, other.slot.startTime, other.slot.endTime)) {
-          conflicts++;
-        }
-      }
+    if (e.data.type === 'suggestions-error') {
+      console.error('Suggestion search error:', e.data.message);
+      altList.innerHTML = '<div class="move-option" style="color: var(--light-gray);">Error computing suggestions</div>';
+      return;
     }
 
-    // Faculty preference score for this slot
-    let prefScore = 0;
-    if (STATE.facultyPrefs) {
-      prefScore = matchFacultyPrefForSlot(c, slot);
+    if (e.data.type === 'suggestions') {
+      console.log(`Suggestions: ${e.data.suggestions.length} found in ${e.data.elapsed.toFixed(1)}ms`);
+      renderSuggestions(altList, e.data.suggestions, item);
     }
+  };
 
-    alternatives.push({ slot, conflicts, prefScore });
+  worker.onerror = function(err) {
+    worker.terminate();
+    console.error('Suggestion worker error:', err);
+    altList.innerHTML = '<div class="move-option" style="color: var(--light-gray);">Error computing suggestions</div>';
+  };
+
+  worker.postMessage({
+    type: 'suggestions',
+    scheduled: STATE.result.scheduled,
+    frozen: STATE.frozen || [],
+    slots: STATE.slots,
+    facultyPrefs: serializedPrefs,
+    weights: weights,
+    targetCourseKey: targetKey,
+    maxDepth: 2,
+    timeoutMs: 1000,
+    coursesGlobal: typeof COURSES !== 'undefined' ? COURSES : {},
+  });
+}
+
+// ── Render suggestion cards ─────────────────────────────────────
+function renderSuggestions(container, suggestions, item) {
+  container.innerHTML = '';
+
+  if (suggestions.length === 0) {
+    container.innerHTML = '<div class="move-option" style="color: var(--light-gray);">No valid moves found</div>';
+    return;
   }
 
-  // Sort: fewest conflicts first, then best preference
-  alternatives.sort((a, b) => a.conflicts - b.conflicts || b.prefScore - a.prefScore);
-  return alternatives;
+  // Show up to 15 suggestions
+  for (const sug of suggestions.slice(0, 15)) {
+    const div = document.createElement('div');
+
+    // Impact class
+    let impactClass = 'impact-none';
+    if (sug.cascade.length === 1) impactClass = 'impact-low';
+    if (sug.cascade.length >= 2) impactClass = 'impact-high';
+
+    div.className = `move-option${sug.isFreeMove ? ' best' : ''}`;
+
+    // Score delta display
+    const delta = sug.scoreDelta;
+    let deltaClass = 'score-delta neutral';
+    let deltaText = '0';
+    if (delta < -0.5) { deltaClass = 'score-delta negative'; deltaText = delta.toFixed(1); }
+    else if (delta > 0.5) { deltaClass = 'score-delta positive'; deltaText = '+' + delta.toFixed(1); }
+
+    // Time display
+    const slot = sug.targetSlot;
+    const timeStr = `${slot.startTime} – ${slot.endTime}`;
+    const dayStr = slot.dayPattern || '';
+
+    // Build cascade HTML
+    let cascadeHtml = '';
+    if (sug.isFreeMove) {
+      cascadeHtml = '<div class="cascade-summary free-move">No other courses affected</div>';
+    } else {
+      cascadeHtml = '<div class="cascade-list">';
+      for (const c of sug.cascade) {
+        const fromStr = c.fromSlot ? `${c.fromSlot.dayPattern || ''} ${c.fromSlot.startTime}` : '?';
+        const toStr = c.toSlot ? `${c.toSlot.dayPattern || ''} ${c.toSlot.startTime}` : '?';
+        cascadeHtml += `<div class="cascade-item">${c.code} §${c.section}: ${fromStr} → ${toStr}</div>`;
+      }
+      cascadeHtml += '</div>';
+    }
+
+    div.innerHTML = `
+      <div class="move-header">
+        <div class="move-time">${timeStr} <span style="opacity:.6">${dayStr}</span></div>
+        <span class="${deltaClass}">${deltaText}</span>
+      </div>
+      <div class="move-impact">
+        <span class="impact-indicator ${impactClass}">${sug.perturbationCount === 1 ? 'Free' : sug.perturbationCount + ' moves'}</span>
+      </div>
+      ${cascadeHtml}
+    `;
+
+    div.addEventListener('click', () => {
+      applySuggestion(item, sug);
+      closeDetailPanel();
+    });
+
+    container.appendChild(div);
+  }
 }
 
-// ── Match faculty pref for a specific slot ──────────────────────
-function matchFacultyPrefForSlot(course, slot) {
-  if (!STATE.facultyPrefs || !course.instructors) return 0;
-  const inst = course.instructors[0];
-  if (!inst || inst.last === 'Staff') return 0;
+// ── Apply a suggestion (target + cascade moves) ─────────────────
+function applySuggestion(item, suggestion) {
+  // Apply target course move
+  item.slot = suggestion.targetSlot;
+  item.course.slotIndex = suggestion.targetSlot.index;
 
-  // Try to find faculty key
-  const keys = [inst.last, `${inst.last}_${(inst.first || '')[0]}`];
-  for (const key of keys) {
-    const prefs = STATE.facultyPrefs.preferences.get(key);
-    if (!prefs) continue;
-
-    for (const p of prefs) {
-      if (p.format === slot.format &&
-          p.start === slot.startTime) {
-        return p.pref;
-      }
+  // Apply cascade moves
+  for (const cascadeMove of suggestion.cascade) {
+    // Find the scheduled item matching this cascade entry
+    const scheduled = STATE.result.scheduled.find(s =>
+      s.course.code === cascadeMove.code && s.course.section === cascadeMove.section
+    );
+    if (scheduled && cascadeMove.toSlot) {
+      scheduled.slot = cascadeMove.toSlot;
+      scheduled.course.slotIndex = cascadeMove.toSlot.index;
     }
   }
-  return 0;
-}
-
-// ── Move course to a new slot ───────────────────────────────────
-function moveCourseToSlot(item, newSlot) {
-  // Update the course's slot assignment
-  item.slot = newSlot;
-  item.course.slotIndex = newSlot.index;
 
   // Re-detect conflicts
   if (STATE.result) {
     const semesterMap = buildSemesterMap();
     const conflictGraph = buildConflictGraph(semesterMap);
     STATE.result.conflicts = detectConflicts(STATE.result.scheduled, conflictGraph);
+    STATE.result.constraintReport = buildConstraintReport(STATE.result.scheduled, conflictGraph, semesterMap);
+    STATE.result.studentAnalysis = buildStudentAnalysis(STATE.result.scheduled, semesterMap);
   }
 
-  renderGrid();
-  applyFilters();
-  renderAnalysis();
-}
-
-// ── Re-optimize a single course ─────────────────────────────────
-function reoptimizeSingleCourse(item) {
-  // Lock all courses except this one
-  const prevLocked = new Map();
-  for (const c of STATE.courses) {
-    prevLocked.set(c, c.locked);
-    if (c !== item.course) c.locked = true;
-  }
-
-  // Clear this course's assignment
-  item.course.locked = false;
-  item.course.slotIndex = null;
-
-  // Run optimizer
-  const weights = getWeights();
-  const prefs = STATE.facultyPrefs || { preferences: new Map(), specialRules: [] };
-  STATE.result = optimizeSchedule(STATE.courses, STATE.frozen || [], STATE.slots, prefs, weights);
-
-  // Restore lock states
-  for (const [c, wasLocked] of prevLocked) {
-    c.locked = wasLocked;
+  // Flash affected courses
+  const affectedCodes = new Set([`${item.course.code}-${item.course.section}`]);
+  for (const c of suggestion.cascade) {
+    affectedCodes.add(`${c.code}-${c.section}`);
   }
 
   renderGrid();
   applyFilters();
   renderAnalysis();
   renderLoads();
-  closeDetailPanel();
+
+  // Add flash animation to affected blocks
+  requestAnimationFrame(() => {
+    for (const block of document.querySelectorAll('.course-block')) {
+      const blockKey = `${block.dataset.code}-${block.dataset.section}`;
+      if (affectedCodes.has(blockKey)) {
+        block.classList.add('flash');
+        block.addEventListener('animationend', () => block.classList.remove('flash'), { once: true });
+      }
+    }
+  });
+}
+
+function closeDetailPanel() {
+  const panel = document.getElementById('course-detail-panel');
+  if (panel) panel.classList.remove('open');
+  STATE.selectedCourse = null;
 }
 
 // ── Apply filter dropdowns ──────────────────────────────────────

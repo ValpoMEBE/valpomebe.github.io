@@ -1,0 +1,279 @@
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  TEST HARNESS — Scheduler optimizer test/benchmark styles   ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+:root {
+  --th-bg:       var(--bg, #1a1108);
+  --th-surface:  #231a0e;
+  --th-border:   #3a2e1a;
+  --th-gold:     #d4a843;
+  --th-text:     #e8dcc8;
+  --th-muted:    #8a7e6a;
+  --th-green:    #4caf50;
+  --th-yellow:   #ff9800;
+  --th-red:      #f44336;
+}
+
+/* ── Container ─────────────────────────────────────────────── */
+.th-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ── Header & controls ─────────────────────────────────────── */
+.th-header {
+  margin-bottom: 2rem;
+}
+
+.th-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.6rem;
+  color: var(--th-gold);
+  margin: 0 0 1rem;
+}
+
+.th-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.th-btn {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--th-gold);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.th-btn-primary {
+  background: var(--th-gold);
+  color: #1a1108;
+}
+.th-btn-primary:hover {
+  background: #e6bc5a;
+}
+
+.th-btn-secondary {
+  background: transparent;
+  color: var(--th-gold);
+}
+.th-btn-secondary:hover {
+  background: rgba(212, 168, 67, 0.12);
+}
+
+.th-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.th-runs-label {
+  color: var(--th-muted);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.th-runs-input {
+  width: 60px;
+  padding: 0.35rem 0.5rem;
+  background: var(--th-surface);
+  border: 1px solid var(--th-border);
+  border-radius: 4px;
+  color: var(--th-text);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ── Progress ──────────────────────────────────────────────── */
+.th-progress {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--th-surface);
+  border: 1px solid var(--th-border);
+  border-radius: 4px;
+  color: var(--th-yellow);
+  font-size: 0.85rem;
+  font-family: monospace;
+}
+
+/* ── Sections ──────────────────────────────────────────────── */
+.th-section {
+  margin-bottom: 2rem;
+}
+
+.th-section-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.15rem;
+  color: var(--th-gold);
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--th-gold);
+  margin-bottom: 1rem;
+}
+
+.th-results {
+  min-height: 2rem;
+}
+
+.th-placeholder {
+  color: var(--th-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* ── Dataset cards (correctness) ───────────────────────────── */
+.th-dataset-card {
+  background: var(--th-surface);
+  border: 1px solid var(--th-border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.th-dataset-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.th-dataset-name {
+  font-weight: 700;
+  color: var(--th-text);
+  font-size: 0.95rem;
+}
+
+.th-dataset-desc {
+  color: var(--th-muted);
+  font-size: 0.8rem;
+  flex: 1;
+}
+
+.th-badge {
+  padding: 0.15rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.th-badge-pass {
+  background: var(--th-green);
+  color: #fff;
+}
+
+.th-badge-fail {
+  background: var(--th-red);
+  color: #fff;
+}
+
+.th-badge-skip {
+  background: var(--th-muted);
+  color: #fff;
+}
+
+.th-assertions {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+}
+
+.th-assertions li {
+  padding: 0.15rem 0;
+  color: var(--th-text);
+}
+
+.th-assertions li::before {
+  margin-right: 0.4rem;
+  font-weight: 700;
+}
+
+.th-assert-pass::before {
+  content: "PASS";
+  color: var(--th-green);
+}
+
+.th-assert-fail::before {
+  content: "FAIL";
+  color: var(--th-red);
+}
+
+/* ── Benchmark table ───────────────────────────────────────── */
+.th-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.th-table th {
+  background: var(--th-surface);
+  color: var(--th-gold);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--th-gold);
+}
+
+.th-table td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid var(--th-border);
+  color: var(--th-text);
+  font-family: monospace;
+}
+
+.th-table tr:hover td {
+  background: rgba(212, 168, 67, 0.06);
+}
+
+/* ── Breakdown table ───────────────────────────────────────── */
+.th-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.th-breakdown-table caption {
+  text-align: left;
+  color: var(--th-text);
+  font-weight: 600;
+  padding: 0.4rem 0;
+  font-size: 0.9rem;
+}
+
+.th-breakdown-table th {
+  background: var(--th-surface);
+  color: var(--th-gold);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--th-border);
+}
+
+.th-breakdown-table td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid var(--th-border);
+  color: var(--th-text);
+  font-family: monospace;
+}
+
+/* ── Log textarea ──────────────────────────────────────────── */
+.th-log {
+  width: 100%;
+  background: #0e0a04;
+  color: var(--th-muted);
+  border: 1px solid var(--th-border);
+  border-radius: 4px;
+  padding: 0.75rem;
+  font-family: monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  resize: vertical;
+}

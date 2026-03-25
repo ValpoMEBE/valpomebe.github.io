@@ -970,10 +970,23 @@
   margin-bottom: .5rem;
 }
 
+/* ── Suggestion cards ─────────────────────────────────────── */
+.suggestion-spinner {
+  text-align: center;
+  color: var(--gold);
+  font-size: .8rem;
+  padding: 1.5rem 0;
+  animation: pulse-text 1.2s ease-in-out infinite;
+}
+@keyframes pulse-text {
+  0%, 100% { opacity: .5; }
+  50%      { opacity: 1; }
+}
+
 .move-option {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: .3rem;
   padding: .5rem .6rem;
   margin-bottom: .4rem;
   background: rgba(255,255,255,.04);
@@ -993,15 +1006,31 @@
   background: rgba(0,99,84,.08);
 }
 
-.move-option .move-slot {
-  font-size: .75rem;
+.move-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.move-time {
+  font-size: .78rem;
   font-family: var(--font-mono);
   color: var(--white);
 }
 
-.move-option .move-days {
-  font-size: .68rem;
-  color: var(--light-gray);
+.score-delta {
+  font-size: .72rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.score-delta.negative { color: #4ecdc4; }
+.score-delta.positive { color: #ff6b6b; }
+.score-delta.neutral  { color: var(--light-gray); }
+
+.move-impact {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
 }
 
 .impact-indicator {
@@ -1027,6 +1056,36 @@
 .impact-indicator.impact-high {
   background: rgba(255,68,68,.12);
   color: #ff6b6b;
+}
+
+/* ── Cascade list (displaced courses) ────────────────────── */
+.cascade-summary.free-move {
+  font-size: .7rem;
+  color: var(--teal);
+  font-style: italic;
+}
+
+.cascade-list {
+  padding-left: .4rem;
+  border-left: 2px solid rgba(255,255,255,.08);
+  margin-top: .2rem;
+}
+
+.cascade-item {
+  font-size: .68rem;
+  font-family: var(--font-mono);
+  color: var(--light-gray);
+  padding: .15rem 0 .15rem .4rem;
+}
+
+/* ── Flash animation for moved courses ───────────────────── */
+@keyframes flash-gold {
+  0%   { box-shadow: 0 0 0 0 rgba(245,184,10,.7); }
+  50%  { box-shadow: 0 0 12px 4px rgba(245,184,10,.5); }
+  100% { box-shadow: 0 0 0 0 rgba(245,184,10,0); }
+}
+.course-block.flash {
+  animation: flash-gold .8s ease-out;
 }
 
 /* ── Print styles ───────────────────────────────────────────── */

@@ -4,7 +4,11 @@
       "Bash(python -c \":*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4000/dev/transcript/)",
       "Bash(python3 -c \":*)",
-      "Bash(C:/Ruby30-x64/bin/bundle.cmd exec:*)"
+      "Bash(C:/Ruby30-x64/bin/bundle.cmd exec:*)",
+      "Bash(taskkill //F //IM ruby.exe)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4000/dev/scheduler-test/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4000/dev/scheduler/)"
     ]
   }
 }

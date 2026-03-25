@@ -1,0 +1,62 @@
+---
+layout: scheduler-test
+title: "Scheduler Test Harness"
+permalink: /scheduler-test/
+---
+
+<div class="th-container">
+  <header class="th-header">
+    <h1 class="th-title">Scheduler Optimizer &mdash; Test Harness</h1>
+    <div class="th-controls">
+      <button id="btn-run-all" class="th-btn th-btn-primary">Run All</button>
+      <button id="btn-run-correctness" class="th-btn th-btn-secondary">Run Correctness Only</button>
+      <label class="th-runs-label">
+        Runs
+        <input id="input-runs" type="number" value="20" min="1" max="200" class="th-runs-input">
+      </label>
+    </div>
+    <div id="progress-bar" class="th-progress" style="display:none;">
+      <span id="progress-text"></span>
+    </div>
+  </header>
+
+  <section class="th-section">
+    <h2 class="th-section-title">Correctness Tests</h2>
+    <div id="correctness-results" class="th-results">
+      <p class="th-placeholder">Click "Run All" or "Run Correctness Only" to start.</p>
+    </div>
+  </section>
+
+  <section class="th-section">
+    <h2 class="th-section-title">Benchmark Results</h2>
+    <div id="benchmark-results" class="th-results">
+      <table class="th-table" id="benchmark-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Dataset</th>
+            <th>Min</th>
+            <th>Max</th>
+            <th>Mean</th>
+            <th>Median</th>
+            <th>StdDev</th>
+            <th>Avg Time (ms)</th>
+          </tr>
+        </thead>
+        <tbody id="benchmark-tbody"></tbody>
+      </table>
+      <p class="th-placeholder" id="benchmark-placeholder">Benchmarks run after correctness tests (via "Run All").</p>
+    </div>
+  </section>
+
+  <section class="th-section">
+    <h2 class="th-section-title">Score Breakdown (per constraint)</h2>
+    <div id="breakdown-results" class="th-results">
+      <p class="th-placeholder" id="breakdown-placeholder">Breakdown appears after benchmarks complete.</p>
+    </div>
+  </section>
+
+  <section class="th-section">
+    <h2 class="th-section-title">Log</h2>
+    <textarea id="test-log" class="th-log" readonly rows="20"></textarea>
+  </section>
+</div>
