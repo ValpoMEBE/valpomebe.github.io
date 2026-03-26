@@ -598,7 +598,7 @@
 .minor-grade.grade-d  { color: var(--orange); }
 .minor-grade.grade-f  { color: #f87171; }
 .minor-grade.grade-tr { color: #a78bfa; }
-.minor-grade.grade-ip { color: var(--yellow); font-style: italic; }
+.minor-grade.grade-ip { background: var(--yellow); color: var(--dark-brown); font-style: italic; }
 .minor-grade.grade-s  { color: #4ade80; }
 .minor-need {
   font-size: .72rem; color: var(--orange); font-style: italic;

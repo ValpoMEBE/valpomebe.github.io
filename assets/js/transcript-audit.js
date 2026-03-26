@@ -724,6 +724,26 @@ function renderAudit(auditResult, unmatched, summary) {
   const remainingUnmatched = usedForGroups
     ? unmatched.filter(u => !usedForGroups.has(u.code))
     : unmatched;
+
+  // Matched courses that didn't fill any degree requirement or elective group
+  // should also appear as "Additional Courses"
+  const usedCourseIds = new Set();
+  for (const c of audit) {
+    if (c.status !== 'remaining') usedCourseIds.add(c.id);
+  }
+  for (const gc of groupCards) {
+    for (const fc of gc.filledCourses) usedForGroups.add(fc.code);
+  }
+  const matched = AUDIT_STATE.lastMatched || [];
+  const seenCodes = new Set(remainingUnmatched.map(u => u.code));
+  for (const m of matched) {
+    if (usedCourseIds.has(m.courseId)) continue;
+    if (usedForGroups.has(m.code)) continue;
+    if (seenCodes.has(m.code)) continue;
+    seenCodes.add(m.code);
+    remainingUnmatched.push(m);
+  }
+
   renderUnmatched(remainingUnmatched);
 }
 
@@ -1511,21 +1531,41 @@ function buildMajorSheetData(auditResult, unmatched) {
     rows.push(row);
   }
 
-  // Extra/unmatched courses section
+  // Extra/unmatched courses section — include matched-but-unused courses too
   const remaining = usedForGroups
     ? (unmatched || []).filter(u => !usedForGroups.has(u.code))
     : (unmatched || []);
+
+  // Add matched courses that didn't fill any requirement or group
+  const usedIds = new Set();
+  for (const c of audit) {
+    if (c.status !== 'remaining') usedIds.add(c.id);
+  }
+  for (const gc of groupCards) {
+    for (const fc of gc.filledCourses) usedForGroups.add(fc.code);
+  }
+  const matched = AUDIT_STATE.lastMatched || [];
+  const seenCodes = new Set(remaining.map(u => u.code));
+  for (const m of matched) {
+    if (usedIds.has(m.courseId)) continue;
+    if (usedForGroups.has(m.code)) continue;
+    if (seenCodes.has(m.code)) continue;
+    seenCodes.add(m.code);
+    remaining.push(m);
+  }
 
   if (remaining.length > 0) {
     rows.push([]);
     rows.push(['Extra Classes', '', '']);
     for (const u of remaining) {
-      const status = getCourseStatusForExport(u.active.grade);
+      const grade = u.active ? u.active.grade : u.grade;
+      const title = u.active ? u.active.title : (u.courseData ? u.courseData.title : '');
+      const credits = u.active ? (u.active.credits || '?') : (u.courseData ? u.courseData.credits : '?');
+      const status = getCourseStatusForExport(grade);
       if (status === 'failed') continue;
-      const prefix = !u.active.grade ? '(In-Progress) ' : '';
-      const gradeStr = u.active.grade ? ' (' + u.active.grade + ')' : '';
-      const credits = u.active.credits || '?';
-      rows.push([u.code + ' - ' + (u.active.title || ''), credits, '', prefix + u.code + gradeStr]);
+      const prefix = !grade ? '(In-Progress) ' : '';
+      const gradeStr = grade ? ' (' + grade + ')' : '';
+      rows.push([u.code + ' - ' + (title || ''), credits, '', prefix + u.code + gradeStr]);
     }
   }
 
