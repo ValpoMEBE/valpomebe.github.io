@@ -28,9 +28,9 @@ requirements:
       - "ME 333"
       - "PHYS 246"
       - "PSY 370"
-      - "STAT 343"
-      - "STAT 361"
-      - "STAT 362"
-      - "STAT 363"
+      - "DATA 343"
+      - "DATA 361"
+      - "DATA 362"
+      - "DATA 363"
     max_from:
       "DATA 490": 6

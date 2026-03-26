@@ -618,6 +618,14 @@
 }
 .minor-aab-text { color: var(--light-gray); }
 
+/* ── AUDIT BUTTON ROW ──────────────────────────────────────── */
+.audit-btn-row {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: .6rem; margin-top: .8rem;
+}
+.audit-btn-row .reset-btn,
+.audit-btn-row .plan-btn { display: inline-block; margin: 0; }
+
 /* ── PLAN BUTTON ───────────────────────────────────────────── */
 .plan-btn {
   display: block; margin: 2rem auto 0;

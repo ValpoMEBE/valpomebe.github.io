@@ -1,0 +1,7 @@
+# Department renames: old dept prefix → new dept prefix
+# Any course with the old prefix on a transcript is automatically
+# treated as the new prefix during audit matching.
+
+- old: "STAT"
+  new: "DATA"
+  note: "STAT department renamed to DATA effective 2025-2026 catalog"

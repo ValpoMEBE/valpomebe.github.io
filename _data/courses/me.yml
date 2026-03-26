@@ -115,7 +115,7 @@
   coreqs:
   - ME_125
   - ME_261
-  - STAT_240
+  - DATA_240
   offered: Fall
   desc: Experimental methods, instrumentation, data acquisition, and uncertainty analysis. Includes ME 333L (0 cr).
 - id: ME_352

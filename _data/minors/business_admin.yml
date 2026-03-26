@@ -15,5 +15,5 @@ requirements:
       - "MGT 304"
       - "MKT 304"
     substitutions:
-      "STAT 340": "BUS 205"
+      "DATA 340": "BUS 205"
       "BAN 340": "BUS 205"

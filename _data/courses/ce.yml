@@ -65,7 +65,7 @@
   tags:
   - transportation
   prereqs:
-  - [STAT_240, CE_202]
+  - [DATA_240, CE_202]
   coreqs: []
   desc: Transportation system characteristics, demand, planning, engineering studies, human and vehicle design factors, traffic flow and operations, signing and marking, and safety. Covers highway, rail, air, and water modes.
 
@@ -269,7 +269,7 @@
   tags:
   - geotechnical
   prereqs:
-  - [STAT_240, CE_202]
+  - [DATA_240, CE_202]
   - CE_320
   coreqs: []
   desc: Causative mechanisms of earthquakes, magnitudes, ground motion, effect of local soil conditions. Response of soils to seismic loading, liquefaction phenomena, laboratory and in-situ testing for seismic loading.

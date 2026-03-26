@@ -17,29 +17,17 @@ let AUDIT_STATE = {
   lastEntries: null, // raw parsed entries for CSV export
 };
 
-// ── Course code aliases (transcript → courses.yml id) ──────────
-const CODE_ALIASES = {
-  // Core I/II courses are now handled by ELECTIVE_GROUPS (core1/core2 approved lists)
-  // — no aliases needed for CORE 110, CORE 120, CC 110A, CC 115A, etc.
-  'GE 100L':   'GE_100',   // lab bundled with GE 100
-  'PHYS 141L': 'PHYS_141', // lab bundled
-  'PHYS 142L': 'PHYS_142', // lab bundled
-  'CHEM 121L': 'CHEM_121', // lab bundled
-  'CHEM 122L': 'CHEM_122',
-  'CHEM 221L': 'CHEM_221',
-  'CHEM 222L': 'CHEM_222',
-  'KIN 101':   'XS_101',    // KIN 101 equivalent to XS 101
-  'ME 333L':   'ME_333',    // lab bundled with ME 333
-  'CHEM 115L': 'CHEM_115',  // lab bundled with CHEM 115
-  'ME 251L':   'ME_251',    // lab bundled with ME 251
-  'BIO 151L':  'BIO_151',   // lab bundled with BIO 151
-  'BIO 152L':  'BIO_152',   // lab bundled with BIO 152
-  // CC 215 handled by THEO_GROUP approved list (theology.yml), no alias needed
-  // ECE lab courses bundled with lecture
-  'ECE 221L':  'ECE_221',   // lab bundled
-  'ECE 322L':  'ECE_322',   // lab bundled
-  'ECE 422L':  'ECE_422',   // lab bundled
-};
+// ── Course code aliases ──────────────────────────────────────────
+// Now data-driven: COURSE_ALIASES, DEPT_RENAMES, WL_DEPTS injected
+// from _data/aliases/*.yml via _layouts/transcript.html.
+// Build a lookup object from the COURSE_ALIASES array for fast access.
+const CODE_ALIASES = (() => {
+  const map = {};
+  if (typeof COURSE_ALIASES !== 'undefined' && Array.isArray(COURSE_ALIASES)) {
+    for (const a of COURSE_ALIASES) map[a.from] = a.to;
+  }
+  return map;
+})();
 
 // ── Elective group definitions ─────────────────────────────────
 // Each group maps placeholder IDs → a combined card with tally.
@@ -241,9 +229,24 @@ function buildCodeIndex() {
     }
   }
 
-  // Add manual aliases
+  // Add course code aliases (data-driven from _data/aliases/course_aliases.yml)
   for (const [code, id] of Object.entries(CODE_ALIASES)) {
     index[code.toUpperCase()] = id;
+  }
+
+  // Apply department renames (data-driven from _data/aliases/department_renames.yml)
+  // e.g. STAT → DATA: any "STAT XXX" code maps to the same course as "DATA XXX"
+  if (typeof DEPT_RENAMES !== 'undefined' && Array.isArray(DEPT_RENAMES)) {
+    for (const rename of DEPT_RENAMES) {
+      const oldPrefix = rename.old.toUpperCase() + ' ';
+      const newPrefix = rename.new.toUpperCase() + ' ';
+      for (const [key, id] of Object.entries(index)) {
+        if (key.startsWith(newPrefix)) {
+          const oldKey = oldPrefix + key.slice(newPrefix.length);
+          if (!index[oldKey]) index[oldKey] = id;
+        }
+      }
+    }
   }
 
   // Apply CAPS blanket substitutions (data-driven aliases)
@@ -273,7 +276,7 @@ function buildApprovedSet(listKeys) {
   return codes;
 }
 
-const WL_DEPTS = ['CHIN', 'FREN', 'GER', 'SPAN', 'JAPN', 'ARAB', 'LAT', 'GRK'];
+// WL_DEPTS is now injected from _data/aliases/world_languages.yml via the layout
 
 function isApprovedElective(code, approvedSet, blanketDepts, checkWorldLang) {
   const upper = code.toUpperCase();
@@ -439,8 +442,9 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     }
 
     const allIP = filledCourses.length > 0 && filledCourses.every(c => !c.grade);
-    const groupStatus = creditsFilled >= totalCredits ? 'filled'
-                       : allIP ? 'ip'
+    const anyIP = filledCourses.some(c => !c.grade);
+    const groupStatus = allIP ? 'ip'
+                       : creditsFilled >= totalCredits ? (anyIP ? 'ip' : 'filled')
                        : creditsFilled > 0 ? 'partial' : 'empty';
 
     groupCards.push({
@@ -708,6 +712,12 @@ function renderAudit(auditResult, unmatched, summary) {
   const csvBtn = document.getElementById('csv-btn');
   if (csvBtn) {
     csvBtn.style.display = AUDIT_STATE.lastEntries ? '' : 'none';
+  }
+
+  // Show "Download Audit Summary" Excel button
+  const excelBtn = document.getElementById('excel-btn');
+  if (excelBtn) {
+    excelBtn.style.display = AUDIT_STATE.lastAuditResult ? '' : 'none';
   }
 
   // Unmatched courses (exclude ones used for elective groups)
@@ -1276,6 +1286,7 @@ async function parseTranscript() {
 function runAudit(matched, unmatched, codeIndex) {
   const auditResult = computeAudit(matched, AUDIT_STATE.program, codeIndex, unmatched);
   const summary = computeSummary(auditResult, matched);
+  AUDIT_STATE.lastAuditResult = auditResult;
   renderAudit(auditResult, unmatched, summary);
 
   // Re-run minor audits if any are selected
@@ -1315,6 +1326,293 @@ function downloadCSV() {
   URL.revokeObjectURL(url);
 }
 
+// ── Excel Audit Summary Export ────────────────────────────────────
+// Uses xlsx-js-style (drop-in SheetJS replacement with cell styling)
+
+function getProgramLabel(program) {
+  const labels = {
+    'ME': 'Mechanical Engineering',
+    'BE_Biomech': 'Bioengineering - Biomechanical',
+    'BE_Bioelec': 'Bioengineering - Bioelectrical',
+    'BE_Biomed': 'Bioengineering - Biomedical',
+    'CE': 'Civil Engineering',
+    'CPE': 'Computer Engineering',
+    'EE': 'Electrical Engineering',
+    'ENE': 'Environmental Engineering',
+  };
+  return labels[program] || program;
+}
+
+// Sanitize sheet name: Excel forbids \ / * ? : [ ] and max 31 chars
+function sanitizeSheetName(name) {
+  return name.replace(/[\\/*?:\[\]]/g, '-').substring(0, 31);
+}
+
+function mapAuditStatus(status) {
+  const map = {
+    'completed': 'Fulfilled',
+    'transfer': 'Fulfilled',
+    'no-grade': 'In Progress',
+    'ip': 'In Progress',
+    'failed': 'Unfulfilled',
+    'remaining': 'Unfulfilled',
+  };
+  return map[status] || status;
+}
+
+function mapGroupStatus(groupStatus) {
+  const map = {
+    'filled': 'Fulfilled',
+    'partial': 'Partially Fulfilled',
+    'ip': 'In Progress',
+    'empty': 'Unfulfilled',
+  };
+  return map[groupStatus] || groupStatus;
+}
+
+function getCourseStatusForExport(grade) {
+  if (!grade) return 'ip';
+  const g = grade.toUpperCase();
+  if (g === 'F') return 'failed';
+  if (g === 'W') return 'withdrawn';
+  return 'completed';
+}
+
+// Cell style presets
+const EXCEL_STYLES = {
+  header: {
+    font: { bold: true, color: { rgb: 'FFFFFF' } },
+    fill: { fgColor: { rgb: '4A2F1A' } },    // Valpo brown
+    alignment: { horizontal: 'center' },
+  },
+  fulfilled: {
+    fill: { fgColor: { rgb: 'C6EFCE' } },     // green bg
+    font: { color: { rgb: '006100' } },
+  },
+  inProgress: {
+    fill: { fgColor: { rgb: 'FFEB9C' } },     // yellow bg
+    font: { color: { rgb: '9C6500' } },
+  },
+  partiallyFulfilled: {
+    fill: { fgColor: { rgb: 'FFF2CC' } },     // light yellow bg
+    font: { color: { rgb: '9C6500' } },
+  },
+  unfulfilled: {
+    fill: { fgColor: { rgb: 'FFC7CE' } },     // red bg
+    font: { color: { rgb: '9C0006' } },
+  },
+  sectionHeader: {
+    font: { bold: true, sz: 12 },
+    fill: { fgColor: { rgb: 'D9D9D9' } },
+  },
+};
+
+function getStatusStyle(statusText) {
+  switch (statusText) {
+    case 'Fulfilled':           return EXCEL_STYLES.fulfilled;
+    case 'In Progress':         return EXCEL_STYLES.inProgress;
+    case 'Partially Fulfilled': return EXCEL_STYLES.partiallyFulfilled;
+    case 'Unfulfilled':         return EXCEL_STYLES.unfulfilled;
+    default:                    return {};
+  }
+}
+
+// Apply styles to a worksheet after it's created from aoa
+function applySheetStyles(ws, rows) {
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  // Style header row
+  for (let c = range.s.c; c <= range.e.c; c++) {
+    const addr = XLSX.utils.encode_cell({ r: 0, c });
+    if (ws[addr]) ws[addr].s = EXCEL_STYLES.header;
+  }
+
+  // Style status column + in-progress course cells
+  for (let r = 1; r <= range.e.r; r++) {
+    const row = rows[r];
+    if (!row || row.length === 0) continue;
+
+    // "Extra Classes" section header
+    if (row[0] === 'Extra Classes') {
+      for (let c = 0; c <= range.e.c; c++) {
+        const addr = XLSX.utils.encode_cell({ r, c });
+        if (ws[addr]) ws[addr].s = EXCEL_STYLES.sectionHeader;
+      }
+      continue;
+    }
+
+    // Status cell (column C / index 2)
+    const statusText = row[2];
+    if (statusText) {
+      const addr = XLSX.utils.encode_cell({ r, c: 2 });
+      if (ws[addr]) ws[addr].s = getStatusStyle(statusText);
+    }
+
+    // In-progress course cells get yellow highlight
+    for (let c = 3; c < row.length; c++) {
+      const val = row[c];
+      if (typeof val === 'string' && val.startsWith('(In-Progress)')) {
+        const addr = XLSX.utils.encode_cell({ r, c });
+        if (ws[addr]) ws[addr].s = EXCEL_STYLES.inProgress;
+      }
+    }
+  }
+}
+
+function buildMajorSheetData(auditResult, unmatched) {
+  const { audit, groupCards, usedForGroups } = auditResult;
+  const rows = [];
+
+  // Header row
+  rows.push(['Requirement', 'Credits', 'Status']);
+
+  // Sort audit entries by semester
+  const sorted = [...audit].sort((a, b) => (a.semester || 99) - (b.semester || 99));
+
+  for (const c of sorted) {
+    const status = mapAuditStatus(c.status);
+    const row = [c.code + ' - ' + c.title, c.credits || '', status];
+
+    if (c.status === 'completed' || c.status === 'transfer') {
+      const display = c.filledBy || c.code;
+      const gradeStr = c.grade ? ' (' + c.grade + ')' : '';
+      row.push(display + gradeStr);
+    } else if (c.status === 'no-grade' || c.status === 'ip') {
+      const display = c.filledBy || c.code;
+      row.push('(In-Progress) ' + display);
+    }
+
+    rows.push(row);
+  }
+
+  // Grouped elective/Core cards
+  for (const gc of groupCards) {
+    const status = mapGroupStatus(gc.groupStatus);
+    const row = [gc.label + ' (' + gc.totalCredits + ' cr)', gc.totalCredits, status];
+
+    for (const fc of gc.filledCourses) {
+      const fcStatus = getCourseStatusForExport(fc.grade);
+      if (fcStatus === 'failed') continue;
+      const prefix = !fc.grade ? '(In-Progress) ' : '';
+      const gradeStr = fc.grade ? ' (' + fc.grade + ')' : '';
+      const crStr = ' (' + (fc.credits ? fc.credits + ' cr' : '? cr') + ')';
+      row.push(prefix + fc.code + gradeStr + crStr);
+    }
+
+    rows.push(row);
+  }
+
+  // Extra/unmatched courses section
+  const remaining = usedForGroups
+    ? (unmatched || []).filter(u => !usedForGroups.has(u.code))
+    : (unmatched || []);
+
+  if (remaining.length > 0) {
+    rows.push([]);
+    rows.push(['Extra Classes', '', '']);
+    for (const u of remaining) {
+      const status = getCourseStatusForExport(u.active.grade);
+      if (status === 'failed') continue;
+      const prefix = !u.active.grade ? '(In-Progress) ' : '';
+      const gradeStr = u.active.grade ? ' (' + u.active.grade + ')' : '';
+      const credits = u.active.credits || '?';
+      rows.push([u.code + ' - ' + (u.active.title || ''), credits, '', prefix + u.code + gradeStr]);
+    }
+  }
+
+  return rows;
+}
+
+function buildMinorSheetData(minorResult) {
+  const rows = [];
+  rows.push(['Requirement', 'Status', 'Fulfilling Courses']);
+
+  for (const req of minorResult.requirements) {
+    const status = req.met ? 'Fulfilled' : (req.creditsApplied > 0 ? 'Partially Fulfilled' : 'Unfulfilled');
+    const row = [req.label, status];
+
+    for (const fc of req.filled) {
+      const fcStatus = getCourseStatusForExport(fc.grade);
+      if (fcStatus === 'failed') continue;
+      const prefix = !fc.grade ? '(In-Progress) ' : '';
+      const gradeStr = fc.grade ? ' (' + fc.grade + ')' : '';
+      const crStr = ' (' + (fc.credits ? fc.credits + ' cr' : '? cr') + ')';
+      row.push(prefix + fc.code + gradeStr + crStr);
+    }
+
+    rows.push(row);
+  }
+
+  // Above & Beyond row
+  const aab = minorResult.aboveAndBeyond;
+  rows.push([
+    'Above & Beyond',
+    aab.met ? 'Fulfilled' : 'Unfulfilled',
+    aab.course || ''
+  ]);
+
+  // Overall summary
+  rows.push([]);
+  rows.push([
+    'Overall',
+    minorResult.overallMet ? 'COMPLETE' : 'INCOMPLETE',
+    minorResult.totalApplied + '/' + minorResult.minCredits + ' credits'
+  ]);
+
+  return rows;
+}
+
+// Compute max columns needed, then set widths for all of them
+function setColWidths(ws, rows) {
+  let maxCols = 0;
+  for (const row of rows) maxCols = Math.max(maxCols, row.length);
+  const cols = [{ wch: 42 }, { wch: 8 }, { wch: 20 }];
+  for (let i = 3; i < maxCols; i++) cols.push({ wch: 24 });
+  ws['!cols'] = cols;
+}
+
+function downloadAuditExcel() {
+  if (!AUDIT_STATE.lastAuditResult) return;
+  if (typeof XLSX === 'undefined') { alert('Excel library not loaded. Please reload the page.'); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // ── Major tab ──
+  const programLabel = getProgramLabel(AUDIT_STATE.program);
+  const majorData = buildMajorSheetData(AUDIT_STATE.lastAuditResult, AUDIT_STATE.lastUnmatched);
+  const majorWs = XLSX.utils.aoa_to_sheet(majorData);
+  setColWidths(majorWs, majorData);
+  applySheetStyles(majorWs, majorData);
+  XLSX.utils.book_append_sheet(wb, majorWs, sanitizeSheetName('Major - ' + programLabel));
+
+  // ── Minor tabs ──
+  const selected = AUDIT_STATE.selectedMinors || [];
+  if (selected.length > 0 && typeof computeAllMinors === 'function') {
+    const auditResult = computeAudit(
+      AUDIT_STATE.lastMatched,
+      AUDIT_STATE.program,
+      AUDIT_STATE.lastCodeIndex,
+      AUDIT_STATE.lastUnmatched
+    );
+    const minorResults = computeAllMinors(
+      AUDIT_STATE.lastMatched,
+      AUDIT_STATE.lastUnmatched,
+      auditResult,
+      selected,
+      AUDIT_STATE.program
+    );
+    for (const mr of minorResults) {
+      const minorData = buildMinorSheetData(mr);
+      const minorWs = XLSX.utils.aoa_to_sheet(minorData);
+      setColWidths(minorWs, minorData);
+      applySheetStyles(minorWs, minorData);
+      XLSX.utils.book_append_sheet(wb, minorWs, sanitizeSheetName('Minor - ' + mr.name));
+    }
+  }
+
+  XLSX.writeFile(wb, 'audit-summary.xlsx');
+}
+
 function resetAudit() {
   document.getElementById('results-section').style.display = 'none';
   document.getElementById('upload-section').style.display = '';
@@ -1324,6 +1622,7 @@ function resetAudit() {
   AUDIT_STATE.lastUnmatched = null;
   AUDIT_STATE.lastCodeIndex = null;
   AUDIT_STATE.lastEntries = null;
+  AUDIT_STATE.lastAuditResult = null;
   clearFile();
 }
 

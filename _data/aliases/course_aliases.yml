@@ -1,0 +1,70 @@
+# Course code aliases: transcript code → course ID
+# Used for lab bundling, course equivalences, etc.
+# "from" is the code as it appears on the transcript.
+# "to" is the course ID in courses.yml (underscore format).
+
+# ── Lab courses bundled with lectures ──────────────────────────
+- from: "GE 100L"
+  to: "GE_100"
+  note: "lab bundled with GE 100"
+
+- from: "PHYS 141L"
+  to: "PHYS_141"
+  note: "lab bundled"
+
+- from: "PHYS 142L"
+  to: "PHYS_142"
+  note: "lab bundled"
+
+- from: "CHEM 121L"
+  to: "CHEM_121"
+  note: "lab bundled"
+
+- from: "CHEM 122L"
+  to: "CHEM_122"
+  note: "lab bundled"
+
+- from: "CHEM 221L"
+  to: "CHEM_221"
+  note: "lab bundled"
+
+- from: "CHEM 222L"
+  to: "CHEM_222"
+  note: "lab bundled"
+
+- from: "CHEM 115L"
+  to: "CHEM_115"
+  note: "lab bundled with CHEM 115"
+
+- from: "ME 333L"
+  to: "ME_333"
+  note: "lab bundled with ME 333"
+
+- from: "ME 251L"
+  to: "ME_251"
+  note: "lab bundled with ME 251"
+
+- from: "BIO 151L"
+  to: "BIO_151"
+  note: "lab bundled with BIO 151"
+
+- from: "BIO 152L"
+  to: "BIO_152"
+  note: "lab bundled with BIO 152"
+
+- from: "ECE 221L"
+  to: "ECE_221"
+  note: "lab bundled"
+
+- from: "ECE 322L"
+  to: "ECE_322"
+  note: "lab bundled"
+
+- from: "ECE 422L"
+  to: "ECE_422"
+  note: "lab bundled"
+
+# ── Course equivalences ────────────────────────────────────────
+- from: "KIN 101"
+  to: "XS_101"
+  note: "KIN 101 equivalent to XS 101"

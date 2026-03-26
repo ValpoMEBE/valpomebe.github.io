@@ -56,9 +56,14 @@
     <div id="minor-results-container"></div>
   </div>
 
-  <button class="plan-btn" id="plan-btn" onclick="showPlanner()" style="display:none;">Plan Remaining Semesters</button>
-  <button class="reset-btn" id="csv-btn" onclick="downloadCSV()" style="display:none;">Download Anonymized CSV</button>
-  <button class="reset-btn" onclick="resetAudit()">Upload Another Transcript</button>
+  <div class="audit-btn-row">
+    <button class="plan-btn" id="excel-btn" onclick="downloadAuditExcel()" style="display:none;">Download Audit Summary</button>
+    <button class="plan-btn" id="plan-btn" onclick="showPlanner()" style="display:none;">Plan Remaining Semesters</button>
+  </div>
+  <div class="audit-btn-row">
+    <button class="reset-btn" id="csv-btn" onclick="downloadCSV()" style="display:none;">Download Anonymized CSV</button>
+    <button class="reset-btn" onclick="resetAudit()">Upload Another Transcript</button>
+  </div>
 </div>
 
 <!-- Detail panel (bottom popup) -->

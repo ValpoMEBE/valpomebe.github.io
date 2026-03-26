@@ -37,6 +37,11 @@ layout: default
   // ── CAPS blanket substitutions ───────────────────────────
   const CAPS_DATA = {{ site.data.transcript.caps_substitutions | jsonify }};
 
+  // ── Data-driven aliases ─────────────────────────────────
+  const DEPT_RENAMES    = {{ site.data.aliases.department_renames | jsonify }};
+  const COURSE_ALIASES  = {{ site.data.aliases.course_aliases | jsonify }};
+  const WL_DEPTS        = {{ site.data.aliases.world_languages | jsonify }};
+
   // ── Minor definitions ─────────────────────────────────
   const MINORS_DATA = {
     {%- for pair in site.data.minors -%}
@@ -48,6 +53,7 @@ layout: default
 {{ content }}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script src="{{ '/assets/js/transcript-parser.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/transcript-audit.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/transcript-planner.js' | relative_url }}"></script>

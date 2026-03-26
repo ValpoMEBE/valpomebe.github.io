@@ -287,7 +287,7 @@
   prereqs:
   - ECE_360
   coreqs:
-  - STAT_240
+  - DATA_240
   desc: Methods of transmission of information by electrical signals through bandwidth-limited, noisy channels. AM, FM, PAM, and PCM modulation schemes and their channel requirements.
 
 - id: ECE_455

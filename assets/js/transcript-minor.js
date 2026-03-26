@@ -13,6 +13,18 @@ function parseCourseCode(code) {
   return { dept: m[1], num: parseInt(m[2], 10) };
 }
 
+/** Apply department renames (e.g. STAT → DATA) to a transcript course code */
+function applyDeptRenames(code) {
+  if (typeof DEPT_RENAMES === 'undefined' || !Array.isArray(DEPT_RENAMES)) return code;
+  for (const rename of DEPT_RENAMES) {
+    const oldPrefix = rename.old.toUpperCase() + ' ';
+    if (code.toUpperCase().startsWith(oldPrefix)) {
+      return rename.new + code.slice(rename.old.length);
+    }
+  }
+  return code;
+}
+
 /** Build a flat list of all transcript courses (matched + unmatched) with status */
 function buildTranscriptPool(matched, unmatched) {
   const pool = [];
@@ -22,7 +34,7 @@ function buildTranscriptPool(matched, unmatched) {
   for (const m of matched) {
     const status = getCourseStatus(m.active.grade);
     if (status === 'failed') continue;          // skip F grades
-    const code = m.code;
+    const code = applyDeptRenames(m.code);
 
     // Bundled labs (e.g. ECE 221L → ECE 221): add lab credits to parent entry
     if (typeof CODE_ALIASES !== 'undefined' && CODE_ALIASES[code]) {
@@ -49,7 +61,7 @@ function buildTranscriptPool(matched, unmatched) {
   for (const u of (unmatched || [])) {
     const status = getCourseStatus(u.active.grade);
     if (status === 'failed') continue;          // skip F grades
-    const code = u.code;
+    const code = applyDeptRenames(u.code);
     if (seen.has(code)) continue;
     seen.add(code);
     const entry = {
