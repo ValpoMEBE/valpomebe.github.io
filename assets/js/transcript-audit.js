@@ -1410,9 +1410,11 @@ const EXCEL_STYLES = {
 function getStatusStyle(statusText) {
   switch (statusText) {
     case 'Fulfilled':           return EXCEL_STYLES.fulfilled;
+    case 'COMPLETE':            return EXCEL_STYLES.fulfilled;
     case 'In Progress':         return EXCEL_STYLES.inProgress;
     case 'Partially Fulfilled': return EXCEL_STYLES.partiallyFulfilled;
     case 'Unfulfilled':         return EXCEL_STYLES.unfulfilled;
+    case 'INCOMPLETE':          return EXCEL_STYLES.unfulfilled;
     default:                    return {};
   }
 }
@@ -1426,6 +1428,11 @@ function applySheetStyles(ws, rows) {
     const addr = XLSX.utils.encode_cell({ r: 0, c });
     if (ws[addr]) ws[addr].s = EXCEL_STYLES.header;
   }
+
+  // Find status column index from header row
+  const header = rows[0] || [];
+  const statusCol = header.indexOf('Status');
+  const courseStartCol = statusCol >= 0 ? statusCol + 1 : 3;
 
   // Style status column + in-progress course cells
   for (let r = 1; r <= range.e.r; r++) {
@@ -1441,15 +1448,17 @@ function applySheetStyles(ws, rows) {
       continue;
     }
 
-    // Status cell (column C / index 2)
-    const statusText = row[2];
-    if (statusText) {
-      const addr = XLSX.utils.encode_cell({ r, c: 2 });
-      if (ws[addr]) ws[addr].s = getStatusStyle(statusText);
+    // Status cell
+    if (statusCol >= 0) {
+      const statusText = row[statusCol];
+      if (statusText) {
+        const addr = XLSX.utils.encode_cell({ r, c: statusCol });
+        if (ws[addr]) ws[addr].s = getStatusStyle(statusText);
+      }
     }
 
     // In-progress course cells get yellow highlight
-    for (let c = 3; c < row.length; c++) {
+    for (let c = courseStartCol; c < row.length; c++) {
       const val = row[c];
       if (typeof val === 'string' && val.startsWith('(In-Progress)')) {
         const addr = XLSX.utils.encode_cell({ r, c });
