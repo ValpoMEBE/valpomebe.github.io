@@ -68,8 +68,8 @@ function reconstructLines(items) {
 }
 
 // ── Line parsing ───────────────────────────────────────────────
-// Match course lines: starts with dept code (2-4 uppercase) + number (1-4 digits + optional letter)
-const COURSE_LINE_RE = /^([A-Z]{2,4})\s+(\d{1,4}[A-Z]?)\s+(.+)/;
+// Match course lines: starts with dept code (2-4 uppercase) + number (1-4 digits + optional suffix letters e.g. A, L, CD)
+const COURSE_LINE_RE = /^([A-Z]{2,4})\s+(\d{1,4}[A-Z]{0,3})\s+(.+)/;
 
 // Lines to skip (AP lines are exam scores, not real courses)
 const SKIP_RE = /^(Course Title|Hrs |------|.*Totals:|Cumulative|Page \d|Valparaiso University|AP |^\s*$)/i;
@@ -298,7 +298,7 @@ async function parseCSVTranscript(file) {
     if (fields.length < 4) continue;
 
     const code = fields[0].trim();
-    const parts = code.match(/^([A-Z]{2,4})\s+(\d{1,4}[A-Z]?)$/i);
+    const parts = code.match(/^([A-Z]{2,4})\s+(\d{1,4}[A-Z]{0,3})$/i);
     if (!parts) continue;
 
     const dept = parts[1].toUpperCase();
