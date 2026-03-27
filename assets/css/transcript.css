@@ -402,6 +402,10 @@
   font-family: var(--font-mono); font-size: .7rem;
   font-weight: 700; color: var(--brown); letter-spacing: .03em;
 }
+.group-subtitle {
+  font-size: .6rem; color: var(--brown); opacity: .7;
+  margin-top: -.1rem; margin-bottom: .15rem;
+}
 .group-tally {
   font-family: var(--font-mono); font-size: .65rem;
   font-weight: 700; color: var(--brown);
@@ -503,19 +507,13 @@
 .minor-tag-remove:hover { opacity: 1; color: #fff; }
 .minor-picker {
   width: 100%; max-width: 900px; margin: .5rem auto 0;
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: .35rem .75rem; padding: .6rem;
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: .35rem; padding: .6rem;
   background: rgba(0,0,0,.15); border-radius: 6px;
   border: 1px solid rgba(255,255,255,.08);
 }
-.minor-checkbox-label {
-  display: flex; align-items: center; gap: .35rem;
-  font-size: .75rem; color: var(--light-gray); cursor: pointer;
-  padding: .2rem .3rem; border-radius: 3px; transition: background .15s;
-}
-.minor-checkbox-label:hover { background: rgba(255,255,255,.06); }
-.minor-checkbox-label input[type="checkbox"] {
-  accent-color: var(--teal); width: 14px; height: 14px;
+.minor-picker .prog-btn {
+  font-size: .75rem;
 }
 
 /* ── MINOR RESULTS SECTION ─────────────────────────────────── */
@@ -644,6 +642,32 @@
 .aab-met { background: rgba(74,222,128,.15); color: #4ade80; }
 .aab-not-met { background: rgba(248,113,113,.15); color: #f87171; }
 
+/* Secondary major view toggle */
+.secondary-view-toggle {
+  display: flex; justify-content: center; gap: .35rem;
+  margin: .75rem 0;
+}
+.view-btn {
+  background: transparent; border: 1px solid rgba(255,255,255,.25);
+  color: var(--light-gray); padding: .3rem .8rem; border-radius: 4px;
+  font-size: .75rem; cursor: pointer; transition: all .15s;
+}
+.view-btn:hover { border-color: var(--gold); color: var(--gold); }
+.view-btn.active {
+  background: var(--gold); color: var(--brown); border-color: var(--gold);
+  font-weight: 600;
+}
+
+/* Christ College toggle */
+.cc-active {
+  background: var(--teal) !important;
+  border-color: var(--teal) !important;
+  color: #fff !important;
+}
+#cc-toggle-indicator {
+  font-size: .7rem; margin-left: .5rem; color: var(--gold);
+}
+
 /* Double major picker */
 .dbl-major-picker {
   padding: .5rem 0;
@@ -701,7 +725,7 @@
   .audit-grid { gap: 0; }
   .sem-col { width: 150px; }
   .audit-panel-relations { grid-template-columns: 1fr; }
-  .minor-picker { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .minor-picker { gap: .25rem; }
   .minor-req-row { flex-direction: column; }
   .minor-req-label { min-width: unset; }
 }

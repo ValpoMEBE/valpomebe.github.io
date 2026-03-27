@@ -1,0 +1,31 @@
+# Christ College Scholar Requirements
+# Source: Undergraduate Catalog 2025-2026, p.379-380
+#
+# Min credits: 16 beyond first-year program (CC 110 + CC 115)
+# Min GPA: 3.300 cumulative and in CC courses
+# Membership: minimum 3 semesters (2 for transfer)
+
+id: cc_scholar
+name: "Christ College Scholar"
+min_credits_beyond_fy: 16
+min_gpa: 3.3
+
+requirements:
+  - label: "First-Year Program"
+    type: required
+    courses: ["CC 110A", "CC 110B", "CC 110L", "CC 115A", "CC 115B", "CC 115L"]
+
+  - label: "Required Courses"
+    type: required
+    courses: ["CC 215", "CC 499"]
+
+  - label: "Elective (pick 1)"
+    type: pick
+    pick: 1
+    courses: ["CC 205", "CC 255"]
+
+  - label: "Additional Seminars (pick 2)"
+    type: pick
+    pick: 2
+    courses: ["CC 205", "CC 255", "CC 300", "CC 325", "CC 455"]
+    note: "CC 325 may be repeated. Approved study abroad also qualifies."

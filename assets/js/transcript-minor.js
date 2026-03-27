@@ -458,22 +458,31 @@ function computeAllMinors(matched, unmatched, auditResult, selectedMinorIds, pro
 function initMinorPicker() {
   const picker = document.getElementById('minor-picker');
   if (!picker || typeof MINORS_DATA === 'undefined') return;
+  populateMinorButtons();
+}
+
+function populateMinorButtons() {
+  const picker = document.getElementById('minor-picker');
+  if (!picker || typeof MINORS_DATA === 'undefined') return;
+  picker.innerHTML = '';
 
   const keys = Object.keys(MINORS_DATA).sort((a, b) =>
     MINORS_DATA[a].name.localeCompare(MINORS_DATA[b].name)
   );
+  const selected = AUDIT_STATE.selectedMinors || [];
 
   for (const key of keys) {
     const minor = MINORS_DATA[key];
-    const label = document.createElement('label');
-    label.className = 'minor-checkbox-label';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.value = key;
-    cb.addEventListener('change', () => toggleMinor(key, cb.checked));
-    label.appendChild(cb);
-    label.appendChild(document.createTextNode(' ' + minor.name));
-    picker.appendChild(label);
+    const btn = document.createElement('button');
+    btn.className = 'prog-btn' + (selected.includes(key) ? ' active' : '');
+    btn.textContent = minor.name;
+    btn.dataset.minor = key;
+    btn.addEventListener('click', () => {
+      const isActive = selected.includes(key);
+      toggleMinor(key, !isActive);
+      btn.classList.toggle('active', !isActive);
+    });
+    picker.appendChild(btn);
   }
 }
 
@@ -516,11 +525,11 @@ function updateMinorTags() {
 
 function removeMinor(key) {
   AUDIT_STATE.selectedMinors = (AUDIT_STATE.selectedMinors || []).filter(k => k !== key);
-  // Uncheck the checkbox
+  // Deactivate the button in the picker
   const picker = document.getElementById('minor-picker');
   if (picker) {
-    const cb = picker.querySelector('input[value="' + key + '"]');
-    if (cb) cb.checked = false;
+    const btn = picker.querySelector('[data-minor="' + key + '"]');
+    if (btn) btn.classList.remove('active');
   }
   updateMinorTags();
   rerunMinors();
@@ -717,6 +726,112 @@ function getGradeClass(grade) {
   if (g === 'F') return 'grade-f';
   if (g === 'TR') return 'grade-tr';
   return '';
+}
+
+// ── Christ College Scholar ───────────────────────────────────────
+
+function toggleCC() {
+  if (!AUDIT_STATE.ccEnabled) AUDIT_STATE.ccEnabled = false;
+  AUDIT_STATE.ccEnabled = !AUDIT_STATE.ccEnabled;
+  const indicator = document.getElementById('cc-toggle-indicator');
+  if (indicator) indicator.textContent = AUDIT_STATE.ccEnabled ? 'Enabled' : '';
+  // Style the toggle button
+  const btn = indicator && indicator.closest('.minor-toggle');
+  if (btn) btn.classList.toggle('cc-active', AUDIT_STATE.ccEnabled);
+  rerunCC();
+}
+
+function rerunCC() {
+  const section = document.getElementById('cc-results-section');
+  const container = document.getElementById('cc-results-container');
+  if (!section || !container) return;
+
+  if (!AUDIT_STATE.ccEnabled || !AUDIT_STATE.lastMatched ||
+      typeof CC_SCHOLAR_DATA === 'undefined' || !CC_SCHOLAR_DATA) {
+    section.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  const pool = buildTranscriptPool(AUDIT_STATE.lastMatched, AUDIT_STATE.lastUnmatched);
+  const result = computeCCAudit(pool);
+  renderCCResult(result, container);
+  section.style.display = '';
+}
+
+function computeCCAudit(pool) {
+  const usedCodes = new Set();
+  const results = [];
+
+  for (const req of CC_SCHOLAR_DATA.requirements) {
+    let result;
+    switch (req.type) {
+      case 'required':
+        result = evalRequired(req, pool, usedCodes);
+        break;
+      case 'pick':
+        result = evalPick(req, pool, usedCodes);
+        break;
+      case 'credits':
+        result = evalCredits(req, pool, usedCodes);
+        break;
+      default:
+        continue;
+    }
+    results.push(result);
+  }
+
+  // Calculate credits beyond first-year program
+  const fyReq = results[0]; // First-Year Program requirement
+  const fyCredits = fyReq ? fyReq.creditsApplied : 0;
+  const beyondFYCredits = results.slice(1).reduce((s, r) => s + r.creditsApplied, 0);
+  const totalApplied = fyCredits + beyondFYCredits;
+  const allReqsMet = results.every(r => r.met);
+  const creditsMet = beyondFYCredits >= (CC_SCHOLAR_DATA.min_credits_beyond_fy || 16);
+
+  return {
+    name: CC_SCHOLAR_DATA.name,
+    requirements: results,
+    totalApplied,
+    beyondFYCredits,
+    minBeyondFY: CC_SCHOLAR_DATA.min_credits_beyond_fy || 16,
+    overallMet: allReqsMet && creditsMet,
+  };
+}
+
+function renderCCResult(result, container) {
+  container.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'minor-audit-card' + (result.overallMet ? ' minor-met' : '');
+
+  // Header
+  const headerDiv = document.createElement('div');
+  headerDiv.className = 'minor-card-header';
+  const icon = result.overallMet ? '\u2713' : '\u25CB';
+  const iconClass = result.overallMet ? 'met' : 'unmet';
+  headerDiv.innerHTML =
+    '<span class="minor-status-icon ' + iconClass + '">' + icon + '</span>' +
+    '<span class="minor-card-title">' + result.name + '</span>' +
+    '<span class="minor-card-tally">' + result.beyondFYCredits + ' / ' + result.minBeyondFY + ' cr beyond FY</span>';
+  card.appendChild(headerDiv);
+
+  // Progress bar
+  const pct = Math.min(100, Math.round((result.beyondFYCredits / result.minBeyondFY) * 100));
+  const progressWrap = document.createElement('div');
+  progressWrap.className = 'minor-progress-wrap';
+  progressWrap.innerHTML = '<div class="minor-progress-bar" style="width:' + pct + '%"></div>';
+  card.appendChild(progressWrap);
+
+  // Requirements list
+  const reqList = document.createElement('div');
+  reqList.className = 'minor-req-list';
+  for (const req of result.requirements) {
+    reqList.appendChild(createReqRow(req));
+  }
+  card.appendChild(reqList);
+
+  container.appendChild(card);
 }
 
 // ── Initialize picker on DOM ready ───────────────────────────────

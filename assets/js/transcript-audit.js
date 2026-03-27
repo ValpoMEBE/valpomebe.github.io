@@ -17,6 +17,8 @@ let AUDIT_STATE = {
   lastCodeIndex: null,
   lastEntries: null, // raw parsed entries for CSV export
   lastSecondaryAuditResult: null, // double major audit
+  secondaryView: 'status', // 'status' | 'category' | 'timeline'
+  ccEnabled: false, // Christ College Scholar tracking
   studentName: null, // extracted from transcript PDF
 };
 
@@ -45,6 +47,21 @@ const CODE_ALIASES = (() => {
   const map = {};
   if (typeof COURSE_ALIASES !== 'undefined' && Array.isArray(COURSE_ALIASES)) {
     for (const a of COURSE_ALIASES) map[a.from] = a.to;
+  }
+  return map;
+})();
+
+// Build lab-to-parent map: for aliases where "from" ends in L (lab courses),
+// map parentId → { labCode, labId }. Used for program-aware lab grouping.
+const LAB_ALIASES = (() => {
+  const map = {}; // parentId → { labCode, labId }
+  if (typeof COURSE_ALIASES !== 'undefined' && Array.isArray(COURSE_ALIASES)) {
+    for (const a of COURSE_ALIASES) {
+      if (/\d+L$/.test(a.from)) {
+        const labId = a.from.replace(/\s+/g, '_').toUpperCase();
+        map[a.to] = { labCode: a.from, labId };
+      }
+    }
   }
   return map;
 })();
@@ -508,6 +525,31 @@ function matchCourses(resolvedCourses, codeIndex) {
 function computeAudit(matched, program, codeIndex, unmatched) {
   // VUE_101/VUE_102 are handled by Core I/II group cards — exclude from required list
   const coreGroupIds = new Set(['VUE_101', 'VUE_102', 'THEO_GE']);
+
+  // Detect lab groups: parent course is in the curriculum, has a lab alias,
+  // and the parent's credits include the lab (desc mentions lab or credits > lecture-only).
+  // 0-credit labs and lecture-only courses are NOT grouped.
+  const labGroups = []; // { parentId, labCode, parentCourse, labCredits }
+  for (const [parentId, info] of Object.entries(LAB_ALIASES)) {
+    const parent = COURSES[parentId];
+    if (parent && parent.semesters && parent.semesters[program]) {
+      const labCourse = COURSES[info.labId];
+      const labCredits = labCourse ? labCourse.credits : 0;
+      if (labCredits <= 0) continue; // 0-credit labs stay bundled silently
+      // Only group if the parent's desc mentions the lab (indicating bundled credits)
+      const labCodeSuffix = info.labCode.split(' ').pop(); // e.g., "141L"
+      const descMentionsLab = (parent.desc || '').includes(labCodeSuffix);
+      if (!descMentionsLab) continue; // lecture-only course, lab not required
+      labGroups.push({
+        parentId,
+        labCode: info.labCode,
+        parentCourse: parent,
+        labCredits,
+      });
+      coreGroupIds.add(parentId);
+    }
+  }
+
   const required = COURSES_ARRAY
     .filter(c => c.semesters && c.semesters[program])
     .filter(c => !coreGroupIds.has(c.id));
@@ -641,6 +683,70 @@ function computeAudit(matched, program, codeIndex, unmatched) {
       groupStatus,
       showAll: g.showAll || false,
       semester: g.ids.length > 1 ? latestSem : earliestSem,
+    });
+  }
+
+  // ── Phase 1b: Build lab group cards ──────────────────────────
+  // For each aliased lab pair where the parent is in the curriculum,
+  // find transcript entries by their original code.
+  for (const lg of labGroups) {
+    const filledCourses = [];
+    let creditsFilled = 0;
+    // Parent credits from courses.yml include the bundled lab. Separate them.
+    const lectureCr = (lg.parentCourse.credits || 0) - lg.labCredits;
+    const totalCredits = lg.parentCourse.credits || 0; // combined total
+    const parentSem = lg.parentCourse.semesters[program] || 99;
+
+    // Find lecture transcript entry by code (e.g., "PHYS 141")
+    const lectureMatch = matched.find(m => m.code === lg.parentCourse.code);
+    if (lectureMatch) {
+      const grade = lectureMatch.active.grade;
+      const status = getCourseStatus(grade);
+      if (status !== 'failed') {
+        const cr = grade ? (lectureMatch.active.credits || lectureCr) : 0;
+        filledCourses.push({ code: lg.parentCourse.code, grade, credits: cr });
+        creditsFilled += cr;
+      }
+    }
+
+    // Find lab transcript entry by code (e.g., "PHYS 141L")
+    const labMatch = matched.find(m => m.code === lg.labCode);
+    if (labMatch) {
+      const grade = labMatch.active.grade;
+      const status = getCourseStatus(grade);
+      if (status !== 'failed') {
+        const cr = grade ? (labMatch.active.credits || lg.labCredits) : 0;
+        filledCourses.push({ code: lg.labCode, grade, credits: cr });
+        creditsFilled += cr;
+      }
+    }
+
+    const allIP = filledCourses.length > 0 && filledCourses.every(c => !c.grade);
+    const anyIP = filledCourses.some(c => !c.grade);
+    const groupStatus = filledCourses.length === 0 ? 'empty'
+      : allIP ? 'ip'
+      : creditsFilled >= totalCredits ? (anyIP ? 'ip' : 'filled')
+      : creditsFilled > 0 ? 'partial' : 'empty';
+
+    // Mark these codes as used so they don't appear as additional courses
+    for (const fc of filledCourses) usedForGroups.add(fc.code);
+    // Mark parent ID as completed if the group is fully done
+    if (groupStatus === 'filled') {
+      completedIds.add(lg.parentId);
+    }
+
+    groupCards.push({
+      isGroupCard: true,
+      isLabGroup: true,
+      key: 'lab_' + lg.parentId,
+      label: lg.parentCourse.code,
+      subtitle: lg.parentCourse.title,
+      totalCredits,
+      creditsFilled,
+      filledCourses,
+      groupStatus,
+      showAll: true,
+      semester: parentSem,
     });
   }
 
@@ -1006,11 +1112,16 @@ function createGroupCard(gc) {
       '</div>';
   }
 
+  const subtitleHtml = gc.subtitle
+    ? '<div class="group-subtitle">' + gc.subtitle + '</div>'
+    : '';
+
   card.innerHTML =
     '<div class="group-header">' +
       '<span class="group-name">' + gc.label + '</span>' +
       '<span class="group-tally">' + (gc.showAll ? gc.creditsFilled + ' cr' : gc.creditsFilled + ' / ' + gc.totalCredits + ' cr') + '</span>' +
     '</div>' +
+    subtitleHtml +
     '<div class="group-progress-wrap">' +
       '<div class="group-progress-bar" style="width:' + pct + '%"></div>' +
     '</div>' +
@@ -1124,12 +1235,27 @@ function renderSecondaryAudit(auditResult, unmatched, summary, primaryAudit) {
       '<div class="progress-bar-wrap"><div class="progress-bar" style="width:' + summary.pct + '%"></div></div>';
   }
 
-  // Semester grid (reuse existing rendering helpers)
+  // Render grid based on selected view
   const { audit, groupCards, usedForGroups } = auditResult;
   const grid = document.getElementById('secondary-audit-grid');
   if (!grid) return;
   grid.innerHTML = '';
 
+  const view = AUDIT_STATE.secondaryView || 'status';
+  if (view === 'timeline') {
+    renderSecondaryTimeline(audit, groupCards, grid);
+  } else if (view === 'category') {
+    renderSecondaryCategory(audit, groupCards, grid);
+  } else {
+    renderSecondaryStatus(audit, groupCards, grid);
+  }
+
+  // Don't show unmatched for secondary — primary already shows them
+  const secUnmatchedSection = document.getElementById('secondary-unmatched-section');
+  if (secUnmatchedSection) secUnmatchedSection.style.display = 'none';
+}
+
+function renderSecondaryTimeline(audit, groupCards, grid) {
   for (const sem of SEMESTERS) {
     const courses = audit
       .filter(c => c.semester === sem.s)
@@ -1153,16 +1279,106 @@ function renderSecondaryAudit(auditResult, unmatched, summary, primaryAudit) {
     col.appendChild(cardsWrap);
     grid.appendChild(col);
   }
+}
 
-  // Unmatched for secondary
-  const remainingUnmatched = usedForGroups
-    ? unmatched.filter(u => !usedForGroups.has(u.code))
-    : unmatched;
-  const secUnmatchedSection = document.getElementById('secondary-unmatched-section');
-  const secUnmatchedList = document.getElementById('secondary-unmatched-list');
-  if (secUnmatchedSection && secUnmatchedList) {
-    // Don't show unmatched for secondary — primary already shows them
-    secUnmatchedSection.style.display = 'none';
+function renderSecondaryStatus(audit, groupCards, grid) {
+  const allItems = [...audit, ...groupCards];
+  const statusOrder = ['remaining', 'failed', 'no-grade', 'ip', 'partial', 'empty', 'transfer', 'completed', 'filled'];
+  const statusLabels = {
+    completed: 'Completed', transfer: 'Completed (Transfer)', filled: 'Completed',
+    'no-grade': 'In Progress', ip: 'In Progress', partial: 'Partially Fulfilled',
+    remaining: 'Remaining', empty: 'Remaining', failed: 'Failed',
+  };
+
+  // Group by display status
+  const groups = {};
+  for (const item of allItems) {
+    const st = item.isGroupCard ? item.groupStatus : item.status;
+    const label = statusLabels[st] || 'Other';
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(item);
+  }
+
+  // Render in order: Completed, In Progress, Remaining, Failed
+  const order = ['Completed', 'Completed (Transfer)', 'In Progress', 'Partially Fulfilled', 'Remaining', 'Failed'];
+  for (const label of order) {
+    const items = groups[label];
+    if (!items || !items.length) continue;
+
+    const col = document.createElement('div');
+    col.className = 'sem-col';
+    const header = document.createElement('div');
+    header.className = 'sem-header';
+    header.innerHTML = '<div class="sem-name">' + label + ' (' + items.length + ')</div>';
+    col.appendChild(header);
+
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'sem-cards';
+    for (const item of items) {
+      if (item.isGroupCard) cardsWrap.appendChild(createGroupCard(item));
+      else cardsWrap.appendChild(createAuditCard(item));
+    }
+    col.appendChild(cardsWrap);
+    grid.appendChild(col);
+  }
+}
+
+function renderSecondaryCategory(audit, groupCards, grid) {
+  // Group by course tags/type
+  const categories = { 'Core / Gen Ed': [], 'Major Courses': [], 'Electives': [] };
+
+  for (const c of audit) {
+    if (c.isPlaceholder) {
+      categories['Electives'].push(c);
+    } else if ((c.tags || []).some(t => ['core', 'gen-ed', 'vue'].includes(t))) {
+      categories['Core / Gen Ed'].push(c);
+    } else {
+      categories['Major Courses'].push(c);
+    }
+  }
+  // Group cards go to Electives or Core depending on key
+  for (const gc of groupCards) {
+    if (gc.key.startsWith('core') || gc.key.startsWith('theo') || gc.key.startsWith('lab_')) {
+      categories['Core / Gen Ed'].push(gc);
+    } else {
+      categories['Electives'].push(gc);
+    }
+  }
+
+  for (const [label, items] of Object.entries(categories)) {
+    if (!items.length) continue;
+    const col = document.createElement('div');
+    col.className = 'sem-col';
+    const header = document.createElement('div');
+    header.className = 'sem-header';
+    header.innerHTML = '<div class="sem-name">' + label + ' (' + items.length + ')</div>';
+    col.appendChild(header);
+
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'sem-cards';
+    for (const item of items) {
+      if (item.isGroupCard) cardsWrap.appendChild(createGroupCard(item));
+      else cardsWrap.appendChild(createAuditCard(item));
+    }
+    col.appendChild(cardsWrap);
+    grid.appendChild(col);
+  }
+}
+
+function setSecondaryView(view, btn) {
+  AUDIT_STATE.secondaryView = view;
+  document.querySelectorAll('.secondary-view-toggle .view-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // Re-render with cached data
+  if (AUDIT_STATE.lastSecondaryAuditResult) {
+    const { audit, groupCards } = AUDIT_STATE.lastSecondaryAuditResult;
+    const grid = document.getElementById('secondary-audit-grid');
+    if (grid) {
+      grid.innerHTML = '';
+      if (view === 'timeline') renderSecondaryTimeline(audit, groupCards, grid);
+      else if (view === 'category') renderSecondaryCategory(audit, groupCards, grid);
+      else renderSecondaryStatus(audit, groupCards, grid);
+    }
   }
 }
 
@@ -1389,6 +1605,9 @@ const ZOOM_MIN = 0.5, ZOOM_MAX = 2.0, ZOOM_STEP = 0.1;
 function applyZoom() {
   const area = document.getElementById('audit-area');
   if (area) area.style.zoom = zoomLevel;
+  // Apply same zoom to secondary major area
+  const secArea = document.getElementById('secondary-audit-area');
+  if (secArea) secArea.style.zoom = zoomLevel;
   const label = document.getElementById('zoom-level');
   if (label) label.textContent = Math.round((zoomLevel / 1.3) * 100) + '%';
 }
@@ -1419,6 +1638,7 @@ function selectProgram(prog, btn) {
   if (typeof applyCurriculum === 'function') {
     applyCurriculum(AUDIT_STATE.program, AUDIT_STATE.catalogYear);
   }
+  populateDoubleMajorButtons();
   rerunAudit();
 }
 
@@ -1429,6 +1649,7 @@ function selectTrack(track, btn) {
   if (typeof applyCurriculum === 'function') {
     applyCurriculum(AUDIT_STATE.program, AUDIT_STATE.catalogYear);
   }
+  populateDoubleMajorButtons();
   rerunAudit();
 }
 
@@ -1689,6 +1910,7 @@ function runAudit(matched, unmatched, codeIndex) {
 
   // Re-run minor audits if any are selected
   if (typeof rerunMinors === 'function') rerunMinors();
+  if (typeof rerunCC === 'function') rerunCC();
 }
 
 function rerunAudit() {

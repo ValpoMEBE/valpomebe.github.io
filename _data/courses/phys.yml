@@ -12,6 +12,18 @@
   - MATH_131
   desc: 'Classical mechanics: kinematics, Newton''s laws, energy, momentum. Includes PHYS 141L (1 cr lab).'
 
+- id: PHYS_141L
+  code: PHYS 141L
+  title: Experimental Physics I
+  credits: 1
+  tags:
+  - physics
+  - lab
+  prereqs: []
+  coreqs:
+  - PHYS_141
+  desc: Laboratory component for PHYS 141.
+
 - id: PHYS_142
   code: PHYS 142
   title: Electricity, Magnetism & Waves
@@ -23,6 +35,18 @@
   coreqs:
   - MATH_132
   desc: Electrostatics, circuits, magnetism, optics, and waves.
+
+- id: PHYS_142L
+  code: PHYS 142L
+  title: Experimental Physics II
+  credits: 1
+  tags:
+  - physics
+  - lab
+  prereqs: []
+  coreqs:
+  - PHYS_142
+  desc: Laboratory component for PHYS 142.
 
 - id: PHYS_190
   code: PHYS 190
