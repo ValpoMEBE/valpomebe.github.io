@@ -1,0 +1,28 @@
+# Computer Science B.S. — 300+ level CS electives
+# At least 12 credits from CS courses numbered 300+
+# Non-CS courses that count at 300+ level are also included
+# Source: Undergraduate Catalog 2025-2026
+- code: "CS 325"
+- code: "CS 330"
+- code: "CS 335"
+- code: "CS 340"
+- code: "CS 342"
+- code: "CS 345"
+- code: "CS 350"
+- code: "CS 354"
+- code: "CS 356"
+- code: "CS 365"
+- code: "CS 372"
+- code: "CS 381"
+- code: "CS 458"
+- code: "CS 490"
+- code: "CS 493"
+- code: "CS 495"
+- code: "CS 496"
+- code: "CS 497"
+- code: "CS 498"
+# Non-CS courses allowed at 300+ level
+- code: "ECE 221"
+- code: "MATH 371"
+- code: "DATA 374"
+- code: "DATA 433"
