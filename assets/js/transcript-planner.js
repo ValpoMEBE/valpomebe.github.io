@@ -667,6 +667,7 @@ function rebuildPlan() {
   } else {
     renderPlanner(remaining, placed, semCredits, unplaced, TP_STATE.startSem);
   }
+  evaluateTPRequirements();
 }
 
 
@@ -799,6 +800,7 @@ function exitTranscriptRearrange(save) {
 
   // Re-render static grid
   renderPlanner(TP_STATE.remaining, TP_STATE.placed, TP_STATE.semCredits, TP_STATE.unplaced, TP_STATE.startSem);
+  evaluateTPRequirements();
 }
 
 function tpReRenderRearrange() {
@@ -1132,3 +1134,128 @@ document.addEventListener('keydown', (ev) => {
     }
   }
 });
+
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  REQUIREMENTS CHECK (Transcript Planner)                    ║
+// ║  Evaluates minor/CC requirements against the planned courses║
+// ╚══════════════════════════════════════════════════════════════╝
+
+function evaluateTPRequirements() {
+  const section = document.getElementById('tp-req-section');
+  const container = document.getElementById('tp-req-container');
+  if (!section || !container) return;
+
+  // Gather all courses: completed (from audit) + planned (remaining)
+  const pool = [];
+  const seen = new Set();
+
+  // Completed courses from the transcript (matched entries)
+  const matched = AUDIT_STATE.lastMatched || [];
+  for (const m of matched) {
+    const status = typeof getCourseStatus === 'function' ? getCourseStatus(m.active?.grade) : 'completed';
+    if (status === 'failed') continue;
+    const code = typeof applyDeptRenames === 'function' ? applyDeptRenames(m.code) : m.code;
+    if (seen.has(code)) continue;
+    seen.add(code);
+    const isIP = !m.active?.grade;
+    pool.push({
+      code,
+      credits: isIP ? 0 : (m.active?.credits || (m.courseData ? m.courseData.credits : 3)),
+      grade: m.active?.grade || null,
+      status,
+    });
+  }
+
+  // Planned remaining courses
+  const remaining = TP_STATE.remaining || [];
+  for (const c of remaining) {
+    if (seen.has(c.code)) continue;
+    seen.add(c.code);
+    pool.push({
+      code: c.code,
+      credits: c.credits,
+      grade: null,
+      status: 'planned',
+    });
+  }
+
+  container.innerHTML = '';
+  let hasCards = false;
+
+  // Minor evaluations
+  const selectedMinors = AUDIT_STATE.selectedMinors || [];
+  if (selectedMinors.length > 0 && typeof computeMinorAudit === 'function' && typeof MINORS_DATA !== 'undefined') {
+    for (const minorKey of selectedMinors) {
+      const minorDef = MINORS_DATA[minorKey];
+      if (!minorDef || !minorDef.requirements) continue;
+      const result = computeMinorAudit(pool, minorDef, new Set(), new Set());
+      container.appendChild(
+        typeof createMinorCard === 'function' ? createMinorCard(result) : renderTPFallbackCard(result)
+      );
+      hasCards = true;
+    }
+  }
+
+  // CC Scholar evaluation
+  if (AUDIT_STATE.ccEnabled && typeof CC_SCHOLAR_DATA !== 'undefined' && CC_SCHOLAR_DATA && CC_SCHOLAR_DATA.requirements) {
+    if (typeof computeMinorAudit === 'function') {
+      const ccDef = Object.assign({}, CC_SCHOLAR_DATA);
+      ccDef.min_credits = ccDef.min_credits || ccDef.min_credits_beyond_fy || 0;
+      const result = computeMinorAudit(pool, ccDef, new Set(), new Set());
+      result.name = 'Christ College Scholar';
+      container.appendChild(
+        typeof createMinorCard === 'function' ? createMinorCard(result) : renderTPFallbackCard(result)
+      );
+      hasCards = true;
+    }
+  }
+
+  section.style.display = hasCards ? '' : 'none';
+}
+
+function renderTPFallbackCard(result) {
+  const allMet = result.overallMet || result.requirements.every(r => r.met);
+  const card = document.createElement('div');
+  card.className = 'minor-audit-card' + (allMet ? ' minor-met' : '');
+
+  const header = document.createElement('div');
+  header.className = 'minor-card-header';
+
+  const icon = document.createElement('span');
+  icon.className = 'minor-status-icon ' + (allMet ? 'met' : 'unmet');
+  icon.textContent = allMet ? '\u2713' : '\u25CB';
+  header.appendChild(icon);
+
+  const title = document.createElement('span');
+  title.className = 'minor-card-title';
+  title.textContent = result.name;
+  header.appendChild(title);
+
+  if (result.minCredits) {
+    const tally = document.createElement('span');
+    tally.className = 'minor-card-tally';
+    tally.textContent = result.totalApplied + ' / ' + result.minCredits + ' cr';
+    header.appendChild(tally);
+  }
+  card.appendChild(header);
+
+  // Requirements
+  const reqList = document.createElement('div');
+  reqList.className = 'minor-req-list';
+  for (const req of result.requirements) {
+    const row = document.createElement('div');
+    row.className = 'minor-req-row ' + (req.met ? 'met' : 'unmet');
+    const rowIcon = document.createElement('span');
+    rowIcon.className = 'minor-req-icon ' + (req.met ? 'met' : 'unmet');
+    rowIcon.textContent = req.met ? '\u2713' : '\u25CB';
+    row.appendChild(rowIcon);
+    const label = document.createElement('span');
+    label.className = 'minor-req-label';
+    label.textContent = req.label;
+    row.appendChild(label);
+    reqList.appendChild(row);
+  }
+  card.appendChild(reqList);
+  return card;
+}

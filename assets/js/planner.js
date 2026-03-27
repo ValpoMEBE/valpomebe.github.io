@@ -77,7 +77,7 @@ function selectPrimaryProgram(prog, btn) {
   const minorRow = document.getElementById('minor-row');
   if (minorRow) {
     minorRow.style.display = '';
-    populateMinorButtons();
+    populatePlannerMinorButtons();
   }
   const ccRow = document.getElementById('cc-row');
   if (ccRow) ccRow.style.display = '';
@@ -144,7 +144,7 @@ function clearSecondaryProgram() {
   generatePlan();
 }
 
-function populateMinorButtons() {
+function populatePlannerMinorButtons() {
   const container = document.getElementById('minor-btns');
   if (!container || typeof MINORS_DATA === 'undefined') return;
   container.innerHTML = '';
@@ -169,7 +169,7 @@ function populateMinorButtons() {
   }
 }
 
-function toggleCC() {
+function togglePlannerCC() {
   PLANNER_STATE.ccEnabled = !PLANNER_STATE.ccEnabled;
   const btn = document.getElementById('cc-toggle-btn');
   if (btn) {
@@ -1180,11 +1180,16 @@ function evaluateMinorReqs(minorKey, pool) {
 
 function evaluateCCReqs(pool) {
   if (!CC_SCHOLAR_DATA || !CC_SCHOLAR_DATA.requirements) return null;
-
-  // CC has same format as minor definitions, so reuse computeMinorAudit
   if (typeof computeMinorAudit !== 'function') return null;
 
-  return computeMinorAudit(pool, CC_SCHOLAR_DATA, new Set(), new Set());
+  // Adapt CC data to match minor definition format (min_credits, name without "Minor" suffix)
+  const ccDef = Object.assign({}, CC_SCHOLAR_DATA);
+  ccDef.min_credits = ccDef.min_credits || ccDef.min_credits_beyond_fy || 0;
+
+  const result = computeMinorAudit(pool, ccDef, new Set(), new Set());
+  // Fix title — createMinorCard appends " Minor", so strip it from the name
+  result.name = 'Christ College Scholar';
+  return result;
 }
 
 // ── Main orchestrator ──
@@ -1264,7 +1269,7 @@ function renderRequirementsPanel(results) {
   const primaryEl = document.getElementById('req-primary-section');
   primaryEl.innerHTML = '';
   if (results.primary) {
-    primaryEl.appendChild(renderMajorSection(results.primary));
+    primaryEl.appendChild(renderMajorCard(results.primary));
   }
 
   // Secondary
@@ -1272,169 +1277,260 @@ function renderRequirementsPanel(results) {
   secondaryEl.innerHTML = '';
   if (results.secondary) {
     secondaryEl.style.display = '';
-    secondaryEl.appendChild(renderMajorSection(results.secondary));
+    secondaryEl.appendChild(renderMajorCard(results.secondary));
   } else {
     secondaryEl.style.display = 'none';
   }
 
-  // Minors
+  // Minors — reuse createMinorCard from transcript-minor.js if available
   const minorsEl = document.getElementById('req-minors-section');
   minorsEl.innerHTML = '';
   if (results.minors.length) {
     minorsEl.style.display = '';
     for (const m of results.minors) {
-      minorsEl.appendChild(renderMinorSection(m));
+      minorsEl.appendChild(
+        typeof createMinorCard === 'function' ? createMinorCard(m) : renderFallbackMinorCard(m)
+      );
     }
   } else {
     minorsEl.style.display = 'none';
   }
 
-  // CC
+  // CC — same card rendering as minors
   const ccEl = document.getElementById('req-cc-section');
   ccEl.innerHTML = '';
   if (results.cc) {
     ccEl.style.display = '';
-    ccEl.appendChild(renderMinorSection(results.cc));
+    ccEl.appendChild(
+      typeof createMinorCard === 'function' ? createMinorCard(results.cc) : renderFallbackMinorCard(results.cc)
+    );
   } else {
     ccEl.style.display = 'none';
   }
 }
 
-function renderMajorSection(majorResult) {
-  const section = document.createElement('div');
-  section.className = 'req-card';
+// ── Major program card (uses minor-audit-card DOM structure) ──
+
+function renderMajorCard(majorResult) {
+  const allMet = majorResult.allMet;
+  const card = document.createElement('div');
+  card.className = 'minor-audit-card' + (allMet ? ' minor-met' : '');
 
   // Header
   const header = document.createElement('div');
-  header.className = 'req-card-header';
-  const icon = majorResult.allMet ? '<span class="req-icon req-met">&#10003;</span>' : '<span class="req-icon req-unmet">&#9675;</span>';
-  header.innerHTML = icon +
-    '<span class="req-card-title">' + majorResult.label + '</span>' +
-    '<span class="req-card-count">' + majorResult.metCount + ' / ' + majorResult.totalReqs + '</span>';
-  section.appendChild(header);
+  header.className = 'minor-card-header';
 
-  // Required courses — only show missing ones to keep it concise
+  const statusIcon = document.createElement('span');
+  statusIcon.className = 'minor-status-icon ' + (allMet ? 'met' : 'unmet');
+  statusIcon.textContent = allMet ? '\u2713' : '\u25CB';
+  header.appendChild(statusIcon);
+
+  const title = document.createElement('span');
+  title.className = 'minor-card-title';
+  title.textContent = majorResult.label;
+  header.appendChild(title);
+
+  const tally = document.createElement('span');
+  tally.className = 'minor-card-tally';
+  tally.textContent = majorResult.metCount + ' / ' + majorResult.totalReqs;
+  header.appendChild(tally);
+
+  card.appendChild(header);
+
+  // Progress bar
+  const pct = majorResult.totalReqs > 0
+    ? Math.min(100, Math.round((majorResult.metCount / majorResult.totalReqs) * 100))
+    : 0;
+  const progressWrap = document.createElement('div');
+  progressWrap.className = 'minor-progress-wrap';
+  const progressBar = document.createElement('div');
+  progressBar.className = 'minor-progress-bar';
+  progressBar.style.width = pct + '%';
+  progressBar.classList.add(pct >= 100 ? 'full' : pct > 0 ? 'partial' : 'empty');
+  progressWrap.appendChild(progressBar);
+  card.appendChild(progressWrap);
+
+  // Missing required courses
   const missingCourses = majorResult.requiredCourses.filter(c => !c.met);
   if (missingCourses.length > 0) {
-    const missingDiv = document.createElement('div');
-    missingDiv.className = 'req-missing-group';
-    missingDiv.innerHTML = '<span class="req-missing-label">Missing courses:</span>';
-    const chipWrap = document.createElement('div');
-    chipWrap.className = 'req-chip-wrap';
-    for (const c of missingCourses) {
-      const chip = document.createElement('span');
-      chip.className = 'req-chip req-chip-missing';
-      chip.textContent = c.code;
-      chipWrap.appendChild(chip);
-    }
-    missingDiv.appendChild(chipWrap);
-    section.appendChild(missingDiv);
+    const reqList = document.createElement('div');
+    reqList.className = 'minor-req-list';
+
+    const row = document.createElement('div');
+    row.className = 'minor-req-row unmet';
+
+    const icon = document.createElement('span');
+    icon.className = 'minor-req-icon unmet';
+    icon.textContent = '\u25CB';
+    row.appendChild(icon);
+
+    const label = document.createElement('span');
+    label.className = 'minor-req-label';
+    label.textContent = 'Missing Courses';
+    row.appendChild(label);
+
+    const detail = document.createElement('span');
+    detail.className = 'minor-req-detail';
+    detail.innerHTML = '<span class="minor-need">Need: ' +
+      missingCourses.map(c => c.code).join(', ') + '</span>';
+    row.appendChild(detail);
+
+    reqList.appendChild(row);
+    card.appendChild(reqList);
   }
 
-  // Elective groups
+  // Elective groups as requirement rows
   if (majorResult.electiveGroups.length > 0) {
-    const groupsDiv = document.createElement('div');
-    groupsDiv.className = 'req-groups';
+    const reqList = card.querySelector('.minor-req-list') || (() => {
+      const el = document.createElement('div');
+      el.className = 'minor-req-list';
+      card.appendChild(el);
+      return el;
+    })();
+
     for (const g of majorResult.electiveGroups) {
       const row = document.createElement('div');
-      row.className = 'req-group-row';
-      const gIcon = g.met ? '<span class="req-icon-sm req-met">&#10003;</span>' : '<span class="req-icon-sm req-unmet">&#9675;</span>';
-      const pct = g.totalSlots > 0 ? Math.round((g.slotsInPlan / g.totalSlots) * 100) : 0;
-      row.innerHTML = gIcon +
-        '<span class="req-group-label">' + g.label + '</span>' +
-        '<span class="req-group-detail">' + g.slotsInPlan + '/' + g.totalSlots + ' slots &middot; ' + g.filledCredits + '/' + g.totalCredits + ' cr</span>' +
-        '<div class="req-progress"><div class="req-progress-bar" style="width:' + pct + '%"></div></div>';
-      groupsDiv.appendChild(row);
+      row.className = 'minor-req-row ' + (g.met ? 'met' : 'unmet');
+
+      const icon = document.createElement('span');
+      icon.className = 'minor-req-icon ' + (g.met ? 'met' : 'unmet');
+      icon.textContent = g.met ? '\u2713' : '\u25CB';
+      row.appendChild(icon);
+
+      const label = document.createElement('span');
+      label.className = 'minor-req-label';
+      label.textContent = g.label;
+      row.appendChild(label);
+
+      const detail = document.createElement('span');
+      detail.className = 'minor-req-detail';
+      if (g.met) {
+        detail.innerHTML = '<span class="minor-course-chip">' +
+          g.slotsInPlan + '/' + g.totalSlots + ' slots (' + g.filledCredits + ' cr)</span>';
+      } else {
+        detail.innerHTML = '<span class="minor-course-chip">' +
+          g.slotsInPlan + '/' + g.totalSlots + ' slots</span>' +
+          '<span class="minor-need">' + (g.totalCredits - g.filledCredits) + ' cr needed</span>';
+      }
+      row.appendChild(detail);
+
+      reqList.appendChild(row);
     }
-    section.appendChild(groupsDiv);
   }
 
-  return section;
+  return card;
 }
 
-function renderMinorSection(minorResult) {
-  const section = document.createElement('div');
-  section.className = 'req-card';
+// ── Fallback minor card (if createMinorCard not available) ──
 
-  const metReqs = minorResult.requirements.filter(r => r.met).length;
-  const totalReqs = minorResult.requirements.length;
-  const allMet = metReqs === totalReqs;
+function renderFallbackMinorCard(result) {
+  const allMet = result.overallMet || result.requirements.every(r => r.met);
+  const card = document.createElement('div');
+  card.className = 'minor-audit-card' + (allMet ? ' minor-met' : '');
 
   // Header
   const header = document.createElement('div');
-  header.className = 'req-card-header';
-  const icon = allMet ? '<span class="req-icon req-met">&#10003;</span>' : '<span class="req-icon req-unmet">&#9675;</span>';
-  const creditsInfo = minorResult.minCredits
-    ? ' <span class="req-card-credits">' + minorResult.totalApplied + ' / ' + minorResult.minCredits + ' cr</span>'
-    : '';
-  header.innerHTML = icon +
-    '<span class="req-card-title">' + minorResult.name + '</span>' +
-    creditsInfo +
-    '<span class="req-card-count">' + metReqs + ' / ' + totalReqs + '</span>';
-  section.appendChild(header);
+  header.className = 'minor-card-header';
 
-  // Each requirement
-  for (const req of minorResult.requirements) {
-    const row = document.createElement('div');
-    row.className = 'req-row';
-    const rIcon = req.met ? '<span class="req-icon-sm req-met">&#10003;</span>' : '<span class="req-icon-sm req-unmet">&#9675;</span>';
-    row.innerHTML = rIcon + '<span class="req-row-label">' + req.label + '</span>';
+  const statusIcon = document.createElement('span');
+  statusIcon.className = 'minor-status-icon ' + (allMet ? 'met' : 'unmet');
+  statusIcon.textContent = allMet ? '\u2713' : '\u25CB';
+  header.appendChild(statusIcon);
 
-    // Filled courses
-    if (req.filled && req.filled.length > 0) {
-      const chips = document.createElement('span');
-      chips.className = 'req-chip-wrap-inline';
-      for (const f of req.filled) {
-        const chip = document.createElement('span');
-        chip.className = 'req-chip req-chip-filled';
-        chip.textContent = f.code;
-        chips.appendChild(chip);
-      }
-      row.appendChild(chips);
-    }
+  const title = document.createElement('span');
+  title.className = 'minor-card-title';
+  title.textContent = result.name;
+  header.appendChild(title);
 
-    // Missing info
-    if (!req.met) {
-      const missing = document.createElement('span');
-      missing.className = 'req-row-missing';
-      if (req.type === 'credits' && req.creditsNeeded) {
-        missing.textContent = (req.creditsNeeded - req.creditsApplied) + ' cr needed';
-      } else if (req.type === 'required' && req.missing && req.missing.length) {
-        missing.textContent = 'Need: ' + req.missing.join(', ');
-      } else if (req.type === 'pick' && req.needed) {
-        const have = req.filled ? req.filled.length : 0;
-        missing.textContent = (req.needed - have) + ' more needed';
-      } else if (req.type === 'repeat' && req.countNeeded) {
-        missing.textContent = (req.countNeeded - (req.countFilled || 0)) + ' more needed';
-      }
-      row.appendChild(missing);
-    }
-
-    section.appendChild(row);
+  if (result.minCredits) {
+    const tally = document.createElement('span');
+    tally.className = 'minor-card-tally';
+    tally.textContent = result.totalApplied + ' / ' + result.minCredits + ' cr';
+    header.appendChild(tally);
   }
 
-  // Above and beyond (for minors)
-  if (minorResult.aboveAndBeyond) {
-    const aab = minorResult.aboveAndBeyond;
+  card.appendChild(header);
+
+  // Progress bar
+  if (result.minCredits) {
+    const pct = Math.min(100, Math.round((result.totalApplied / result.minCredits) * 100));
+    const progressWrap = document.createElement('div');
+    progressWrap.className = 'minor-progress-wrap';
+    const progressBar = document.createElement('div');
+    progressBar.className = 'minor-progress-bar';
+    progressBar.style.width = pct + '%';
+    progressBar.classList.add(pct >= 100 ? 'full' : pct > 0 ? 'partial' : 'empty');
+    progressWrap.appendChild(progressBar);
+    card.appendChild(progressWrap);
+  }
+
+  // Requirements
+  const reqList = document.createElement('div');
+  reqList.className = 'minor-req-list';
+  for (const req of result.requirements) {
+    reqList.appendChild(
+      typeof createReqRow === 'function' ? createReqRow(req) : renderFallbackReqRow(req)
+    );
+  }
+  card.appendChild(reqList);
+
+  // Above and beyond
+  if (result.aboveAndBeyond) {
+    const aab = result.aboveAndBeyond;
     const aabRow = document.createElement('div');
-    aabRow.className = 'req-row';
-    const aabIcon = aab.met ? '<span class="req-icon-sm req-met">&#10003;</span>' : '<span class="req-icon-sm req-unmet">&#9675;</span>';
-    aabRow.innerHTML = aabIcon + '<span class="req-row-label">Above &amp; Beyond</span>';
-    if (aab.met && aab.course) {
-      const chip = document.createElement('span');
-      chip.className = 'req-chip req-chip-filled';
-      chip.textContent = aab.course;
-      aabRow.appendChild(chip);
-    } else if (!aab.met) {
-      const missing = document.createElement('span');
-      missing.className = 'req-row-missing';
-      missing.textContent = 'Need 200+ level, 3+ cr course';
-      aabRow.appendChild(missing);
-    }
-    section.appendChild(aabRow);
+    aabRow.className = 'minor-aab-row ' + (aab.met ? 'met' : 'unmet');
+    const aabIcon = document.createElement('span');
+    aabIcon.className = 'minor-req-icon ' + (aab.met ? 'met' : 'unmet');
+    aabIcon.textContent = aab.met ? '\u2713' : '\u2717';
+    aabRow.appendChild(aabIcon);
+    const aabText = document.createElement('span');
+    aabText.className = 'minor-aab-text';
+    aabText.textContent = aab.met
+      ? 'Above & Beyond: ' + aab.course
+      : 'Above & Beyond: need 1 course (200+, 3+ cr) not used for degree';
+    aabRow.appendChild(aabText);
+    card.appendChild(aabRow);
   }
 
-  return section;
+  return card;
+}
+
+function renderFallbackReqRow(req) {
+  const row = document.createElement('div');
+  row.className = 'minor-req-row ' + (req.met ? 'met' : 'unmet');
+
+  const icon = document.createElement('span');
+  icon.className = 'minor-req-icon ' + (req.met ? 'met' : 'unmet');
+  icon.textContent = req.met ? '\u2713' : '\u25CB';
+  row.appendChild(icon);
+
+  const label = document.createElement('span');
+  label.className = 'minor-req-label';
+  label.textContent = req.label;
+  row.appendChild(label);
+
+  const detail = document.createElement('span');
+  detail.className = 'minor-req-detail';
+  if (req.filled && req.filled.length > 0) {
+    detail.innerHTML = req.filled.map(f =>
+      '<span class="minor-course-chip">' + f.code +
+      ' (' + (f.credits > 0 ? f.credits + ' cr' : '- cr') + ')</span>'
+    ).join(' ');
+  }
+  if (req.type === 'credits' && !req.met) {
+    const remaining = Math.max(0, req.creditsNeeded - req.creditsApplied);
+    detail.innerHTML += '<span class="minor-need">' + remaining + ' cr needed</span>';
+  }
+  if (req.type === 'required' && req.missing && req.missing.length > 0) {
+    detail.innerHTML += '<span class="minor-need">Need: ' + req.missing.join(', ') + '</span>';
+  }
+  if (req.type === 'pick' && !req.met) {
+    const remaining = (req.needed || 1) - req.filled.length;
+    detail.innerHTML += '<span class="minor-need">' + remaining + ' more course(s) needed</span>';
+  }
+  row.appendChild(detail);
+
+  return row;
 }
 
 function toggleReqPanel() {

@@ -746,7 +746,7 @@ function createMinorCard(result) {
 
   const title = document.createElement('span');
   title.className = 'minor-card-title';
-  title.textContent = result.name + ' Minor';
+  title.textContent = /Minor|Scholar/i.test(result.name) ? result.name : result.name + ' Minor';
   header.appendChild(title);
 
   const tally = document.createElement('span');

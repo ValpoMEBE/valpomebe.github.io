@@ -414,12 +414,11 @@
   .sem-col { flex: 0 0 150px; }
   .planner-panel-relations { grid-template-columns: 1fr; }
   .rearrange-controls { padding: .4rem .5rem; }
-  .req-card { padding: .6rem; }
-  .req-card-header { flex-wrap: wrap; }
 }
 
 
 /* ── REQUIREMENTS PANEL ──────────────────────────────────── */
+/* Collapsible wrapper — contents use minor-audit-card styles */
 
 .planner-req-panel {
   margin: .75rem 1.5rem;
@@ -428,200 +427,98 @@
   background: rgba(255,255,255,.03);
   overflow: hidden;
 }
-
 .req-panel-header {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  padding: .6rem 1rem;
-  cursor: pointer;
-  transition: background .15s;
+  display: flex; align-items: center; gap: .6rem;
+  padding: .6rem 1rem; cursor: pointer; transition: background .15s;
 }
-.req-panel-header:hover {
-  background: rgba(255,255,255,.05);
-}
-
+.req-panel-header:hover { background: rgba(255,255,255,.05); }
 .req-panel-title {
-  font-size: .85rem;
-  font-weight: 600;
-  color: var(--light-gray);
+  font-family: var(--font-display); font-size: .85rem;
+  font-weight: 600; color: var(--light-gray);
 }
-
 .req-panel-summary {
-  font-size: .75rem;
-  color: #aaa;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: .35rem;
+  font-size: .75rem; color: #aaa; margin-left: auto;
+  display: flex; align-items: center; gap: .35rem;
 }
-
-.req-summary-dot {
-  display: inline-block;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-}
-.req-dot-met   { background: #4caf50; }
-.req-dot-unmet { background: #ff9800; }
-
-.req-panel-arrow {
-  font-size: .7rem;
-  color: #888;
-  transition: transform .2s;
-}
-
+.req-summary-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.req-dot-met   { background: var(--teal); }
+.req-dot-unmet { background: var(--orange); }
+.req-panel-arrow { font-size: .7rem; color: #888; }
 .req-panel-body {
   padding: .25rem 1rem .75rem;
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.req-section-title {
+  font-family: var(--font-display); font-size: .9rem;
+  color: var(--gold); margin-bottom: .5rem;
 }
 
-/* ── Requirement cards ── */
+/* ── Minor-card styles (mirrored from transcript.css for planner page) ── */
 
-.req-card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 6px;
-  padding: .6rem .8rem;
+.minor-audit-card {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px; padding: .85rem 1rem; margin-bottom: .75rem;
+  transition: border-color .2s;
 }
-
-.req-card-header {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  margin-bottom: .4rem;
+.minor-audit-card.minor-met { border-color: var(--teal); }
+.minor-card-header {
+  display: flex; align-items: center; gap: .5rem; margin-bottom: .4rem;
 }
-
-.req-card-title {
-  font-size: .8rem;
-  font-weight: 600;
-  color: #ddd;
+.minor-status-icon {
+  font-size: .9rem; font-weight: 700; width: 1.2rem; text-align: center;
 }
-
-.req-card-credits {
-  font-size: .7rem;
-  color: #aaa;
+.minor-status-icon.met  { color: var(--teal); }
+.minor-status-icon.unmet { color: var(--light-gray); }
+.minor-card-title {
+  font-family: var(--font-display); font-size: .95rem;
+  color: #fff; font-weight: 600; flex: 1;
 }
-
-.req-card-count {
-  font-size: .7rem;
-  color: #999;
-  margin-left: auto;
+.minor-card-tally {
+  font-family: var(--font-mono); font-size: .75rem;
+  color: var(--gold); white-space: nowrap;
 }
-
-/* ── Icons ── */
-
-.req-icon {
-  font-size: .85rem;
-  flex-shrink: 0;
+.minor-progress-wrap {
+  height: 5px; background: rgba(0,0,0,.15);
+  border-radius: 3px; overflow: hidden; margin-bottom: .6rem;
 }
-.req-icon-sm {
-  font-size: .7rem;
-  flex-shrink: 0;
+.minor-progress-bar {
+  height: 100%; border-radius: 3px; transition: width .4s ease;
 }
-.req-met   { color: #4caf50; }
-.req-unmet { color: #ff9800; }
-
-/* ── Missing courses ── */
-
-.req-missing-group {
-  margin-top: .3rem;
+.minor-progress-bar.full    { background: var(--teal); }
+.minor-progress-bar.partial { background: var(--orange); }
+.minor-progress-bar.empty   { background: transparent; }
+.minor-req-list {
+  display: flex; flex-direction: column; gap: .3rem; margin-bottom: .5rem;
 }
-.req-missing-label {
-  font-size: .7rem;
-  color: #999;
-  display: block;
-  margin-bottom: .2rem;
+.minor-req-row {
+  display: flex; align-items: flex-start; gap: .4rem;
+  font-size: .78rem; padding: .2rem 0;
 }
-.req-chip-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .25rem;
+.minor-req-icon {
+  font-size: .75rem; width: 1rem; text-align: center; flex-shrink: 0;
+  margin-top: .1rem;
 }
-.req-chip {
-  font-size: .65rem;
-  padding: .15rem .4rem;
-  border-radius: 3px;
-  white-space: nowrap;
+.minor-req-icon.met  { color: var(--teal); }
+.minor-req-icon.unmet { color: var(--light-gray); }
+.minor-req-label { color: var(--light-gray); min-width: 140px; flex-shrink: 0; }
+.minor-req-detail {
+  display: flex; flex-wrap: wrap; gap: .25rem; align-items: center;
 }
-.req-chip-missing {
-  background: rgba(255,152,0,.15);
-  color: #ff9800;
-  border: 1px solid rgba(255,152,0,.3);
+.minor-course-chip {
+  display: inline-flex; align-items: center; gap: .2rem;
+  background: rgba(255,255,255,.06); border-radius: 3px;
+  padding: .1rem .35rem; font-size: .72rem; color: var(--light-blue);
 }
-.req-chip-filled {
-  background: rgba(76,175,80,.12);
-  color: #81c784;
-  border: 1px solid rgba(76,175,80,.25);
+.minor-need { font-size: .72rem; color: var(--orange); font-style: italic; }
+.minor-aab-row {
+  display: flex; align-items: center; gap: .4rem;
+  font-size: .75rem; padding: .35rem .5rem;
+  border-radius: 4px; margin-top: .3rem;
 }
-
-/* ── Elective group rows ── */
-
-.req-groups {
-  margin-top: .3rem;
-  display: flex;
-  flex-direction: column;
-  gap: .3rem;
+.minor-aab-row.met {
+  background: rgba(0,99,84,.15); border: 1px solid rgba(0,99,84,.3);
 }
-
-.req-group-row {
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-  font-size: .72rem;
+.minor-aab-row.unmet {
+  background: rgba(199,105,23,.1); border: 1px solid rgba(199,105,23,.3);
 }
-
-.req-group-label {
-  color: #ccc;
-  min-width: 100px;
-}
-
-.req-group-detail {
-  color: #999;
-  font-size: .65rem;
-  min-width: 90px;
-}
-
-.req-progress {
-  flex: 1;
-  max-width: 100px;
-  height: 4px;
-  background: rgba(255,255,255,.1);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.req-progress-bar {
-  height: 100%;
-  background: var(--gold);
-  border-radius: 2px;
-  transition: width .3s;
-}
-
-/* ── Minor/CC requirement rows ── */
-
-.req-row {
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-  padding: .15rem 0;
-  font-size: .72rem;
-  flex-wrap: wrap;
-}
-
-.req-row-label {
-  color: #ccc;
-}
-
-.req-chip-wrap-inline {
-  display: inline-flex;
-  gap: .2rem;
-  flex-wrap: wrap;
-}
-
-.req-row-missing {
-  font-size: .65rem;
-  color: #ff9800;
-  font-style: italic;
-}
+.minor-aab-text { color: var(--light-gray); }
