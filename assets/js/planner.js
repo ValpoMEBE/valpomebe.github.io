@@ -82,10 +82,6 @@ function selectPrimaryProgram(prog, btn) {
   const ccRow = document.getElementById('cc-row');
   if (ccRow) ccRow.style.display = '';
 
-  // Clear secondary selection UI
-  const clearBtn = document.getElementById('clear-secondary-btn');
-  if (clearBtn) clearBtn.style.display = 'none';
-
   // Reset CC toggle
   PLANNER_STATE.ccEnabled = false;
   const ccBtn = document.getElementById('cc-toggle-btn');
@@ -122,13 +118,17 @@ function populateSecondaryButtons() {
     btn.className = 'prog-btn';
     btn.textContent = label;
     btn.addEventListener('click', () => {
-      PLANNER_STATE.secondary = key;
-      container.querySelectorAll('.prog-btn').forEach(b => {
-        if (b !== btn) b.classList.remove('active');
-      });
-      btn.classList.add('active');
-      const clearBtn = document.getElementById('clear-secondary-btn');
-      if (clearBtn) clearBtn.style.display = '';
+      if (PLANNER_STATE.secondary === key) {
+        // Toggle off on reclick
+        PLANNER_STATE.secondary = null;
+        btn.classList.remove('active');
+      } else {
+        PLANNER_STATE.secondary = key;
+        container.querySelectorAll('.prog-btn').forEach(b => {
+          if (b !== btn) b.classList.remove('active');
+        });
+        btn.classList.add('active');
+      }
       generatePlan();
     });
     container.appendChild(btn);
@@ -139,8 +139,6 @@ function clearSecondaryProgram() {
   PLANNER_STATE.secondary = null;
   const container = document.getElementById('secondary-prog-btns');
   if (container) container.querySelectorAll('.prog-btn').forEach(b => b.classList.remove('active'));
-  const clearBtn = document.getElementById('clear-secondary-btn');
-  if (clearBtn) clearBtn.style.display = 'none';
   generatePlan();
 }
 
@@ -909,78 +907,37 @@ function downloadPlanExcel() {
 // ║  REARRANGE SCHEDULE MODE                                    ║
 // ╚══════════════════════════════════════════════════════════════╝
 
-// ── Validation ──────────────────────────────────────────────
+// ── Enter / Exit Rearrange Mode (uses shared rearrange-engine.js) ──
 
-function validateCourse(course, allCourses, slots) {
-  const byId = {};
-  for (const c of allCourses) byId[c.id] = c;
-  const allIds = new Set(allCourses.map(c => c.id));
-
-  const courseSlot = slots.find(s => s.key === course.slotKey);
-  if (!courseSlot) return { status: 'valid', issues: [] };
-  const courseOrder = courseSlot.order;
-  const courseSeason = courseSlot.season;
-
-  const issues = [];
-  let hasError = false;
-  let hasWarning = false;
-
-  // Check prereqs
-  for (const entry of (course.prereqs || [])) {
-    const pIds = Array.isArray(entry) ? entry : [entry];
-    // For OR groups, at least one must be in an earlier slot
-    const satisfied = pIds.some(p => {
-      if (!allIds.has(p)) return true; // not in plan = externally satisfied
-      const pCourse = byId[p];
-      if (!pCourse) return true;
-      const pSlot = slots.find(s => s.key === pCourse.slotKey);
-      return pSlot && pSlot.order < courseOrder;
-    });
-    if (!satisfied) {
-      hasError = true;
-      const codes = pIds.map(p => byId[p]?.code || p).join(' or ');
-      issues.push('Prereq not met: ' + codes + ' must be earlier');
-    }
-  }
-
-  // Check coreqs
-  for (const coId of (course.coreqs || [])) {
-    if (!allIds.has(coId)) continue;
-    const coCourse = byId[coId];
-    if (!coCourse) continue;
-    const coSlot = slots.find(s => s.key === coCourse.slotKey);
-    if (!coSlot || coSlot.order > courseOrder) {
-      hasError = true;
-      issues.push('Coreq not met: ' + (coCourse.code || coId) + ' must be same or earlier semester');
-    }
-  }
-
-  // Check offering
-  if (courseSeason === 'Summer') {
-    // Summer: warn unless explicitly offered
-    hasWarning = true;
-    issues.push('Summer offering not guaranteed');
-  } else if (!isOfferedIn(course, courseSeason)) {
-    hasWarning = true;
-    const offeredIn = course.offered || 'unknown';
-    issues.push('Typically offered in ' + offeredIn + ' only');
-  }
-
-  if (hasError) return { status: 'error', issues };
-  if (hasWarning) return { status: 'warning', issues };
-  return { status: 'valid', issues: [] };
+function plannerReRenderRearrange() {
+  validateAllCourses(PLANNER_STATE.rearrangedCourses, PLANNER_STATE.semesterSlots, new Set());
+  renderRearrangeGrid({
+    courses: PLANNER_STATE.rearrangedCourses,
+    slots: PLANNER_STATE.semesterSlots,
+    completedIds: new Set(),
+    gridEl: document.getElementById('planner-grid'),
+    onDrop: (cid, sk) => {
+      const c = PLANNER_STATE.rearrangedCourses.find(x => x.id === cid);
+      if (c && c.slotKey !== sk) { c.slotKey = sk; plannerReRenderRearrange(); }
+    },
+    onCardClick: openPlannerPanel,
+    onAddSemester: (type) => {
+      if (appendSemesterOfType(PLANNER_STATE.semesterSlots, type)) plannerReRenderRearrange();
+    },
+    onInsertSummer: (key) => {
+      if (insertSummerSlot(PLANNER_STATE.semesterSlots, key)) plannerReRenderRearrange();
+    },
+    onRemoveSemester: (slotKey) => {
+      const inSlot = PLANNER_STATE.rearrangedCourses.filter(c => c.slotKey === slotKey);
+      if (inSlot.length > 0) return;
+      if (removeSemesterSlot(PLANNER_STATE.semesterSlots, slotKey)) plannerReRenderRearrange();
+    },
+    statsEls: {
+      totalCredits: document.getElementById('planner-total-credits'),
+      semesters: document.getElementById('planner-semesters'),
+    },
+  });
 }
-
-function validateAllCourses() {
-  const courses = PLANNER_STATE.rearrangedCourses;
-  const slots = PLANNER_STATE.semesterSlots;
-  if (!courses || !slots) return;
-  for (const c of courses) {
-    c._validation = validateCourse(c, courses, slots);
-  }
-}
-
-// ── Enter / Exit ────────────────────────────────────────────
 
 function enterRearrangeMode() {
   if (!PLANNER_STATE.mergedPlan) return;
@@ -1005,9 +962,6 @@ function enterRearrangeMode() {
     const slot = slots.find(s => s.origSem === c.semester);
     c.slotKey = slot ? slot.key : slots[0]?.key || 'F1';
   }
-
-  // Validate
-  validateAllCourses();
 
   // UI updates
   document.getElementById('planner-area')?.classList.add('rearrange-mode');
@@ -1041,14 +995,13 @@ function enterRearrangeMode() {
   const warning = document.getElementById('planner-warning');
   if (warning) warning.style.display = 'none';
 
-  renderRearrangeGrid();
+  plannerReRenderRearrange();
 }
 
 function exitRearrangeMode(save) {
   if (!PLANNER_STATE.rearrangeMode) return;
 
   if (save && PLANNER_STATE.rearrangedCourses && PLANNER_STATE.semesterSlots) {
-    // Apply rearranged positions back to mergedPlan
     const slots = PLANNER_STATE.semesterSlots;
     const slotMap = {};
     for (const s of slots) slotMap[s.key] = s;
@@ -1058,11 +1011,9 @@ function exitRearrangeMode(save) {
       if (slot && slot.origSem) {
         rc.semester = slot.origSem;
       } else if (slot) {
-        // User-added semester: assign a new numeric semester
         rc.semester = slot.order + 1;
       }
     }
-    // Update mergedPlan with rearranged courses
     PLANNER_STATE.mergedPlan.courses = PLANNER_STATE.rearrangedCourses;
     PLANNER_STATE.mergedPlan.stats = computeStats(
       PLANNER_STATE.mergedPlan.courses,
@@ -1109,235 +1060,8 @@ function exitRearrangeMode(save) {
 
 function toggleRearrangeMode() {
   if (PLANNER_STATE.rearrangeMode) {
-    exitRearrangeMode(false); // cancel by default; use buttons for save
+    exitRearrangeMode(false);
   } else {
     enterRearrangeMode();
-  }
-}
-
-// ── Rearrange Grid Renderer ─────────────────────────────────
-
-function renderRearrangeGrid() {
-  const courses = PLANNER_STATE.rearrangedCourses;
-  const slots = PLANNER_STATE.semesterSlots;
-  if (!courses || !slots) return;
-
-  const grid = document.getElementById('planner-grid');
-  grid.innerHTML = '';
-
-  // Compute per-slot credits
-  const slotCredits = {};
-  for (const s of slots) slotCredits[s.key] = 0;
-  for (const c of courses) {
-    if (slotCredits[c.slotKey] !== undefined) {
-      slotCredits[c.slotKey] += c.credits;
-    }
-  }
-
-  // Update stats banner with current totals
-  const totalCredits = courses.reduce((sum, c) => sum + c.credits, 0);
-  document.getElementById('planner-total-credits').textContent = totalCredits;
-  document.getElementById('planner-semesters').textContent = slots.length;
-
-  for (const slot of slots) {
-    const slotCourses = courses
-      .filter(c => c.slotKey === slot.key)
-      .sort((a, b) => {
-        if (a.isPlaceholder !== b.isPlaceholder) return a.isPlaceholder ? 1 : -1;
-        return a.code.localeCompare(b.code);
-      });
-
-    const credits = slotCredits[slot.key] || 0;
-    const isOverloaded = credits > MAX_CREDITS_PER_SEM;
-
-    const col = document.createElement('div');
-    col.className = 'sem-col';
-    col.dataset.slotKey = slot.key;
-
-    // Header
-    const header = document.createElement('div');
-    header.className = 'sem-header';
-    let headerHTML =
-      '<div class="sem-year">' + slot.yearLabel + '</div>' +
-      '<div class="sem-name">' + slot.season + ' &mdash; ' +
-        '<span class="' + (isOverloaded ? 'credits-overloaded' : '') + '">' +
-          credits + ' cr' +
-        '</span>' +
-      '</div>';
-
-    // Remove button for user-added empty semesters
-    if (slot.userAdded && slotCourses.length === 0) {
-      headerHTML += '<button class="remove-semester-btn" onclick="removeSemester(\'' +
-        slot.key + '\')" title="Remove this semester">&times;</button>';
-    }
-    header.innerHTML = headerHTML;
-
-    // Add Summer button on Spring semesters
-    if (slot.season === 'Spring') {
-      const nextSlot = slots[slots.indexOf(slot) + 1];
-      const hasSummer = nextSlot && nextSlot.season === 'Summer';
-      if (!hasSummer) {
-        const summerBtn = document.createElement('button');
-        summerBtn.className = 'add-summer-btn';
-        summerBtn.textContent = '+ Summer';
-        summerBtn.title = 'Add summer term after this Spring';
-        summerBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          insertSummer(slot.key);
-        });
-        header.appendChild(summerBtn);
-      }
-    }
-
-    col.appendChild(header);
-
-    // Drop zone (cards container)
-    const cardsWrap = document.createElement('div');
-    cardsWrap.className = 'sem-cards';
-    cardsWrap.dataset.slotKey = slot.key;
-
-    // Drag-and-drop events on the drop zone
-    cardsWrap.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      cardsWrap.classList.add('drop-target');
-    });
-    cardsWrap.addEventListener('dragleave', (e) => {
-      // Only remove if leaving the container itself
-      if (!cardsWrap.contains(e.relatedTarget)) {
-        cardsWrap.classList.remove('drop-target');
-      }
-    });
-    cardsWrap.addEventListener('drop', (e) => {
-      e.preventDefault();
-      cardsWrap.classList.remove('drop-target');
-      const courseId = e.dataTransfer.getData('text/plain');
-      if (courseId) handleDrop(courseId, slot.key);
-    });
-
-    // Render cards
-    for (const course of slotCourses) {
-      const card = createRearrangeCard(course);
-      cardsWrap.appendChild(card);
-    }
-
-    col.appendChild(cardsWrap);
-    grid.appendChild(col);
-  }
-
-  // Add-semester column at the end
-  const addCol = document.createElement('div');
-  addCol.className = 'sem-col add-semester-col';
-  addCol.innerHTML =
-    '<div class="add-semester-inner">' +
-      '<span class="add-semester-icon">+</span>' +
-      '<div class="add-semester-options">' +
-        '<button onclick="addSemester(\'Fall\')">+ Fall</button>' +
-        '<button onclick="addSemester(\'Spring\')">+ Spring</button>' +
-        '<button onclick="addSemester(\'Summer\')">+ Summer</button>' +
-      '</div>' +
-    '</div>';
-  grid.appendChild(addCol);
-}
-
-function createRearrangeCard(course) {
-  const card = document.createElement('div');
-  const v = course._validation || { status: 'valid', issues: [] };
-
-  card.className = 'planner-card validation-' + v.status;
-  card.dataset.id = course.id;
-  card.draggable = true;
-
-  // Status icon
-  const icon = v.status === 'valid' ? '✓' : v.status === 'warning' ? '⚠' : '✕';
-  const iconClass = 'validation-icon validation-icon-' + v.status;
-
-  card.innerHTML =
-    '<div class="planner-card-top">' +
-      '<span class="planner-code">' + course.code + '</span>' +
-      '<span class="' + iconClass + '">' + icon + '</span>' +
-    '</div>' +
-    '<div class="planner-title">' + course.title + '</div>' +
-    '<div class="planner-card-bottom">' +
-      '<span class="planner-credits">' + course.credits + ' cr</span>' +
-    '</div>';
-
-  // Tooltip for issues
-  if (v.issues.length) {
-    card.title = v.issues.join('\n');
-  }
-
-  // Click to open detail panel
-  card.addEventListener('click', (e) => {
-    if (e.defaultPrevented) return;
-    openPlannerPanel(course);
-  });
-
-  // Drag events
-  card.addEventListener('dragstart', (e) => {
-    PLANNER_STATE.dragCourse = course.id;
-    e.dataTransfer.setData('text/plain', course.id);
-    e.dataTransfer.effectAllowed = 'move';
-    card.classList.add('dragging');
-    // Highlight all drop zones
-    requestAnimationFrame(() => {
-      document.querySelectorAll('.sem-cards').forEach(z => z.classList.add('drop-zone-active'));
-    });
-  });
-  card.addEventListener('dragend', () => {
-    PLANNER_STATE.dragCourse = null;
-    card.classList.remove('dragging');
-    document.querySelectorAll('.sem-cards').forEach(z => {
-      z.classList.remove('drop-zone-active', 'drop-target');
-    });
-  });
-
-  return card;
-}
-
-// ── Drag-and-Drop Handler ───────────────────────────────────
-
-function handleDrop(courseId, targetSlotKey) {
-  const courses = PLANNER_STATE.rearrangedCourses;
-  if (!courses) return;
-
-  const course = courses.find(c => c.id === courseId);
-  if (!course) return;
-  if (course.slotKey === targetSlotKey) return; // no change
-
-  course.slotKey = targetSlotKey;
-
-  // Re-validate and re-render
-  validateAllCourses();
-  renderRearrangeGrid();
-}
-
-// ── Semester Management ─────────────────────────────────────
-
-function addSemester(type) {
-  const slots = PLANNER_STATE.semesterSlots;
-  if (!slots) return;
-  const key = appendSemesterOfType(slots, type);
-  if (key) renderRearrangeGrid();
-}
-
-function insertSummer(afterSpringKey) {
-  const slots = PLANNER_STATE.semesterSlots;
-  if (!slots) return;
-  const key = insertSummerSlot(slots, afterSpringKey);
-  if (key) renderRearrangeGrid();
-}
-
-function removeSemester(slotKey) {
-  const slots = PLANNER_STATE.semesterSlots;
-  const courses = PLANNER_STATE.rearrangedCourses;
-  if (!slots || !courses) return;
-
-  // Check if any courses are in this slot
-  const inSlot = courses.filter(c => c.slotKey === slotKey);
-  if (inSlot.length > 0) return; // can't remove non-empty semester
-
-  if (removeSemesterSlot(slots, slotKey)) {
-    renderRearrangeGrid();
   }
 }

@@ -713,6 +713,274 @@
   display: flex; flex-wrap: wrap; gap: .5rem;
 }
 
+/* ── TRANSCRIPT PLANNER — REARRANGE & TOOLBAR ────────────── */
+
+.tp-toolbar {
+  display: flex; gap: .5rem; justify-content: center;
+  padding: 0 1.5rem .75rem; flex-wrap: wrap;
+}
+
+.tp-extras {
+  display: flex; gap: .5rem; align-items: center;
+  justify-content: center; padding: 0 1.5rem .5rem; flex-wrap: wrap;
+}
+
+/* Validation legend */
+.tp-validation-legend {
+  display: flex; gap: 1rem; justify-content: center;
+  padding: .3rem 1.5rem .5rem; flex-wrap: wrap;
+}
+.tp-validation-legend .legend-item {
+  display: flex; align-items: center; gap: .3rem;
+  color: var(--light-gray); font-size: .7rem;
+}
+.tp-validation-legend .legend-swatch {
+  width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+}
+
+/* Rearrange mode card styles (shared classes from rearrange-engine) */
+.planner-section .rearrange-mode .planner-card {
+  border-left-color: transparent !important;
+  cursor: grab; position: relative;
+}
+.planner-section .planner-card {
+  background: var(--card-bg, rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.06);
+  border-left: 4px solid transparent;
+  border-radius: 6px; padding: .5rem .55rem .4rem;
+  transition: box-shadow .15s, border-color .15s, background .15s;
+  cursor: pointer;
+}
+.planner-section .planner-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.planner-section .planner-card-top {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.planner-section .planner-code {
+  font-weight: 700; font-size: .72rem; color: var(--gold);
+  letter-spacing: .02em;
+}
+.planner-section .planner-title {
+  font-size: .62rem; color: var(--parchment); margin-top: .15rem;
+  line-height: 1.25; opacity: .85;
+}
+.planner-section .planner-card-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: .2rem;
+}
+.planner-section .planner-credits {
+  font-size: .6rem; color: var(--light-gray); opacity: .6;
+}
+
+/* Validation card states */
+.planner-section .planner-card.validation-valid {
+  background: rgba(46, 204, 113, .1);
+  border-left: 4px solid #2ecc71 !important;
+}
+.planner-section .planner-card.validation-warning {
+  background: rgba(241, 196, 15, .15);
+  border-left: 4px solid #f1c40f !important;
+}
+.planner-section .planner-card.validation-error {
+  background: rgba(231, 76, 60, .18);
+  border-left: 4px solid #e74c3c !important;
+}
+
+/* Status icon */
+.planner-section .validation-icon {
+  font-size: .7rem; font-weight: 700; line-height: 1;
+  width: 16px; height: 16px; display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 50%; flex-shrink: 0;
+}
+.planner-section .validation-icon-valid   { color: #2ecc71; background: rgba(46,204,113,.15); }
+.planner-section .validation-icon-warning { color: #f1c40f; background: rgba(241,196,15,.15); }
+.planner-section .validation-icon-error   { color: #e74c3c; background: rgba(231,76,60,.15); }
+
+/* Drag and drop */
+.planner-section .planner-card.dragging { opacity: .3; }
+.planner-section .sem-cards.drop-zone-active {
+  min-height: 60px;
+  border: 2px dashed rgba(255,255,255,.12);
+  border-radius: 6px;
+  transition: border-color .15s, background .15s;
+}
+.planner-section .sem-cards.drop-target {
+  border-color: var(--teal) !important;
+  background: rgba(0,99,84,.1);
+}
+
+/* Add/remove semester */
+.planner-section .add-semester-col {
+  display: flex; align-items: stretch; justify-content: center;
+  min-height: 200px;
+}
+.planner-section .add-semester-inner {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .5rem; padding: 1rem .5rem;
+  border: 2px dashed rgba(255,255,255,.1);
+  border-radius: 8px; width: 100%; cursor: pointer;
+  transition: border-color .15s;
+}
+.planner-section .add-semester-inner:hover { border-color: rgba(255,255,255,.25); }
+.planner-section .add-semester-icon {
+  font-size: 1.5rem; color: rgba(255,255,255,.3);
+  font-weight: 300; line-height: 1;
+}
+.planner-section .add-semester-options {
+  display: flex; flex-direction: column; gap: .3rem;
+}
+.planner-section .add-semester-options button {
+  appearance: none; -webkit-appearance: none;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  color: #bbb; font-size: .68rem; padding: .25rem .5rem;
+  border-radius: 3px; cursor: pointer; transition: background .15s;
+}
+.planner-section .add-semester-options button:hover {
+  background: rgba(255,255,255,.12); color: #fff;
+}
+.planner-section .add-summer-btn {
+  appearance: none; -webkit-appearance: none;
+  display: block; margin: .3rem auto 0; padding: .15rem .4rem;
+  background: transparent; border: 1px dashed rgba(255,255,255,.15);
+  color: #999; font-size: .6rem; border-radius: 3px;
+  cursor: pointer; transition: all .15s;
+}
+.planner-section .add-summer-btn:hover {
+  border-color: var(--teal); color: var(--teal);
+}
+.planner-section .remove-semester-btn {
+  appearance: none; -webkit-appearance: none;
+  position: absolute; top: .2rem; right: .2rem;
+  background: none; border: none; color: rgba(255,255,255,.3);
+  font-size: .8rem; cursor: pointer; line-height: 1; padding: 0 .2rem;
+}
+.planner-section .remove-semester-btn:hover { color: #e74c3c; }
+
+/* Rearrange toggle/save/cancel buttons reuse .rearrange-toggle-btn etc from planner */
+.planner-section .rearrange-toggle-btn {
+  appearance: none; -webkit-appearance: none;
+  background-color: transparent; border: 1px solid rgba(255,255,255,.25);
+  color: #ccc; font-size: .75rem; padding: .4rem .8rem;
+  border-radius: 4px; cursor: pointer;
+  transition: background-color .15s, border-color .15s, color .15s;
+  white-space: nowrap;
+}
+.planner-section .rearrange-toggle-btn:hover { border-color: var(--teal); color: var(--teal); }
+.planner-section .rearrange-toggle-btn.active {
+  background-color: var(--teal); border-color: var(--teal); color: #fff;
+}
+.planner-section .rearrange-controls {
+  display: flex; justify-content: center; gap: .6rem; padding: .4rem 1.5rem;
+}
+.planner-section .rearrange-save-btn, .planner-section .rearrange-cancel-btn {
+  appearance: none; -webkit-appearance: none;
+  font-size: .75rem; padding: .35rem .8rem;
+  border-radius: 4px; cursor: pointer; border: 1px solid;
+  transition: background-color .15s;
+}
+.planner-section .rearrange-save-btn {
+  background-color: var(--teal); border-color: var(--teal); color: #fff;
+}
+.planner-section .rearrange-save-btn:hover { background-color: #007a66; }
+.planner-section .rearrange-cancel-btn {
+  background-color: transparent; border-color: rgba(255,255,255,.2); color: #ccc;
+}
+.planner-section .rearrange-cancel-btn:hover { background-color: rgba(255,255,255,.08); }
+
+/* Overloaded credits */
+.planner-section .credits-overloaded { color: #e74c3c; font-weight: 700; }
+
+/* Legend swatches */
+.swatch-valid   { background: #2ecc71; }
+.swatch-warning { background: #f1c40f; }
+.swatch-error   { background: #e74c3c; }
+
+/* ── Add Course Modal ─────────────────────────────────────── */
+
+.tp-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+}
+.tp-modal {
+  background: var(--brown, #3a2a1a); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px; width: 90%; max-width: 500px;
+  max-height: 80vh; display: flex; flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+}
+.tp-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .75rem 1rem; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.tp-modal-header h3 {
+  color: var(--gold); font-size: 1rem; margin: 0;
+}
+.tp-modal-close {
+  appearance: none; -webkit-appearance: none;
+  background: none; border: none; color: rgba(255,255,255,.4);
+  font-size: 1.2rem; cursor: pointer; line-height: 1;
+}
+.tp-modal-close:hover { color: #fff; }
+.tp-search-input {
+  margin: .75rem 1rem .5rem; padding: .5rem .6rem;
+  background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 5px; color: var(--parchment); font-size: .8rem;
+  outline: none;
+}
+.tp-search-input:focus { border-color: var(--teal); }
+.tp-course-results {
+  overflow-y: auto; flex: 1; padding: 0 1rem .75rem;
+  max-height: 50vh;
+}
+.tp-course-result {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .45rem .5rem; border-radius: 4px; cursor: pointer;
+  transition: background .12s;
+}
+.tp-course-result:hover { background: rgba(255,255,255,.06); }
+.tp-course-result-info {
+  display: flex; flex-direction: column; gap: .1rem;
+}
+.tp-course-result-code {
+  font-weight: 700; font-size: .72rem; color: var(--gold);
+}
+.tp-course-result-title {
+  font-size: .62rem; color: var(--parchment); opacity: .7;
+}
+.tp-course-result-credits {
+  font-size: .6rem; color: var(--light-gray); opacity: .5; white-space: nowrap;
+}
+.tp-result-tag {
+  font-size: .55rem; font-weight: 400; color: var(--teal); opacity: .7;
+  margin-left: .3rem;
+}
+
+/* Custom course entry */
+.tp-custom-course {
+  padding: .5rem 1rem .75rem;
+  border-top: 1px solid rgba(255,255,255,.06);
+  margin-top: .25rem;
+}
+.tp-custom-label {
+  font-size: .7rem; color: var(--light-gray); opacity: .6; margin-bottom: .4rem;
+}
+.tp-custom-fields {
+  display: flex; gap: .35rem; align-items: center; flex-wrap: wrap;
+}
+.tp-custom-input {
+  padding: .35rem .5rem; background: rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 4px;
+  color: var(--parchment); font-size: .72rem; outline: none;
+  width: 100px;
+}
+.tp-custom-input:focus { border-color: var(--teal); }
+.tp-custom-title-input { flex: 1; min-width: 140px; }
+.tp-custom-credits-input { width: 45px; text-align: center; }
+.tp-custom-add-btn { padding: .35rem .6rem !important; font-size: .7rem !important; }
+
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .upload-section { padding: 0 1rem; }

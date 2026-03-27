@@ -6,6 +6,31 @@
     <p class="planner-subtitle">Optimized schedule for your remaining courses</p>
   </div>
 
+  <!-- Toolbar: rearrange, download, add course -->
+  <div id="tp-toolbar" class="tp-toolbar">
+    <button id="tp-rearrange-btn" class="rearrange-toggle-btn" onclick="toggleTranscriptRearrange()">Rearrange Schedule</button>
+    <button id="tp-download-btn" class="rearrange-toggle-btn" onclick="downloadTranscriptPlanExcel()">Download Plan</button>
+    <button id="tp-add-course-btn" class="rearrange-toggle-btn" onclick="openAddCourseModal()">+ Add Course</button>
+  </div>
+
+  <!-- Restrict toggle — shown only when extras (double major/minors/CC) are active -->
+  <div id="tp-extras" class="tp-extras" style="display:none;">
+    <button id="tp-restrict-btn" class="rearrange-toggle-btn" onclick="toggleTPRestrict()">Restrict to Main Program</button>
+  </div>
+
+  <!-- Rearrange controls (save/cancel, shown in rearrange mode) -->
+  <div id="tp-rearrange-controls" class="rearrange-controls" style="display:none;">
+    <button class="rearrange-save-btn" onclick="exitTranscriptRearrange(true)">Save Changes</button>
+    <button class="rearrange-cancel-btn" onclick="exitTranscriptRearrange(false)">Cancel</button>
+  </div>
+
+  <!-- Validation legend (rearrange mode only) -->
+  <div id="tp-validation-legend" class="tp-validation-legend" style="display:none;">
+    <span class="legend-item"><span class="legend-swatch swatch-valid"></span> Prerequisites met</span>
+    <span class="legend-item"><span class="legend-swatch swatch-warning"></span> Offering mismatch</span>
+    <span class="legend-item"><span class="legend-swatch swatch-error"></span> Prerequisites not met</span>
+  </div>
+
   <div id="planner-grid" class="audit-grid"></div>
 
   <div id="planner-overflow" class="planner-overflow" style="display:none;">
@@ -15,4 +40,25 @@
   </div>
 
   <button class="reset-btn" onclick="hidePlanner()">Back to Audit</button>
+</div>
+
+<!-- Add Course modal -->
+<div id="tp-add-course-modal" class="tp-modal-overlay" style="display:none;">
+  <div class="tp-modal">
+    <div class="tp-modal-header">
+      <h3>Add Course to Plan</h3>
+      <button class="tp-modal-close" onclick="closeAddCourseModal()">&times;</button>
+    </div>
+    <input id="tp-course-search" type="text" class="tp-search-input" placeholder="Search by code or title..." oninput="filterAddCourseResults()">
+    <div id="tp-course-results" class="tp-course-results"></div>
+    <div class="tp-custom-course">
+      <div class="tp-custom-label">Or add a custom course:</div>
+      <div class="tp-custom-fields">
+        <input id="tp-custom-code" type="text" class="tp-custom-input" placeholder="Code (e.g. HIST 101)">
+        <input id="tp-custom-title" type="text" class="tp-custom-input tp-custom-title-input" placeholder="Title (e.g. Western Civilization)">
+        <input id="tp-custom-credits" type="number" class="tp-custom-input tp-custom-credits-input" placeholder="Cr" min="0" max="6" value="3">
+        <button class="rearrange-save-btn tp-custom-add-btn" onclick="addCustomCourse()">Add</button>
+      </div>
+    </div>
+  </div>
 </div>
