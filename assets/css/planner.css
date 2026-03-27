@@ -246,6 +246,162 @@
 }
 
 
+/* ── REARRANGE MODE ───────────────────────────────────────── */
+
+/* Toggle button */
+.rearrange-toggle-btn {
+  appearance: none; -webkit-appearance: none;
+  background-color: transparent; border: 1px solid rgba(255,255,255,.25);
+  color: #ccc; font-size: .75rem; padding: .4rem .8rem;
+  border-radius: 4px; cursor: pointer;
+  transition: background-color .15s, border-color .15s, color .15s;
+  white-space: nowrap;
+}
+.rearrange-toggle-btn:hover { border-color: var(--teal); color: var(--teal); }
+.rearrange-toggle-btn.active {
+  background-color: var(--teal); border-color: var(--teal); color: #fff;
+}
+
+/* Rearrange controls bar */
+.rearrange-controls {
+  display: flex; justify-content: center; gap: .6rem;
+  padding: .4rem 1.5rem;
+}
+.rearrange-save-btn, .rearrange-cancel-btn {
+  appearance: none; -webkit-appearance: none;
+  font-size: .75rem; padding: .35rem .8rem;
+  border-radius: 4px; cursor: pointer; border: 1px solid;
+  transition: background-color .15s;
+}
+.rearrange-save-btn {
+  background-color: var(--teal); border-color: var(--teal); color: #fff;
+}
+.rearrange-save-btn:hover { background-color: #007a66; }
+.rearrange-cancel-btn {
+  background-color: transparent; border-color: rgba(255,255,255,.2); color: #ccc;
+}
+.rearrange-cancel-btn:hover { background-color: rgba(255,255,255,.08); }
+
+/* Disabled controls during rearrange */
+.planner-controls .prog-btn.disabled,
+.planner-controls .planner-clear-btn.disabled {
+  opacity: .35; pointer-events: none; cursor: default;
+}
+
+/* ── Validation card states ──────────────────────────────── */
+
+.rearrange-mode .planner-card {
+  border-left-color: transparent !important;
+  cursor: grab;
+  position: relative;
+}
+.rearrange-mode .planner-origin-dot { display: none; }
+
+.planner-card.validation-valid {
+  background: rgba(46, 204, 113, .1);
+  border-left: 4px solid #2ecc71 !important;
+}
+.planner-card.validation-warning {
+  background: rgba(241, 196, 15, .15);
+  border-left: 4px solid #f1c40f !important;
+}
+.planner-card.validation-error {
+  background: rgba(231, 76, 60, .18);
+  border-left: 4px solid #e74c3c !important;
+}
+
+/* Status icon (replaces origin dot) */
+.validation-icon {
+  font-size: .7rem; font-weight: 700; line-height: 1;
+  width: 16px; height: 16px; display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 50%; flex-shrink: 0;
+}
+.validation-icon-valid   { color: #2ecc71; background: rgba(46,204,113,.15); }
+.validation-icon-warning { color: #f1c40f; background: rgba(241,196,15,.15); }
+.validation-icon-error   { color: #e74c3c; background: rgba(231,76,60,.15); }
+
+/* ── Drag and drop feedback ──────────────────────────────── */
+
+.planner-card.dragging {
+  opacity: .3;
+}
+
+.sem-cards.drop-zone-active {
+  min-height: 60px;
+  border: 2px dashed rgba(255,255,255,.12);
+  border-radius: 6px;
+  transition: border-color .15s, background .15s;
+}
+.sem-cards.drop-target {
+  border-color: var(--teal) !important;
+  background: rgba(0,99,84,.1);
+}
+
+/* ── Add semester column ─────────────────────────────────── */
+
+.add-semester-col {
+  display: flex; align-items: stretch; justify-content: center;
+  min-height: 200px;
+}
+.add-semester-inner {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .5rem; padding: 1rem .5rem;
+  border: 2px dashed rgba(255,255,255,.1);
+  border-radius: 8px; width: 100%;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.add-semester-inner:hover { border-color: rgba(255,255,255,.25); }
+.add-semester-icon {
+  font-size: 1.5rem; color: rgba(255,255,255,.3);
+  font-weight: 300; line-height: 1;
+}
+.add-semester-options {
+  display: flex; flex-direction: column; gap: .3rem;
+}
+.add-semester-options button {
+  appearance: none; -webkit-appearance: none;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  color: #bbb; font-size: .68rem; padding: .25rem .5rem;
+  border-radius: 3px; cursor: pointer;
+  transition: background .15s;
+}
+.add-semester-options button:hover {
+  background: rgba(255,255,255,.12); color: #fff;
+}
+
+/* Add summer button on Spring headers */
+.add-summer-btn {
+  appearance: none; -webkit-appearance: none;
+  display: block; margin: .3rem auto 0; padding: .15rem .4rem;
+  background: transparent; border: 1px dashed rgba(255,255,255,.15);
+  color: #999; font-size: .6rem; border-radius: 3px;
+  cursor: pointer; transition: all .15s;
+}
+.add-summer-btn:hover {
+  border-color: var(--teal); color: var(--teal);
+}
+
+/* Remove semester button */
+.remove-semester-btn {
+  appearance: none; -webkit-appearance: none;
+  position: absolute; top: .2rem; right: .2rem;
+  background: none; border: none; color: rgba(255,255,255,.3);
+  font-size: .8rem; cursor: pointer; line-height: 1;
+  padding: 0 .2rem;
+}
+.remove-semester-btn:hover { color: #e74c3c; }
+.sem-header { position: relative; }
+
+/* ── Validation legend swatches ──────────────────────────── */
+
+.swatch-valid   { background: #2ecc71; }
+.swatch-warning { background: #f1c40f; }
+.swatch-error   { background: #e74c3c; }
+
+
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 
 @media (max-width: 700px) {
@@ -257,4 +413,5 @@
   .planner-area { padding: .5rem .5rem; }
   .sem-col { flex: 0 0 150px; }
   .planner-panel-relations { grid-template-columns: 1fr; }
+  .rearrange-controls { padding: .4rem .5rem; }
 }

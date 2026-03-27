@@ -1,5 +1,6 @@
 <!-- Stats banner -->
 <div id="planner-stats" class="planner-stats" style="display:none;">
+  <button class="rearrange-toggle-btn" id="rearrange-toggle-btn" onclick="toggleRearrangeMode()">Rearrange Schedule</button>
   <div class="planner-stat">
     <span class="planner-stat-value" id="planner-total-credits">0</span>
     <span class="planner-stat-label">Total Credits</span>
@@ -20,6 +21,14 @@
 
 <!-- Overload warning -->
 <div id="planner-warning" class="planner-warning" style="display:none;"></div>
+
+<!-- Rearrange controls -->
+<div id="rearrange-controls" class="rearrange-controls" style="display:none;">
+  <div class="rearrange-actions">
+    <button class="rearrange-save-btn" onclick="exitRearrangeMode(true)">Save Changes</button>
+    <button class="rearrange-cancel-btn" onclick="exitRearrangeMode(false)">Cancel</button>
+  </div>
+</div>
 
 <!-- Semester grid -->
 <div id="planner-area" class="planner-area" style="display:none;">
