@@ -25,6 +25,12 @@ permalink: /
     <span class="card-arrow">Run audit &rarr;</span>
   </a>
 
+  <a href="{{ '/planner/' | relative_url }}" class="card-link">
+    <h2>What-If Planner</h2>
+    <p>Explore program combinations without a transcript. Select majors and minors to see a combined 4-year course plan with overlap analysis.</p>
+    <span class="card-arrow">Plan your path &rarr;</span>
+  </a>
+
   <a href="{{ '/scheduler/' | relative_url }}" class="card-link">
     <h2>Course Schedule Optimizer</h2>
     <p>Generate optimized class schedules that minimize student conflicts and balance faculty loads. Upload course data and let the solver find the best arrangement.</p>

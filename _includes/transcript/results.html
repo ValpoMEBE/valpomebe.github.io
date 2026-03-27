@@ -23,11 +23,24 @@
     </div>
   </div>
 
-  <!-- Zoom controls -->
-  <div class="zoom-controls" id="zoom-controls">
-    <button class="zoom-btn" onclick="zoomOut()" title="Zoom out">&minus;</button>
-    <span class="zoom-level" id="zoom-level">100%</span>
-    <button class="zoom-btn" onclick="zoomIn()" title="Zoom in">&plus;</button>
+  <!-- Audit toolbar: critical path (left) + zoom (right) -->
+  <div class="audit-toolbar">
+    <div class="audit-toolbar-left">
+      <button class="cp-toggle-btn" id="critical-path-btn" onclick="toggleCriticalPath()" style="display:none;">Show Critical Path</button>
+    </div>
+    <div class="audit-toolbar-right">
+      <div class="zoom-controls" id="zoom-controls">
+        <button class="zoom-btn" onclick="zoomOut()" title="Zoom out">&minus;</button>
+        <span class="zoom-level" id="zoom-level">100%</span>
+        <button class="zoom-btn" onclick="zoomIn()" title="Zoom in">&plus;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Critical path info banner -->
+  <div id="critical-path-info" class="critical-path-info" style="display:none;">
+    <span id="critical-path-text"></span>
+    <button class="critical-path-close" onclick="clearCriticalPath()">&times;</button>
   </div>
 
   <!-- Semester grid -->
@@ -81,9 +94,23 @@
     <div id="cc-results-container"></div>
   </div>
 
+  <!-- What-If Program Comparison -->
+  <div id="what-if-section" class="what-if-section" style="display:none;">
+    <div class="what-if-header">
+      <h3 id="what-if-title">What If: Program Name</h3>
+      <button class="what-if-close" onclick="closeWhatIf()">&times;</button>
+    </div>
+    <div id="what-if-summary" class="what-if-summary"></div>
+    <div id="what-if-details" class="what-if-details"></div>
+  </div>
+
   <div class="audit-btn-row">
     <button class="plan-btn" id="excel-btn" onclick="downloadAuditExcel()" style="display:none;">Download Audit Summary</button>
     <button class="plan-btn" id="plan-btn" onclick="showPlanner()" style="display:none;">Plan Remaining Semesters</button>
+  </div>
+  <div class="audit-btn-row">
+    <button class="plan-btn" id="what-if-btn" onclick="toggleWhatIfPicker()" style="display:none;">What If I Switched To&hellip;</button>
+    <div id="what-if-picker" class="what-if-picker" style="display:none;"></div>
   </div>
   <div class="audit-btn-row">
     <button class="reset-btn" id="csv-btn" onclick="downloadCSV()" style="display:none;">Download Anonymized CSV</button>

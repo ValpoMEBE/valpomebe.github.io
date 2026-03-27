@@ -1,0 +1,36 @@
+<div class="planner-controls">
+  <div class="planner-control-row">
+    <span class="planner-label">Primary Program:</span>
+    <div class="planner-prog-btns" id="primary-prog-btns">
+      <button class="prog-btn" onclick="selectPrimaryProgram('ME', this)">Mechanical Engineering</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('BE_Biomech', this)">BE – Biomechanical</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('BE_Bioelec', this)">BE – Bioelectrical</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('BE_Biomed', this)">BE – Biomedical</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('CE', this)">Civil Engineering</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('CPE', this)">Computer Engineering</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('EE', this)">Electrical Engineering</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('ENE', this)">Environmental Engineering</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('Physics_BS', this)">Physics B.S.</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('Math_BS', this)">Mathematics B.S.</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('CS_BS', this)">Computer Science B.S.</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('Chemistry_BS', this)">Chemistry B.S.</button>
+      <button class="prog-btn" onclick="selectPrimaryProgram('Music_BA', this)">Music B.A.</button>
+    </div>
+  </div>
+
+  <div class="planner-control-row" id="secondary-row" style="display:none;">
+    <span class="planner-label">Double Major <span class="planner-hint">(optional)</span>:</span>
+    <div class="planner-prog-btns" id="secondary-prog-btns"></div>
+    <button class="planner-clear-btn" id="clear-secondary-btn" onclick="clearSecondaryProgram()" style="display:none;">Clear</button>
+  </div>
+
+  <div class="planner-control-row" id="minor-row" style="display:none;">
+    <span class="planner-label">Minors <span class="planner-hint">(optional)</span>:</span>
+    <div class="planner-minor-btns" id="minor-btns"></div>
+  </div>
+
+  <div class="planner-control-row" id="cc-row" style="display:none;">
+    <span class="planner-label">Christ College:</span>
+    <button class="prog-btn" id="cc-toggle-btn" onclick="toggleCC()">Christ College Scholar</button>
+  </div>
+</div>

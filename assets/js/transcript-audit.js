@@ -20,6 +20,12 @@ let AUDIT_STATE = {
   secondaryView: 'status', // 'status' | 'category' | 'timeline'
   ccEnabled: false, // Christ College Scholar tracking
   studentName: null, // extracted from transcript PDF
+  // Critical path
+  criticalPathActive: false,
+  criticalPathData: null,
+  // What-If switcher
+  whatIfProgram: null,
+  whatIfAuditResult: null,
 };
 
 // All available programs for double major selection
@@ -1095,6 +1101,33 @@ function renderAudit(auditResult, unmatched, summary) {
     planBtn.style.display = summary.creditsRemaining > 0 ? '' : 'none';
   }
 
+  // Show "Critical Path" button if there are remaining credits
+  const cpBtn = document.getElementById('critical-path-btn');
+  if (cpBtn) {
+    cpBtn.style.display = summary.creditsRemaining > 0 ? '' : 'none';
+  }
+
+  // Show "What If" button after audit runs
+  const wiBtn = document.getElementById('what-if-btn');
+  if (wiBtn) {
+    wiBtn.style.display = '';
+  }
+
+  // Reset critical path state on re-render
+  AUDIT_STATE.criticalPathActive = false;
+  AUDIT_STATE.criticalPathData = null;
+  if (cpBtn) cpBtn.textContent = 'Show Critical Path';
+  const cpInfo = document.getElementById('critical-path-info');
+  if (cpInfo) cpInfo.style.display = 'none';
+
+  // Reset what-if state on re-render
+  AUDIT_STATE.whatIfProgram = null;
+  AUDIT_STATE.whatIfAuditResult = null;
+  const wiSection = document.getElementById('what-if-section');
+  if (wiSection) wiSection.style.display = 'none';
+  const wiPicker = document.getElementById('what-if-picker');
+  if (wiPicker) wiPicker.style.display = 'none';
+
   // Show "Download CSV" button
   const csvBtn = document.getElementById('csv-btn');
   if (csvBtn) {
@@ -1736,6 +1769,19 @@ function applyZoom() {
   if (secArea) secArea.style.zoom = zoomLevel;
   const label = document.getElementById('zoom-level');
   if (label) label.textContent = Math.round((zoomLevel / 1.3) * 100) + '%';
+  // Redraw arrows after zoom change
+  if (auditSelected) {
+    requestAnimationFrame(() => {
+      drawAuditArrows();
+      const course = COURSES[auditSelected];
+      if (course) {
+        const prereqs = new Set(course.prereqs || []);
+        const coreqs  = new Set(course.coreqs  || []);
+        const unlocks = new Set((UNLOCKS[auditSelected] || []).filter(x => COURSES[x] && COURSES[x].semesters && COURSES[x].semesters[AUDIT_STATE.program]));
+        highlightAuditArrows(auditSelected, prereqs, coreqs, unlocks);
+      }
+    });
+  }
 }
 
 function zoomIn() {
@@ -2473,3 +2519,353 @@ document.addEventListener('keydown', ev => {
 
 // ── Init zoom on load ──────────────────────────────────────────
 applyZoom();
+
+// ── Redraw arrows on scroll/resize so they stay aligned ────────
+function redrawArrowsIfNeeded() {
+  if (!auditSelected) return;
+  drawAuditArrows();
+  const course = COURSES[auditSelected];
+  if (course) {
+    const prereqs = new Set(course.prereqs || []);
+    const coreqs  = new Set(course.coreqs  || []);
+    const unlocks = new Set((UNLOCKS[auditSelected] || []).filter(x => COURSES[x] && COURSES[x].semesters && COURSES[x].semesters[AUDIT_STATE.program]));
+    highlightAuditArrows(auditSelected, prereqs, coreqs, unlocks);
+  }
+}
+document.getElementById('audit-area')?.addEventListener('scroll', redrawArrowsIfNeeded);
+window.addEventListener('resize', () => requestAnimationFrame(redrawArrowsIfNeeded));
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  CRITICAL PATH TOGGLE                                       ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+function toggleCriticalPath() {
+  if (AUDIT_STATE.criticalPathActive) {
+    clearCriticalPath();
+    return;
+  }
+
+  if (!AUDIT_STATE.lastAuditResult || !AUDIT_STATE.lastMatched) return;
+
+  const remaining = getRemainingCourses(AUDIT_STATE.lastAuditResult, AUDIT_STATE.program);
+  if (!remaining.length) return;
+
+  const startSem = detectNextSemester(AUDIT_STATE.lastMatched);
+  const cpData = computeCriticalPath(remaining, startSem);
+  if (!cpData || !cpData.chain.length) return;
+
+  AUDIT_STATE.criticalPathActive = true;
+  AUDIT_STATE.criticalPathData = cpData;
+
+  // Update button
+  const btn = document.getElementById('critical-path-btn');
+  if (btn) {
+    btn.textContent = 'Hide Critical Path';
+    btn.classList.add('active');
+  }
+
+  // Show info banner
+  const info = document.getElementById('critical-path-info');
+  const text = document.getElementById('critical-path-text');
+  if (info && text) {
+    const chainLen = cpData.chain.length;
+    const semSpan = cpData.pathSemesters;
+    const { year, season } = getSemLabel(cpData.endSemester);
+    // Build clear chain description
+    const chainCodes = cpData.chain.map(id => {
+      const c = COURSES[id];
+      return c ? c.code : id;
+    });
+    text.innerHTML =
+      '<strong>Critical Path:</strong> ' +
+      chainCodes.join(' &rarr; ') +
+      ' &middot; ' + semSpan + ' semester' + (semSpan > 1 ? 's' : '') + ' remaining' +
+      ' &middot; Finishes ' + season + ', ' + year;
+    info.style.display = '';
+  }
+
+  // Highlight cards on the critical path
+  const chainSet = new Set(cpData.chain);
+  const cards = document.querySelectorAll('#audit-grid .audit-card');
+  for (const card of cards) {
+    const id = card.dataset.id;
+    if (!id) continue;
+    if (chainSet.has(id)) {
+      card.classList.add('on-critical-path');
+      // Add chain position badge
+      const pos = cpData.chain.indexOf(id) + 1;
+      const badge = document.createElement('span');
+      badge.className = 'critical-path-badge';
+      badge.textContent = pos;
+      card.appendChild(badge);
+    } else if (card.classList.contains('status-remaining')) {
+      card.classList.add('critical-path-dimmed');
+    }
+  }
+
+  // Redraw arrows if a course is selected (layout may have shifted)
+  if (auditSelected) {
+    drawAuditArrows();
+    const course = COURSES[auditSelected];
+    if (course) {
+      const prereqs = new Set(course.prereqs || []);
+      const coreqs  = new Set(course.coreqs  || []);
+      const unlocks = new Set((UNLOCKS[auditSelected] || []).filter(x => COURSES[x] && COURSES[x].semesters && COURSES[x].semesters[AUDIT_STATE.program]));
+      highlightAuditArrows(auditSelected, prereqs, coreqs, unlocks);
+    }
+  }
+}
+
+function clearCriticalPath() {
+  AUDIT_STATE.criticalPathActive = false;
+  AUDIT_STATE.criticalPathData = null;
+
+  const btn = document.getElementById('critical-path-btn');
+  if (btn) {
+    btn.textContent = 'Show Critical Path';
+    btn.classList.remove('active');
+  }
+
+  const info = document.getElementById('critical-path-info');
+  if (info) info.style.display = 'none';
+
+  // Remove critical path classes and badges
+  const cards = document.querySelectorAll('#audit-grid .audit-card');
+  for (const card of cards) {
+    card.classList.remove('on-critical-path', 'critical-path-dimmed');
+    const badge = card.querySelector('.critical-path-badge');
+    if (badge) badge.remove();
+  }
+
+  // Redraw arrows if a course is selected (layout may have shifted)
+  if (auditSelected) {
+    drawAuditArrows();
+    const course = COURSES[auditSelected];
+    if (course) {
+      const prereqs = new Set(course.prereqs || []);
+      const coreqs  = new Set(course.coreqs  || []);
+      const unlocks = new Set((UNLOCKS[auditSelected] || []).filter(x => COURSES[x] && COURSES[x].semesters && COURSES[x].semesters[AUDIT_STATE.program]));
+      highlightAuditArrows(auditSelected, prereqs, coreqs, unlocks);
+    }
+  }
+}
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  WHAT-IF PROGRAM SWITCHER                                   ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+function toggleWhatIfPicker() {
+  const picker = document.getElementById('what-if-picker');
+  if (!picker) return;
+
+  if (picker.style.display === 'none' || !picker.style.display) {
+    // Populate buttons
+    picker.innerHTML = '';
+    for (const [key, label] of Object.entries(ALL_PROGRAMS)) {
+      if (key === AUDIT_STATE.program) continue;
+      if (key === AUDIT_STATE.secondaryProgram) continue;
+      const btn = document.createElement('button');
+      btn.className = 'what-if-prog-btn';
+      btn.textContent = label;
+      btn.addEventListener('click', () => showWhatIfComparison(key));
+      picker.appendChild(btn);
+    }
+    picker.style.display = '';
+  } else {
+    picker.style.display = 'none';
+  }
+}
+
+function showWhatIfComparison(whatIfProg) {
+  // Hide picker
+  const picker = document.getElementById('what-if-picker');
+  if (picker) picker.style.display = 'none';
+
+  if (!AUDIT_STATE.lastMatched || !AUDIT_STATE.lastAuditResult) return;
+
+  const matched = AUDIT_STATE.lastMatched;
+  const unmatched = AUDIT_STATE.lastUnmatched;
+  const codeIndex = AUDIT_STATE.lastCodeIndex;
+
+  // Load what-if program curriculum
+  if (typeof applyCurriculum === 'function') {
+    applyCurriculum(whatIfProg, AUDIT_STATE.catalogYear);
+  }
+
+  // Run audit against what-if program
+  const whatIfAudit = computeAudit(matched, whatIfProg, codeIndex, unmatched);
+  const whatIfSummary = computeSummary(whatIfAudit, matched);
+
+  // Restore primary curriculum
+  if (typeof applyCurriculum === 'function') {
+    applyCurriculum(AUDIT_STATE.program, AUDIT_STATE.catalogYear);
+  }
+
+  AUDIT_STATE.whatIfProgram = whatIfProg;
+  AUDIT_STATE.whatIfAuditResult = whatIfAudit;
+
+  // Compute diff
+  const primaryAudit = AUDIT_STATE.lastAuditResult.audit;
+  const wiAudit = whatIfAudit.audit;
+
+  // Primary course IDs
+  const primaryIds = new Set(primaryAudit.map(c => c.id));
+  const wiIds = new Set(wiAudit.map(c => c.id));
+
+  // Courses that transfer: completed/transfer/ip in what-if
+  const transferring = wiAudit.filter(c =>
+    (c.status === 'completed' || c.status === 'transfer' || c.status === 'no-grade')
+  );
+
+  // Newly required: remaining in what-if AND not in primary program at all
+  const newlyRequired = wiAudit.filter(c =>
+    c.status === 'remaining' && !primaryIds.has(c.id)
+  );
+
+  // No longer needed: remaining in primary AND not in what-if program at all
+  const noLongerNeeded = primaryAudit.filter(c =>
+    c.status === 'remaining' && !wiIds.has(c.id)
+  );
+
+  // Primary summary for comparison
+  const primarySummary = computeSummary(AUDIT_STATE.lastAuditResult, matched);
+
+  renderWhatIfComparison(whatIfProg, whatIfSummary, primarySummary, transferring, newlyRequired, noLongerNeeded, whatIfAudit);
+}
+
+function renderWhatIfComparison(whatIfProg, wiSummary, primarySummary, transferring, newlyRequired, noLongerNeeded, whatIfAudit) {
+  const section = document.getElementById('what-if-section');
+  if (!section) return;
+  section.style.display = '';
+
+  // Title
+  const title = document.getElementById('what-if-title');
+  if (title) title.textContent = 'What If: ' + (ALL_PROGRAMS[whatIfProg] || whatIfProg);
+
+  // Summary comparison
+  const summaryEl = document.getElementById('what-if-summary');
+  summaryEl.innerHTML =
+    '<div class="what-if-stat-row">' +
+      '<div class="what-if-stat">' +
+        '<span class="what-if-stat-label">Credits Left (Current)</span>' +
+        '<span class="what-if-stat-value">' + primarySummary.creditsRemaining + '</span>' +
+      '</div>' +
+      '<div class="what-if-stat-arrow">&rarr;</div>' +
+      '<div class="what-if-stat">' +
+        '<span class="what-if-stat-label">Credits Left (What-If)</span>' +
+        '<span class="what-if-stat-value">' + wiSummary.creditsRemaining + '</span>' +
+      '</div>' +
+      '<div class="what-if-stat">' +
+        '<span class="what-if-stat-label">Progress (What-If)</span>' +
+        '<span class="what-if-stat-value">' + wiSummary.pct + '%</span>' +
+      '</div>' +
+    '</div>';
+
+  // Details: three lists
+  const details = document.getElementById('what-if-details');
+  details.innerHTML = '';
+
+  // Transferring courses
+  if (transferring.length) {
+    const group = document.createElement('div');
+    group.className = 'what-if-group what-if-transfers';
+    group.innerHTML = '<h4>Courses That Transfer (' + transferring.length + ')</h4>';
+    const list = document.createElement('div');
+    list.className = 'what-if-course-list';
+    for (const c of transferring) {
+      list.appendChild(createWhatIfCourseItem(c, 'transfer'));
+    }
+    group.appendChild(list);
+    details.appendChild(group);
+  }
+
+  // Newly required
+  if (newlyRequired.length) {
+    const group = document.createElement('div');
+    group.className = 'what-if-group what-if-new';
+    group.innerHTML = '<h4>New Courses Needed (' + newlyRequired.length + ')</h4>';
+    const list = document.createElement('div');
+    list.className = 'what-if-course-list';
+    for (const c of newlyRequired) {
+      list.appendChild(createWhatIfCourseItem(c, 'new'));
+    }
+    group.appendChild(list);
+    details.appendChild(group);
+  }
+
+  // No longer needed
+  if (noLongerNeeded.length) {
+    const group = document.createElement('div');
+    group.className = 'what-if-group what-if-dropped';
+    group.innerHTML = '<h4>No Longer Needed (' + noLongerNeeded.length + ')</h4>';
+    const list = document.createElement('div');
+    list.className = 'what-if-course-list';
+    for (const c of noLongerNeeded) {
+      list.appendChild(createWhatIfCourseItem(c, 'dropped'));
+    }
+    group.appendChild(list);
+    details.appendChild(group);
+  }
+
+  // Also show grouped elective status for what-if with courses listed
+  const wiGroupCards = whatIfAudit.groupCards;
+  if (wiGroupCards && wiGroupCards.length) {
+    const group = document.createElement('div');
+    group.className = 'what-if-group what-if-electives';
+    group.innerHTML = '<h4>Elective Groups (What-If)</h4>';
+    const list = document.createElement('div');
+    list.className = 'what-if-course-list';
+    for (const gc of wiGroupCards) {
+      const statusClass = gc.groupStatus === 'filled' ? 'transfer' : gc.groupStatus === 'partial' ? 'new' : 'dropped';
+      const item = document.createElement('div');
+      item.className = 'what-if-elective-group-item';
+
+      // Group header row
+      item.innerHTML =
+        '<div class="what-if-course-item what-if-elective-header">' +
+          '<span class="what-if-dot dot-' + statusClass + '"></span>' +
+          '<span class="what-if-code">' + gc.label + '</span>' +
+          '<span class="what-if-credits">' + gc.creditsFilled + '/' + gc.totalCredits + ' cr</span>' +
+        '</div>';
+
+      // List filled courses within the group
+      if (gc.filledCourses && gc.filledCourses.length) {
+        const sublist = document.createElement('div');
+        sublist.className = 'what-if-elective-sublist';
+        for (const fc of gc.filledCourses) {
+          if (!fc.grade && !fc.code) continue;
+          const gradeStr = fc.grade ? ' (' + fc.grade + ')' : ' (IP)';
+          const sub = document.createElement('div');
+          sub.className = 'what-if-elective-sub-item';
+          sub.textContent = fc.code + gradeStr + ' — ' + fc.credits + ' cr';
+          sublist.appendChild(sub);
+        }
+        item.appendChild(sublist);
+      }
+
+      list.appendChild(item);
+    }
+    group.appendChild(list);
+    details.appendChild(group);
+  }
+
+  section.scrollIntoView({ behavior: 'smooth' });
+}
+
+function createWhatIfCourseItem(course, type) {
+  const item = document.createElement('div');
+  item.className = 'what-if-course-item';
+  item.innerHTML =
+    '<span class="what-if-dot dot-' + type + '"></span>' +
+    '<span class="what-if-code">' + course.code + '</span>' +
+    '<span class="what-if-title-text">' + course.title + '</span>' +
+    '<span class="what-if-credits">' + (course.credits || '?') + ' cr</span>';
+  return item;
+}
+
+function closeWhatIf() {
+  AUDIT_STATE.whatIfProgram = null;
+  AUDIT_STATE.whatIfAuditResult = null;
+  const section = document.getElementById('what-if-section');
+  if (section) section.style.display = 'none';
+}

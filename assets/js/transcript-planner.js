@@ -3,9 +3,13 @@
    ║  Optimizes remaining courses into future semesters,         ║
    ║  respecting prereqs, coreqs, offering semesters, and        ║
    ║  an 18-credit cap.                                          ║
+   ║                                                              ║
+   ║  Requires: scheduling-utils.js (loaded before this file)    ║
+   ║    Provides: MAX_CREDITS_PER_SEM, computeDescendants,       ║
+   ║    buildCoreqClusters, isOfferedIn, getSemLabel,             ║
+   ║    computeCriticalPath                                       ║
    ╚══════════════════════════════════════════════════════════════╝ */
 
-const MAX_CREDITS_PER_SEM = 18;
 const MAX_SEMESTERS = 16; // allow up to 8 years (16 semesters) for scheduling
 
 // Placeholder tier classification for smart scheduling
@@ -104,96 +108,6 @@ function getRemainingCourses(auditResult, program) {
   }
 
   return remaining;
-}
-
-// ── Count downstream dependents (critical-path priority) ─────
-function computeDescendants(courses) {
-  const idSet = new Set(courses.map(c => c.id));
-  const children = {};
-
-  for (const c of courses) {
-    for (const entry of c.prereqs) {
-      // Prereqs can be strings (AND) or arrays (OR groups)
-      const pIds = Array.isArray(entry) ? entry : [entry];
-      for (const p of pIds) {
-        if (idSet.has(p)) {
-          if (!children[p]) children[p] = [];
-          children[p].push(c.id);
-        }
-      }
-    }
-  }
-
-  const cache = {};
-  function count(id) {
-    if (cache[id] !== undefined) return cache[id];
-    const kids = children[id] || [];
-    let total = kids.length;
-    for (const kid of kids) {
-      total += count(kid);
-    }
-    cache[id] = total;
-    return total;
-  }
-
-  const result = {};
-  for (const c of courses) {
-    result[c.id] = count(c.id);
-  }
-  return result;
-}
-
-// ── Group corequisites into clusters ─────────────────────────
-function buildCoreqClusters(courses) {
-  const idToCourse = {};
-  for (const c of courses) idToCourse[c.id] = c;
-
-  const visited = new Set();
-  const clusters = [];
-
-  for (const c of courses) {
-    if (visited.has(c.id)) continue;
-
-    // Gather all courses connected by coreqs
-    const cluster = [];
-    const queue = [c.id];
-    while (queue.length) {
-      const id = queue.shift();
-      if (visited.has(id)) continue;
-      visited.add(id);
-      const course = idToCourse[id];
-      if (!course) continue;
-      cluster.push(course);
-      for (const coId of course.coreqs) {
-        if (idToCourse[coId] && !visited.has(coId)) {
-          queue.push(coId);
-        }
-      }
-    }
-    clusters.push(cluster);
-  }
-
-  return clusters;
-}
-
-// ── Check if a course can be offered in a given season ───────
-function isOfferedIn(course, season) {
-  if (!course.offered) return true; // no restriction
-  if (course.offered === 'Both') return true;
-  return course.offered === season;
-}
-
-// ── Get year label for a semester number ─────────────────────
-function getSemLabel(sem) {
-  const semInfo = SEMESTERS.find(s => s.s === sem);
-  if (semInfo) return { year: semInfo.year, season: semInfo.season };
-  // Beyond semester 8: generate labels
-  const season = sem % 2 === 1 ? 'Fall' : 'Spring';
-  const yearNum = Math.ceil(sem / 2);
-  const yearLabels = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
-  const year = yearNum <= 4 ? yearLabels[yearNum - 1] + ' Year'
-                            : 'Year ' + yearNum;
-  return { year, season };
 }
 
 // ── Main scheduling algorithm ────────────────────────────────

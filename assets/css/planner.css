@@ -1,0 +1,260 @@
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  WHAT-IF PLANNER — Component Styles                          ║
+   ║  Used only on /planner/ (loaded via extra_css)                ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+/* ── CONTROLS ─────────────────────────────────────────────── */
+
+.planner-controls {
+  padding: .75rem 1.5rem;
+}
+.planner-control-row {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: .4rem; margin-bottom: .6rem;
+}
+.planner-label {
+  font-size: .8rem; font-weight: 600; color: var(--light-gray);
+  min-width: 140px; white-space: nowrap;
+}
+.planner-hint {
+  font-weight: 400; font-size: .7rem; color: #999;
+}
+.planner-prog-btns, .planner-minor-btns {
+  display: flex; flex-wrap: wrap; gap: .35rem;
+}
+.prog-btn {
+  appearance: none; -webkit-appearance: none;
+  background-color: transparent; border: 1px solid rgba(255,255,255,.2);
+  color: #ccc; font-size: .75rem; padding: .3rem .7rem;
+  border-radius: 4px; cursor: pointer;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.prog-btn:hover  { border-color: var(--gold); color: var(--gold); }
+.prog-btn.active { background-color: var(--gold); border-color: var(--gold); color: var(--dark-brown); }
+.planner-clear-btn {
+  background: none; border: 1px solid rgba(255,255,255,.15);
+  color: #ccc; font-size: .7rem; padding: .25rem .6rem;
+  border-radius: 4px; cursor: pointer; transition: background .15s;
+}
+.planner-clear-btn:hover { background: rgba(255,255,255,.08); }
+
+
+/* ── STATS BANNER ─────────────────────────────────────────── */
+
+.planner-stats {
+  display: flex; justify-content: center; gap: 1rem;
+  padding: .5rem 1.5rem; flex-wrap: wrap;
+}
+.planner-stat {
+  display: flex; flex-direction: column; align-items: center;
+  background: rgba(255,255,255,.05); border-radius: 6px;
+  padding: .5rem .8rem; min-width: 90px;
+}
+.planner-stat-value {
+  font-size: 1.3rem; font-weight: 700; color: #fff;
+}
+.planner-stat-label {
+  font-size: .65rem; color: var(--light-gray);
+  text-transform: uppercase; letter-spacing: .03em;
+}
+
+.planner-warning {
+  background: rgba(245,184,10,.15); border: 1px solid var(--gold);
+  border-radius: 6px; padding: .5rem 1rem; margin: .5rem 1.5rem;
+  font-size: .8rem; color: var(--gold);
+}
+
+
+/* ── LEGEND ───────────────────────────────────────────────── */
+
+.planner-legend {
+  display: flex; justify-content: center; gap: 1.2rem;
+  padding: .4rem 1.5rem; flex-wrap: wrap;
+}
+.legend-item {
+  display: flex; align-items: center; gap: .3rem;
+  font-size: .72rem; color: var(--light-gray);
+}
+.legend-swatch {
+  width: 12px; height: 12px; border-radius: 3px;
+}
+.swatch-shared    { background: var(--teal); }
+.swatch-primary   { background: var(--gold); }
+.swatch-secondary { background: #6b8fc4; }
+.swatch-minor     { background: #a67fc4; }
+.swatch-cc        { background: #c4a64f; }
+
+
+/* ── GRID ─────────────────────────────────────────────────── */
+
+.planner-area {
+  padding: .5rem 1.5rem;
+  overflow-x: auto;
+}
+.planner-grid {
+  display: flex; gap: 6px;
+  min-width: max-content;
+}
+
+.sem-col {
+  flex: 0 0 175px;
+}
+.sem-header {
+  text-align: center; padding: .4rem .25rem; margin-bottom: .4rem;
+  border-bottom: 2px solid var(--gold);
+}
+.sem-year {
+  font-size: .7rem; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--light-gray);
+}
+.sem-name {
+  font-size: .78rem; color: #fff; font-weight: 600;
+}
+.credits-overloaded {
+  color: #e74c3c; font-weight: 700;
+}
+
+.sem-cards {
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+
+/* ── COURSE CARDS ─────────────────────────────────────────── */
+
+.planner-card {
+  background: rgba(255,255,255,.06);
+  border: 1.5px solid rgba(255,255,255,.1);
+  border-left: 3px solid rgba(255,255,255,.2);
+  border-radius: 5px; padding: .35rem .45rem;
+  transition: border-color .15s, background .15s;
+}
+.planner-card:hover {
+  background: rgba(255,255,255,.1);
+  border-color: rgba(255,255,255,.25);
+}
+.planner-card.selected {
+  border-color: var(--teal);
+  background: rgba(0,99,84,.15);
+}
+
+/* Origin accents */
+.planner-card.origin-shared {
+  border-left-color: var(--teal);
+}
+.planner-card.origin-primary {
+  border-left-color: var(--gold);
+}
+.planner-card.origin-secondary {
+  border-left-color: #6b8fc4;
+}
+.planner-card.origin-minor {
+  border-left-color: #a67fc4;
+}
+.planner-card.origin-cc {
+  border-left-color: #c4a64f;
+}
+
+.planner-card-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.planner-code {
+  font-size: .72rem; font-weight: 700; color: #fff;
+}
+.planner-origin-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+.origin-dot-shared    { background: var(--teal); }
+.origin-dot-primary   { background: var(--gold); }
+.origin-dot-secondary { background: #6b8fc4; }
+.origin-dot-minor     { background: #a67fc4; }
+.origin-dot-cc        { background: #c4a64f; }
+
+.planner-title {
+  font-size: .65rem; color: #bbb; margin: .15rem 0;
+  line-height: 1.25;
+}
+.planner-card-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.planner-credits {
+  font-size: .65rem; color: #999;
+}
+
+
+/* ── OVERFLOW ─────────────────────────────────────────────── */
+
+.planner-overflow {
+  margin: .5rem 1.5rem; padding: .75rem;
+  background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.3);
+  border-radius: 6px;
+}
+.planner-overflow h4 {
+  margin: 0 0 .5rem; font-size: .85rem; color: #e74c3c;
+}
+.planner-overflow-list {
+  display: flex; flex-wrap: wrap; gap: .4rem;
+}
+
+
+/* ── DETAIL PANEL ─────────────────────────────────────────── */
+
+.planner-detail-panel {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #1a1a2e; border-top: 2px solid var(--gold);
+  padding: 1rem 1.5rem; z-index: 100;
+  transform: translateY(100%);
+  transition: transform .25s ease;
+  max-height: 45vh; overflow-y: auto;
+}
+.planner-detail-panel.open {
+  transform: translateY(0);
+}
+#planner-panel-close {
+  position: absolute; top: .5rem; right: .75rem;
+  background: none; border: none; color: var(--light-gray);
+  font-size: 1.2rem; cursor: pointer; opacity: .6;
+  transition: opacity .15s;
+}
+#planner-panel-close:hover { opacity: 1; }
+
+.planner-panel-code {
+  font-size: 1rem; font-weight: 700; color: var(--gold);
+}
+.planner-panel-title {
+  font-size: .9rem; color: #fff; margin: .15rem 0 .4rem;
+}
+.planner-panel-meta {
+  display: flex; gap: 1rem; font-size: .78rem; color: var(--light-gray);
+  margin-bottom: .5rem;
+}
+.planner-panel-desc {
+  font-size: .78rem; color: #bbb; line-height: 1.5;
+  margin-bottom: .75rem;
+}
+.planner-panel-relations {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+}
+.planner-rel-group h5 {
+  margin: 0 0 .3rem; font-size: .72rem; color: var(--light-gray);
+}
+.rel-chip {
+  display: inline-block; background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 4px;
+  padding: .15rem .4rem; font-size: .7rem; color: #ddd;
+  margin: .1rem .2rem .1rem 0;
+}
+
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+
+@media (max-width: 700px) {
+  .planner-controls { padding: .5rem .75rem; }
+  .planner-label { min-width: unset; width: 100%; }
+  .planner-stats { gap: .5rem; }
+  .planner-stat { min-width: 70px; padding: .4rem .5rem; }
+  .planner-stat-value { font-size: 1rem; }
+  .planner-area { padding: .5rem .5rem; }
+  .sem-col { flex: 0 0 150px; }
+  .planner-panel-relations { grid-template-columns: 1fr; }
+}

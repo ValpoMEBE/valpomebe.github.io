@@ -1,0 +1,119 @@
+# Christ College courses
+# Source: Undergraduate Catalog 2025-2026, p.379-380
+
+- id: CC_110A
+  code: CC 110A
+  title: "Texts and Contexts I: First Half Fall"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: [CC_110B, CC_110L]
+  desc: "Human Thought. First half of the fall Christ College first-year seminar."
+
+- id: CC_110B
+  code: CC 110B
+  title: "Texts and Contexts I: Second Half Fall"
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: [CC_110A, CC_110L]
+  desc: "Human Thought. Second half of the fall Christ College first-year seminar."
+
+- id: CC_110L
+  code: CC 110L
+  title: Drama Lab Fall Semester
+  credits: 1
+  tags: []
+  prereqs: []
+  coreqs: [CC_110A, CC_110B]
+  desc: "Drama lab accompanying the fall Christ College first-year seminar."
+
+- id: CC_115A
+  code: CC 115A
+  title: "Texts and Contexts II: First Half Spring"
+  credits: 3
+  tags: []
+  prereqs: [CC_110A]
+  coreqs: [CC_115B, CC_115L]
+  desc: "Spring Christ College first-year seminar, first half."
+
+- id: CC_115B
+  code: CC 115B
+  title: "Texts and Contexts II: Second Half Spring"
+  credits: 3
+  tags: []
+  prereqs: [CC_110A]
+  coreqs: [CC_115A, CC_115L]
+  desc: "Spring Christ College first-year seminar, second half."
+
+- id: CC_115L
+  code: CC 115L
+  title: Debate Lab Spring Semester
+  credits: 1
+  tags: []
+  prereqs: [CC_110L]
+  coreqs: [CC_115A, CC_115B]
+  desc: "Debate lab accompanying the spring Christ College first-year seminar."
+
+- id: CC_205
+  code: CC 205
+  title: Word and Image
+  credits: 3
+  tags: []
+  prereqs: [CC_115A]
+  coreqs: []
+  desc: "Christ College seminar exploring the relationship between word and image."
+
+- id: CC_215
+  code: CC 215
+  title: The Christian Tradition
+  credits: 3
+  tags: []
+  prereqs: [CC_115A]
+  coreqs: []
+  desc: "Christ College seminar on the Christian tradition."
+
+- id: CC_255
+  code: CC 255
+  title: "Interpretation: Self, Culture, & Society"
+  credits: 3
+  tags: []
+  prereqs: [CC_115A]
+  coreqs: []
+  desc: "Christ College seminar on interpretation of self, culture, and society."
+
+- id: CC_300
+  code: CC 300
+  title: Seminar
+  credits: 3
+  tags: []
+  prereqs: [CC_115A]
+  coreqs: []
+  desc: "Christ College seminar. May be repeated."
+
+- id: CC_325
+  code: CC 325
+  title: Seminar
+  credits: 3
+  tags: []
+  prereqs: [CC_115A]
+  coreqs: []
+  desc: "Christ College seminar. May be repeated."
+
+- id: CC_455
+  code: CC 455
+  title: Inquiry in the Liberal Arts
+  credits: 3
+  tags: []
+  prereqs: [CC_115A]
+  coreqs: []
+  desc: "Christ College seminar on inquiry in the liberal arts."
+
+- id: CC_499
+  code: CC 499
+  title: Senior Colloquium
+  credits: 1
+  tags: []
+  prereqs: [CC_215]
+  coreqs: []
+  desc: "Christ College senior colloquium."
