@@ -621,7 +621,7 @@ function populateMinorButtons() {
 
 function toggleMinorPicker() {
   const picker = document.getElementById('minor-picker');
-  const arrow = document.querySelector('.minor-toggle-arrow');
+  const arrow = document.getElementById('minor-arrow');
   if (!picker) return;
   const visible = picker.style.display !== 'none';
   picker.style.display = visible ? 'none' : '';
@@ -649,9 +649,8 @@ function updateMinorTags() {
     const minor = MINORS_DATA[key];
     if (!minor) continue;
     const tag = document.createElement('span');
-    tag.className = 'minor-tag';
-    tag.innerHTML = minor.name +
-      ' <button class="minor-tag-remove" onclick="removeMinor(\'' + key + '\')">&times;</button>';
+    tag.className = 'selected-tag';
+    tag.textContent = minor.name;
     container.appendChild(tag);
   }
 }
@@ -869,7 +868,7 @@ function toggleCC() {
   const indicator = document.getElementById('cc-toggle-indicator');
   if (indicator) indicator.textContent = AUDIT_STATE.ccEnabled ? 'Enabled' : '';
   // Style the toggle button
-  const btn = indicator && indicator.closest('.minor-toggle');
+  const btn = indicator && indicator.closest('.optional-selector-toggle');
   if (btn) btn.classList.toggle('cc-active', AUDIT_STATE.ccEnabled);
   rerunCC();
 }

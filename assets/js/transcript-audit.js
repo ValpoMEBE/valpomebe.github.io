@@ -1810,18 +1810,9 @@ function populateDoubleMajorButtons() {
     const btn = document.createElement('button');
     btn.className = 'prog-btn' + (AUDIT_STATE.secondaryProgram === key ? ' active' : '');
     btn.textContent = label;
-    btn.onclick = () => selectSecondaryProgram(key);
+    // Click toggles: if already selected, deselect; otherwise select
+    btn.onclick = () => selectSecondaryProgram(AUDIT_STATE.secondaryProgram === key ? null : key);
     container.appendChild(btn);
-  }
-  // Add "None" button to clear
-  if (AUDIT_STATE.secondaryProgram) {
-    const noneBtn = document.createElement('button');
-    noneBtn.className = 'prog-btn';
-    noneBtn.textContent = 'Remove';
-    noneBtn.style.borderColor = '#f87171';
-    noneBtn.style.color = '#f87171';
-    noneBtn.onclick = () => selectSecondaryProgram(null);
-    container.appendChild(noneBtn);
   }
 }
 
@@ -1829,12 +1820,11 @@ function selectSecondaryProgram(prog) {
   AUDIT_STATE.secondaryProgram = prog;
   AUDIT_STATE.lastSecondaryAuditResult = null;
 
-  // Update tag display
+  // Update tag display (no × button — click the major button again to deselect)
   const tagEl = document.getElementById('dbl-major-tag');
   if (tagEl) {
     tagEl.innerHTML = prog
-      ? '<span class="minor-tag">' + (ALL_PROGRAMS[prog] || prog) +
-        ' <button onclick="selectSecondaryProgram(null)">&times;</button></span>'
+      ? '<span class="selected-tag">' + (ALL_PROGRAMS[prog] || prog) + '</span>'
       : '';
   }
 

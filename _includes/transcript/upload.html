@@ -26,35 +26,39 @@
   </div>
 </div>
 
-<!-- Double Major selector — collapsible -->
-<div class="minor-controls-bar">
-  <button class="minor-toggle" onclick="toggleDoubleMajor()">
-    <span class="prog-label">Double Major (optional)</span>
-    <span class="minor-toggle-arrow" id="dbl-major-arrow">&#9660;</span>
-  </button>
-  <div id="dbl-major-tag" class="minor-tags"></div>
-  <div id="dbl-major-picker" class="dbl-major-picker" style="display:none;">
+<!-- Double Major selector — click to toggle -->
+<div class="optional-selector">
+  <div class="optional-selector-header">
+    <button class="optional-selector-toggle" onclick="toggleDoubleMajor()">
+      <span class="prog-label">Double Major (optional)</span>
+      <span class="optional-toggle-arrow" id="dbl-major-arrow">&#9660;</span>
+    </button>
+    <div id="dbl-major-tag" class="selected-tags"></div>
+  </div>
+  <div id="dbl-major-picker" class="optional-picker" style="display:none;">
     <div class="program-controls" id="dbl-major-buttons">
       <!-- JS populates buttons from available programs -->
     </div>
   </div>
 </div>
 
-<!-- Minor selector — collapsible picker with tag pills -->
-<div class="minor-controls-bar">
-  <button class="minor-toggle" onclick="toggleMinorPicker()">
-    <span class="prog-label">Minors (optional)</span>
-    <span class="minor-toggle-arrow">&#9660;</span>
-  </button>
-  <div id="minor-tags" class="minor-tags"></div>
-  <div id="minor-picker" class="minor-picker" style="display:none;">
+<!-- Minor selector — click to toggle, multi-select -->
+<div class="optional-selector">
+  <div class="optional-selector-header">
+    <button class="optional-selector-toggle" onclick="toggleMinorPicker()">
+      <span class="prog-label">Minors (optional)</span>
+      <span class="optional-toggle-arrow" id="minor-arrow">&#9660;</span>
+    </button>
+    <div id="minor-tags" class="selected-tags"></div>
+  </div>
+  <div id="minor-picker" class="optional-picker" style="display:none;">
     <!-- JS populates buttons from MINORS_DATA -->
   </div>
 </div>
 
 <!-- Christ College toggle -->
-<div class="minor-controls-bar">
-  <button class="minor-toggle" onclick="toggleCC()">
+<div class="optional-selector">
+  <button class="optional-selector-toggle" onclick="toggleCC()">
     <span class="prog-label">Christ College</span>
     <span class="cc-toggle-indicator" id="cc-toggle-indicator"></span>
   </button>
