@@ -38,8 +38,10 @@ function buildTranscriptPool(matched, unmatched) {
     // No lab bundling — labs appear as separate pool entries so minor
     // requirements can list them individually (e.g. PHYS 141L).
 
-    if (seen.has(code)) continue;
-    seen.add(code);
+    // Allow repeatable courses (MUS 499, etc.) to appear multiple times
+    const isRepeatable = typeof REPEATABLE_COURSES !== 'undefined' && REPEATABLE_COURSES.has(code);
+    if (!isRepeatable && seen.has(code)) continue;
+    if (!isRepeatable) seen.add(code);
     // IP courses (no grade) get 0 credits — they haven't been earned yet.
     // Only use courseData credits as fallback for graded courses.
     const isIP = !m.active.grade;
@@ -342,6 +344,128 @@ function evalCredits(req, pool, usedCodes) {
   };
 }
 
+// ── Repeat type: "Take MUS 499 for 6 semesters" ─────────────────
+// Uses raw entries (not pool) to count instances of a repeatable course.
+function evalRepeat(req, pool, usedCodes) {
+  const target = req.count || 1;
+  const courseCode = req.course;
+  const filled = [];
+
+  // Count all pool entries matching this code (repeatable courses have multiple entries)
+  for (const entry of pool) {
+    if (entry.code !== courseCode) continue;
+    if (usedCodes.has(entry.code + ':' + filled.length)) continue; // unique key per instance
+    filled.push({ code: entry.code, grade: entry.grade, credits: entry.credits });
+    usedCodes.add(entry.code + ':' + (filled.length - 1));
+    if (filled.length >= target) break;
+  }
+
+  return {
+    label: req.label,
+    type: req.type,
+    met: filled.length >= target,
+    filled,
+    missing: [],
+    creditsApplied: filled.reduce((s, c) => s + c.credits, 0),
+    countNeeded: target,
+    countFilled: filled.length,
+  };
+}
+
+// ── Applied Credits type: "Take 6 credits of MUAP" ──────────────
+function evalAppliedCredits(req, pool, usedCodes) {
+  const target = req.credits || 0;
+  const prefix = (req.dept_prefix || '').toUpperCase();
+  const depts = req.depts || (prefix ? [prefix] : []);
+  const filled = [];
+  let total = 0;
+
+  for (const entry of pool) {
+    if (usedCodes.has(entry.code)) continue;
+    const parsed = parseCourseCode(entry.code);
+    if (!parsed) continue;
+    const matches = depts.some(d => parsed.dept === d || parsed.dept.startsWith(d));
+    if (!matches) continue;
+
+    filled.push({ code: entry.code, grade: entry.grade, credits: entry.credits });
+    total += entry.credits;
+    usedCodes.add(entry.code);
+  }
+
+  return {
+    label: req.label,
+    type: req.type,
+    met: total >= target,
+    filled,
+    missing: [],
+    creditsNeeded: target,
+    creditsApplied: total,
+  };
+}
+
+// ── Track type: auto-detect best matching track ──────────────────
+function evalTrack(req, pool, usedCodes) {
+  if (!req.tracks || !req.tracks.length) {
+    return { label: req.label, type: req.type, met: false, filled: [], missing: [],
+             creditsApplied: 0, selectedTrack: null, trackResults: [] };
+  }
+
+  // Evaluate each track independently (with a copy of usedCodes)
+  const trackResults = [];
+  for (const track of req.tracks) {
+    const trackUsed = new Set(usedCodes);
+    const trackFilled = [];
+    let trackCredits = 0;
+    let trackMet = true;
+
+    for (const subReq of (track.requirements || [])) {
+      let subResult;
+      switch (subReq.type) {
+        case 'required': subResult = evalRequired(subReq, pool, trackUsed); break;
+        case 'pick': subResult = evalPick(subReq, pool, trackUsed); break;
+        case 'credits': subResult = evalCredits(subReq, pool, trackUsed); break;
+        case 'applied_credits': subResult = evalAppliedCredits(subReq, pool, trackUsed); break;
+        default: continue;
+      }
+      trackFilled.push(subResult);
+      trackCredits += subResult.creditsApplied;
+      if (!subResult.met) trackMet = false;
+    }
+
+    trackResults.push({
+      name: track.name,
+      met: trackMet,
+      requirements: trackFilled,
+      creditsApplied: trackCredits,
+      pct: track.requirements && track.requirements.length
+        ? Math.round(trackFilled.filter(r => r.met).length / track.requirements.length * 100)
+        : 0,
+    });
+  }
+
+  // Auto-detect: pick track with highest completion percentage
+  trackResults.sort((a, b) => b.pct - a.pct || (b.met ? 1 : 0) - (a.met ? 1 : 0));
+  const best = trackResults[0];
+
+  // Apply the best track's used codes to the main set
+  if (best && best.requirements) {
+    for (const r of best.requirements) {
+      for (const f of (r.filled || [])) usedCodes.add(f.code);
+    }
+  }
+
+  return {
+    label: req.label,
+    type: req.type,
+    met: best ? best.met : false,
+    filled: best ? best.requirements.flatMap(r => r.filled || []) : [],
+    missing: [],
+    creditsApplied: best ? best.creditsApplied : 0,
+    selectedTrack: best ? best.name : null,
+    trackResults,
+  };
+}
+
 // ── Main Minor Audit ─────────────────────────────────────────────
 
 function computeMinorAudit(pool, minorDef, majorUsedSet, otherAboveBeyondCodes) {
@@ -359,6 +483,15 @@ function computeMinorAudit(pool, minorDef, majorUsedSet, otherAboveBeyondCodes) 
         break;
       case 'credits':
         result = evalCredits(req, pool, usedCodes);
+        break;
+      case 'repeat':
+        result = evalRepeat(req, pool, usedCodes);
+        break;
+      case 'applied_credits':
+        result = evalAppliedCredits(req, pool, usedCodes);
+        break;
+      case 'track':
+        result = evalTrack(req, pool, usedCodes);
         break;
       default:
         continue;
@@ -774,6 +907,15 @@ function computeCCAudit(pool) {
         break;
       case 'credits':
         result = evalCredits(req, pool, usedCodes);
+        break;
+      case 'repeat':
+        result = evalRepeat(req, pool, usedCodes);
+        break;
+      case 'applied_credits':
+        result = evalAppliedCredits(req, pool, usedCodes);
+        break;
+      case 'track':
+        result = evalTrack(req, pool, usedCodes);
         break;
       default:
         continue;

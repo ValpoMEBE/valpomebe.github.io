@@ -11,13 +11,14 @@ MUS_163: 1
 MUS_109: 1
 MUEN_ENSEMBLE_1: 1
 MUAP_LESSONS_1: 1
-MUS_499: 1
+MUS_COLLOQ_1: 1
 
 # ── Semester 2 ── Freshman Spring ──
 MUS_164: 2
 MUS_110: 2
 MUEN_ENSEMBLE_2: 2
 MUAP_LESSONS_2: 2
+MUS_COLLOQ_2: 2
 MUS_300: 2
 XS_101: 2
 
@@ -27,21 +28,25 @@ MUS_263: 3
 MUS_213: 3
 MUEN_ENSEMBLE_3: 3
 MUAP_LESSONS_3: 3
+MUS_COLLOQ_3: 3
 
 # ── Semester 4 ── Sophomore Spring ──
 MUS_201: 4
 MUS_264: 4
 MUEN_ENSEMBLE_4: 4
 MUAP_LESSONS_4: 4
+MUS_COLLOQ_4: 4
 
 # ── Semester 5 ── Junior Fall ──
 MUS_318: 5
 MUAP_LESSONS_5: 5
 MUEN_ENSEMBLE_5: 5
+MUS_COLLOQ_5: 5
 
 # ── Semester 6 ── Junior Spring ──
 MUS_319: 6
 MUAP_LESSONS_6: 6
+MUS_COLLOQ_6: 6
 
 # ── Semester 7 ── Senior Fall ──
 MUS_400: 7

@@ -1,0 +1,105 @@
+# Music B.A. Requirements
+# Source: Undergraduate Catalog 2025-2026, p.240-242
+# Total: 124 credits (40 music credits minimum)
+
+id: Music_BA
+name: "Music, B.A."
+min_credits: 40
+
+requirements:
+  - label: "Musicianship Core"
+    type: required
+    courses:
+      - "MUS 109"
+      - "MUS 110"
+      - "MUS 163"
+      - "MUS 164"
+      - "MUS 201"
+      - "MUS 209"
+      - "MUS 213"
+      - "MUS 263"
+      - "MUS 264"
+      - "MUS 318"
+      - "MUS 319"
+
+  - label: "Keyboard Proficiency"
+    type: required
+    courses: ["MUS 300"]
+
+  - label: "Concert Attendance"
+    type: required
+    courses: ["MUS 400"]
+
+  - label: "Music Colloquium (6 semesters)"
+    type: repeat
+    course: "MUS 499"
+    count: 6
+
+  - label: "Instrument Proficiency"
+    type: required
+    courses: ["MUAP 275"]
+
+  - label: "Capstone"
+    type: pick
+    pick: 1
+    courses: ["MUS 404", "MUS 486", "MUS 495"]
+
+  - label: "Principal Instrument (6 cr)"
+    type: applied_credits
+    credits: 6
+    depts: ["MUAP"]
+
+  - label: "Ensemble (5 cr)"
+    type: applied_credits
+    credits: 5
+    depts: ["MUEN"]
+
+  - label: "Specialization Track"
+    type: track
+    tracks:
+      - name: "Standard Option"
+        requirements: []
+
+      - name: "Performance Option"
+        requirements:
+          - label: "Pro-Seminar in Pedagogy"
+            type: required
+            courses: ["MUS 423"]
+          - label: "Chamber Music (2 semesters)"
+            type: applied_credits
+            credits: 1
+            depts: ["MUEN"]
+          - label: "Additional Principal Instrument (6 cr)"
+            type: applied_credits
+            credits: 12
+            depts: ["MUAP"]
+
+      - name: "Church Music Option"
+        requirements:
+          - label: "Church Music Courses"
+            type: required
+            courses: ["MUS 240", "MUS 313", "MUS 337"]
+          - label: "Additional Organ/Voice (4 cr)"
+            type: applied_credits
+            credits: 10
+            depts: ["MUAP"]
+
+      - name: "Music Industry Option"
+        requirements:
+          - label: "Industry Courses"
+            type: required
+            courses: ["MUS 115", "MUS 285", "MUS 405"]
+          - label: "Business/Entrepreneurship"
+            type: pick
+            pick: 1
+            courses: ["BUS 100", "ENT 100"]
+
+      - name: "Composition Option"
+        requirements:
+          - label: "Composition Courses"
+            type: required
+            courses: ["MUS 107", "MUS 115", "MUS 312"]
+          - label: "Composition Lessons (6 cr)"
+            type: applied_credits
+            credits: 6
+            depts: ["MUAP"]

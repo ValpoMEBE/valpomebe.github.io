@@ -658,6 +658,11 @@
   font-weight: 600;
 }
 
+/* Secondary major requirements view */
+.secondary-reqs-container {
+  max-width: 800px; margin: 0 auto; padding: .5rem 0;
+}
+
 /* Christ College toggle */
 .cc-active {
   background: var(--teal) !important;

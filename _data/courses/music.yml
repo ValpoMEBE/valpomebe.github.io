@@ -118,14 +118,65 @@
   coreqs: []
   desc: Required concert attendance throughout the program.
 
-- id: MUS_499
+- id: MUS_COLLOQ_1
   code: MUS 499
-  title: Music Colloquium
+  title: Music Colloquium 1
   credits: 0
   tags: [music]
   prereqs: []
   coreqs: []
-  desc: Department colloquium series. Required each semester (0 cr).
+  isPlaceholder: true
+  desc: Department colloquium series (0 cr). Required 6 semesters.
+
+- id: MUS_COLLOQ_2
+  code: MUS 499
+  title: Music Colloquium 2
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Department colloquium series (0 cr).
+
+- id: MUS_COLLOQ_3
+  code: MUS 499
+  title: Music Colloquium 3
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Department colloquium series (0 cr).
+
+- id: MUS_COLLOQ_4
+  code: MUS 499
+  title: Music Colloquium 4
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Department colloquium series (0 cr).
+
+- id: MUS_COLLOQ_5
+  code: MUS 499
+  title: Music Colloquium 5
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Department colloquium series (0 cr).
+
+- id: MUS_COLLOQ_6
+  code: MUS 499
+  title: Music Colloquium 6
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Department colloquium series (0 cr).
 
 - id: MUAP_275
   code: MUAP 275

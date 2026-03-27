@@ -30,11 +30,31 @@ _config.yml              # Production config (baseurl: "")
 _config.dev.yml           # Dev overrides (baseurl: "/dev")
 _data/
   courses/                # Course catalog — split by subject (me.yml, ge.yml, etc.)
+                          #   Each entry: id, code, title, credits, tags, prereqs, coreqs, desc
+                          #   Used by: degree map, prereq web, transcript audit matching
   curriculum/             # Per-program semester placements (flat map: course_id → semester)
+                          #   Controls which courses appear in a program's degree map/timeline
+                          #   Used by: degree map rendering, transcript audit timeline view
     me.yml                # ME semester layout
     be_biomech.yml        # BE Biomechanical semester layout
     be_bioelec.yml        # BE Bioelectrical semester layout
     be_biomed.yml         # BE Biomedical semester layout
+    music_ba.yml          # Music BA semester layout (for degree map timeline)
+    physics_bs.yml        # Physics BS semester layout
+    # Also: ce.yml, cpe.yml, ee.yml, ene.yml, math_bs.yml, cs_bs.yml, chemistry_bs.yml
+  major_reqs/             # Requirements definitions for non-engineering majors
+                          #   Defines complex requirements (repeatable courses, applied credits,
+                          #   track options) that curriculum files can't express
+                          #   Used by: transcript audit requirements view, Excel export
+    music_ba.yml          # Music BA requirements (musicianship, performance, tracks)
+  aliases/                # Course code mappings and department renames
+    course_aliases.yml    #   Maps transcript codes to course IDs (lab bundling, honors subs)
+    department_renames.yml #   Maps old dept prefixes to new (STAT → DATA)
+    world_languages.yml   #   List of world language department codes
+  minors/                 # Minor program definitions (15 minors)
+                          #   Each: id, name, min_credits, requirements[]
+                          #   Used by: transcript minor audit
+  cc_scholar.yml          # Christ College Scholar requirements
   transcript/             # Approved elective lists (from Undergraduate Catalog 2025-2026)
     me_electives.yml      # ME technical elective approved courses
     be_electives.yml      # BE technical elective approved courses

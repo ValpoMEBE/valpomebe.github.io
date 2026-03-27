@@ -213,6 +213,8 @@ function parseTranscriptLines(lines) {
 const REPEATABLE_COURSES = new Set([
   'BE 490', 'BE 499', 'ME 490', 'ME 499', 'GE 490', 'ECE 490',
   'CC 201', 'CC 499',
+  // Music courses taken multiple semesters
+  'MUS 499', 'MUS 400', 'MUS 486',
 ]);
 
 function resolveRetakes(entries) {

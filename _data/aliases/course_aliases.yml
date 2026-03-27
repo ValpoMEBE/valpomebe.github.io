@@ -12,9 +12,17 @@
   to: "PHYS_141"
   note: "lab bundled"
 
+- from: "PHYS 151"
+  to: "PHYS_141"
+  note: "honors version of PHYS 141"
+
 - from: "PHYS 142L"
   to: "PHYS_142"
   note: "lab bundled"
+
+- from: "PHYS 152"
+  to: "PHYS_142"
+  note: "honors version of PHYS 142"
 
 - from: "PHYS 430L"
   to: "PHYS_430"

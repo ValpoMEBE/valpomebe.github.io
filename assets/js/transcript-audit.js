@@ -387,6 +387,43 @@ const ELECTIVE_GROUPS = {
       checkWorldLang: false,
     },
   ],
+  Music_BA: [
+    ...CORE_GROUPS,
+    THEO_GROUP,
+    {
+      key: 'mus_colloq',
+      label: 'Music Colloquium (6 semesters)',
+      ids: ['MUS_COLLOQ_1', 'MUS_COLLOQ_2', 'MUS_COLLOQ_3', 'MUS_COLLOQ_4', 'MUS_COLLOQ_5', 'MUS_COLLOQ_6'],
+      approvedLists: [],
+      blanketDepts: [],
+      matchCodes: ['MUS 499'],  // exact codes that fill this group
+      showAll: true,
+      fixedCredits: 0,
+    },
+    {
+      key: 'mus_instrument',
+      label: 'Principal Instrument (6 cr)',
+      ids: ['MUAP_LESSONS_1', 'MUAP_LESSONS_2', 'MUAP_LESSONS_3', 'MUAP_LESSONS_4', 'MUAP_LESSONS_5', 'MUAP_LESSONS_6'],
+      approvedLists: [],
+      blanketDepts: ['MUAP'],
+    },
+    {
+      key: 'mus_ensemble',
+      label: 'Ensemble (5 cr)',
+      ids: ['MUEN_ENSEMBLE_1', 'MUEN_ENSEMBLE_2', 'MUEN_ENSEMBLE_3', 'MUEN_ENSEMBLE_4', 'MUEN_ENSEMBLE_5'],
+      approvedLists: [],
+      blanketDepts: ['MUEN'],
+    },
+    {
+      key: 'mus_capstone',
+      label: 'Capstone',
+      ids: ['MUS_CAPSTONE'],
+      approvedLists: [],
+      blanketDepts: [],
+      matchCodes: ['MUS 404', 'MUS 486', 'MUS 495'],
+      maxCourses: 1,
+    },
+  ],
 };
 
 // ── Detect catalog year from transcript entries ─────────────────
@@ -479,9 +516,12 @@ function buildApprovedSet(listKeys) {
 
 // WL_DEPTS is now injected from _data/aliases/world_languages.yml via the layout
 
-function isApprovedElective(code, approvedSet, blanketDepts, checkWorldLang) {
+function isApprovedElective(code, approvedSet, blanketDepts, checkWorldLang, matchCodes) {
   const upper = code.toUpperCase();
   if (approvedSet.has(upper)) return true;
+
+  // Exact code match (e.g., MUS 499 for colloquium group)
+  if (matchCodes && matchCodes.some(mc => mc.toUpperCase() === upper)) return true;
 
   const parts = upper.split(/\s+/);
   if (parts.length < 2) return false;
@@ -627,10 +667,10 @@ function computeAudit(matched, program, codeIndex, unmatched) {
       // CC 215 → THEO_GE), block it from groups to prevent double-counting.
       const isAliased = m.code.replace(/\s+/g, '_').toUpperCase() !== m.courseId;
       if (usedRefs.has(m) || (completedIds.has(m.courseId) && !isAliased)) continue;
-      if (isAliased && requiredIds.has(m.courseId)) continue;
+      if (isAliased && requiredIds.has(m.courseId) && !groupedIds.has(m.courseId)) continue;
       const status = getCourseStatus(m.active.grade);
       if (status === 'failed') continue;
-      if (!isApprovedElective(m.code, approvedSet, g.blanketDepts, g.checkWorldLang)) continue;
+      if (!isApprovedElective(m.code, approvedSet, g.blanketDepts, g.checkWorldLang, g.matchCodes)) continue;
       const cr = m.active.credits || (m.courseData && m.courseData.credits) || 0;
       candidates.push({ code: m.code, grade: m.active.grade, credits: cr, source: 'matched', ref: m });
     }
@@ -639,7 +679,7 @@ function computeAudit(matched, program, codeIndex, unmatched) {
         if (usedRefs.has(u) || completedIds.has('unmatched:' + u.code)) continue;
         const status = getCourseStatus(u.active.grade);
         if (status === 'failed') continue;
-        if (!isApprovedElective(u.code, approvedSet, g.blanketDepts, g.checkWorldLang)) continue;
+        if (!isApprovedElective(u.code, approvedSet, g.blanketDepts, g.checkWorldLang, g.matchCodes)) continue;
         candidates.push({ code: u.code, grade: u.active.grade, credits: u.active.credits || 0, source: 'unmatched', ref: u });
       }
     }
@@ -669,9 +709,18 @@ function computeAudit(matched, program, codeIndex, unmatched) {
 
     const allIP = filledCourses.length > 0 && filledCourses.every(c => !c.grade);
     const anyIP = filledCourses.some(c => !c.grade);
+    // For 0-credit groups (e.g., MUS 499 colloquium), use count-based status
+    const targetSlots = g.ids.length;
+    const useCountBased = totalCredits === 0 && targetSlots > 0;
+    const isFull = useCountBased
+      ? filledCourses.length >= targetSlots
+      : creditsFilled >= totalCredits;
+    const hasProgress = useCountBased
+      ? filledCourses.length > 0
+      : creditsFilled > 0;
     const groupStatus = allIP ? 'ip'
-                       : creditsFilled >= totalCredits ? (anyIP ? 'ip' : 'filled')
-                       : creditsFilled > 0 ? 'partial' : 'empty';
+                       : isFull ? (anyIP ? 'ip' : 'filled')
+                       : hasProgress ? 'partial' : 'empty';
 
     groupCards.push({
       isGroupCard: true,
@@ -697,14 +746,14 @@ function computeAudit(matched, program, codeIndex, unmatched) {
     const totalCredits = lg.parentCourse.credits || 0; // combined total
     const parentSem = lg.parentCourse.semesters[program] || 99;
 
-    // Find lecture transcript entry by code (e.g., "PHYS 141")
-    const lectureMatch = matched.find(m => m.code === lg.parentCourse.code);
+    // Find lecture transcript entry — match by courseId to handle aliases (e.g., PHYS 151 → PHYS_141)
+    const lectureMatch = matched.find(m => m.courseId === lg.parentId && m.code !== lg.labCode);
     if (lectureMatch) {
       const grade = lectureMatch.active.grade;
       const status = getCourseStatus(grade);
       if (status !== 'failed') {
         const cr = grade ? (lectureMatch.active.credits || lectureCr) : 0;
-        filledCourses.push({ code: lg.parentCourse.code, grade, credits: cr });
+        filledCourses.push({ code: lectureMatch.code, grade, credits: cr });
         creditsFilled += cr;
       }
     }
@@ -1241,13 +1290,34 @@ function renderSecondaryAudit(auditResult, unmatched, summary, primaryAudit) {
   if (!grid) return;
   grid.innerHTML = '';
 
-  const view = AUDIT_STATE.secondaryView || 'status';
+  // Populate view toggle based on program type
+  const ENGINEERING_PROGRAMS = ['ME','BE_Biomech','BE_Bioelec','BE_Biomed','CE','CPE','EE','ENE'];
+  const isEng = ENGINEERING_PROGRAMS.includes(AUDIT_STATE.secondaryProgram);
+  const toggleEl = document.getElementById('secondary-view-toggle');
+  if (toggleEl) {
+    toggleEl.innerHTML = '';
+    if (isEng) {
+      // Engineering: Timeline + Requirements toggle
+      const views = [
+        { key: 'timeline', label: 'Timeline' },
+        { key: 'requirements', label: 'Requirements' },
+      ];
+      for (const v of views) {
+        const btn = document.createElement('button');
+        btn.className = 'view-btn' + (v.key === (AUDIT_STATE.secondaryView || 'timeline') ? ' active' : '');
+        btn.textContent = v.label;
+        btn.addEventListener('click', () => setSecondaryView(v.key, btn));
+        toggleEl.appendChild(btn);
+      }
+    }
+    // Non-engineering: no toggle, requirements only
+  }
+
+  const view = isEng ? (AUDIT_STATE.secondaryView || 'timeline') : 'requirements';
   if (view === 'timeline') {
     renderSecondaryTimeline(audit, groupCards, grid);
-  } else if (view === 'category') {
-    renderSecondaryCategory(audit, groupCards, grid);
   } else {
-    renderSecondaryStatus(audit, groupCards, grid);
+    renderSecondaryRequirements(AUDIT_STATE.secondaryProgram, grid);
   }
 
   // Don't show unmatched for secondary — primary already shows them
@@ -1281,88 +1351,97 @@ function renderSecondaryTimeline(audit, groupCards, grid) {
   }
 }
 
-function renderSecondaryStatus(audit, groupCards, grid) {
-  const allItems = [...audit, ...groupCards];
-  const statusOrder = ['remaining', 'failed', 'no-grade', 'ip', 'partial', 'empty', 'transfer', 'completed', 'filled'];
-  const statusLabels = {
-    completed: 'Completed', transfer: 'Completed (Transfer)', filled: 'Completed',
-    'no-grade': 'In Progress', ip: 'In Progress', partial: 'Partially Fulfilled',
-    remaining: 'Remaining', empty: 'Remaining', failed: 'Failed',
-  };
+function renderSecondaryRequirements(program, grid) {
+  // Use MAJOR_REQS_DATA if available for this program, otherwise fall back to audit data
+  const reqKey = Object.keys(typeof MAJOR_REQS_DATA !== 'undefined' ? MAJOR_REQS_DATA : {})
+    .find(k => MAJOR_REQS_DATA[k].id === program);
 
-  // Group by display status
-  const groups = {};
-  for (const item of allItems) {
-    const st = item.isGroupCard ? item.groupStatus : item.status;
-    const label = statusLabels[st] || 'Other';
-    if (!groups[label]) groups[label] = [];
-    groups[label].push(item);
+  if (!reqKey || !AUDIT_STATE.lastMatched) {
+    // No requirements data — fall back to timeline
+    const result = AUDIT_STATE.lastSecondaryAuditResult;
+    if (result) renderSecondaryTimeline(result.audit, result.groupCards, grid);
+    return;
   }
 
-  // Render in order: Completed, In Progress, Remaining, Failed
-  const order = ['Completed', 'Completed (Transfer)', 'In Progress', 'Partially Fulfilled', 'Remaining', 'Failed'];
-  for (const label of order) {
-    const items = groups[label];
-    if (!items || !items.length) continue;
+  const reqDef = MAJOR_REQS_DATA[reqKey];
+  const pool = buildTranscriptPool(AUDIT_STATE.lastMatched, AUDIT_STATE.lastUnmatched);
+  const usedCodes = new Set();
+  const results = [];
 
-    const col = document.createElement('div');
-    col.className = 'sem-col';
-    const header = document.createElement('div');
-    header.className = 'sem-header';
-    header.innerHTML = '<div class="sem-name">' + label + ' (' + items.length + ')</div>';
-    col.appendChild(header);
-
-    const cardsWrap = document.createElement('div');
-    cardsWrap.className = 'sem-cards';
-    for (const item of items) {
-      if (item.isGroupCard) cardsWrap.appendChild(createGroupCard(item));
-      else cardsWrap.appendChild(createAuditCard(item));
+  for (const req of reqDef.requirements) {
+    let result;
+    switch (req.type) {
+      case 'required': result = evalRequired(req, pool, usedCodes); break;
+      case 'pick': result = evalPick(req, pool, usedCodes); break;
+      case 'credits': result = evalCredits(req, pool, usedCodes); break;
+      case 'repeat': result = evalRepeat(req, pool, usedCodes); break;
+      case 'applied_credits': result = evalAppliedCredits(req, pool, usedCodes); break;
+      case 'track': result = evalTrack(req, pool, usedCodes); break;
+      default: continue;
     }
-    col.appendChild(cardsWrap);
-    grid.appendChild(col);
+    results.push(result);
   }
-}
 
-function renderSecondaryCategory(audit, groupCards, grid) {
-  // Group by course tags/type
-  const categories = { 'Core / Gen Ed': [], 'Major Courses': [], 'Electives': [] };
+  // Render each requirement as a minor-style card row
+  const container = document.createElement('div');
+  container.className = 'secondary-reqs-container';
 
-  for (const c of audit) {
-    if (c.isPlaceholder) {
-      categories['Electives'].push(c);
-    } else if ((c.tags || []).some(t => ['core', 'gen-ed', 'vue'].includes(t))) {
-      categories['Core / Gen Ed'].push(c);
-    } else {
-      categories['Major Courses'].push(c);
+  for (const req of results) {
+    const row = document.createElement('div');
+    row.className = 'minor-req-row ' + (req.met ? 'met' : 'unmet');
+
+    const icon = document.createElement('span');
+    icon.className = 'minor-req-icon ' + (req.met ? 'met' : 'unmet');
+    icon.textContent = req.met ? '\u2713' : '\u25CB';
+    row.appendChild(icon);
+
+    const label = document.createElement('span');
+    label.className = 'minor-req-label';
+    label.textContent = req.label;
+    if (req.selectedTrack) label.textContent += ' (' + req.selectedTrack + ')';
+    row.appendChild(label);
+
+    const detail = document.createElement('span');
+    detail.className = 'minor-req-detail';
+
+    if (req.filled && req.filled.length > 0) {
+      const chips = req.filled.map(function(f) {
+        const gradeTxt = f.grade || 'IP';
+        const gradeClass = f.grade ? getGradeClass(f.grade) : 'grade-ip';
+        return '<span class="minor-course-chip">' + f.code +
+          ' <span class="minor-grade ' + gradeClass + '">' + gradeTxt + '</span>' +
+          ' (' + (f.credits > 0 ? f.credits + ' cr' : '- cr') + ')</span>';
+      }).join(' ');
+      detail.innerHTML = chips;
     }
-  }
-  // Group cards go to Electives or Core depending on key
-  for (const gc of groupCards) {
-    if (gc.key.startsWith('core') || gc.key.startsWith('theo') || gc.key.startsWith('lab_')) {
-      categories['Core / Gen Ed'].push(gc);
-    } else {
-      categories['Electives'].push(gc);
+
+    // Show count for repeat type
+    if (req.type === 'repeat') {
+      const countInfo = (req.countFilled || 0) + ' / ' + (req.countNeeded || 0) + ' semesters';
+      detail.innerHTML += '<span class="minor-need">' + countInfo + '</span>';
     }
+
+    // Show credits progress for credit types
+    if ((req.type === 'credits' || req.type === 'applied_credits') && !req.met) {
+      const remaining = Math.max(0, (req.creditsNeeded || 0) - (req.creditsApplied || 0));
+      detail.innerHTML += '<span class="minor-need">' + remaining + ' cr needed</span>';
+    }
+
+    // Show missing courses
+    if (req.type === 'required' && req.missing && req.missing.length > 0) {
+      detail.innerHTML += '<span class="minor-need">Need: ' + req.missing.join(', ') + '</span>';
+    }
+
+    if (req.type === 'pick' && !req.met) {
+      const remaining = (req.needed || 1) - (req.filled || []).length;
+      detail.innerHTML += '<span class="minor-need">' + remaining + ' more course(s) needed</span>';
+    }
+
+    row.appendChild(detail);
+    container.appendChild(row);
   }
 
-  for (const [label, items] of Object.entries(categories)) {
-    if (!items.length) continue;
-    const col = document.createElement('div');
-    col.className = 'sem-col';
-    const header = document.createElement('div');
-    header.className = 'sem-header';
-    header.innerHTML = '<div class="sem-name">' + label + ' (' + items.length + ')</div>';
-    col.appendChild(header);
-
-    const cardsWrap = document.createElement('div');
-    cardsWrap.className = 'sem-cards';
-    for (const item of items) {
-      if (item.isGroupCard) cardsWrap.appendChild(createGroupCard(item));
-      else cardsWrap.appendChild(createAuditCard(item));
-    }
-    col.appendChild(cardsWrap);
-    grid.appendChild(col);
-  }
+  grid.appendChild(container);
 }
 
 function setSecondaryView(view, btn) {
@@ -1376,8 +1455,7 @@ function setSecondaryView(view, btn) {
     if (grid) {
       grid.innerHTML = '';
       if (view === 'timeline') renderSecondaryTimeline(audit, groupCards, grid);
-      else if (view === 'category') renderSecondaryCategory(audit, groupCards, grid);
-      else renderSecondaryStatus(audit, groupCards, grid);
+      else renderSecondaryRequirements(AUDIT_STATE.secondaryProgram, grid);
     }
   }
 }
@@ -2177,6 +2255,39 @@ function buildMajorSheetData(auditResult, unmatched) {
   return rows;
 }
 
+function buildCCSheetData(ccResult) {
+  const rows = [];
+  rows.push(['Requirement', 'Status', 'Fulfilling Courses']);
+
+  for (const req of ccResult.requirements) {
+    const hasIP = req.filled && req.filled.some(fc => !fc.grade);
+    const status = req.met
+      ? (hasIP ? 'In Progress' : 'Fulfilled')
+      : (req.creditsApplied > 0 || (req.filled && req.filled.length > 0) ? 'Partially Fulfilled' : 'Unfulfilled');
+    const row = [req.label, status];
+
+    for (const fc of (req.filled || [])) {
+      const prefix = !fc.grade ? '(In-Progress) ' : '';
+      const gradeStr = fc.grade ? ' (' + fc.grade + ')' : '';
+      const crStr = ' (' + (fc.credits > 0 ? fc.credits + ' cr' : '- cr') + ')';
+      row.push(prefix + fc.code + gradeStr + crStr);
+    }
+    rows.push(row);
+  }
+
+  // Summary
+  rows.push([]);
+  rows.push([
+    'Credits Beyond First-Year',
+    ccResult.overallMet ? 'COMPLETE' : 'INCOMPLETE',
+    ccResult.beyondFYCredits + '/' + ccResult.minBeyondFY + ' credits'
+  ]);
+
+  return rows;
+}
+
+
+
 function buildMinorSheetData(minorResult) {
   const rows = [];
   rows.push(['Requirement', 'Status', 'Fulfilling Courses']);
@@ -2275,6 +2386,18 @@ function downloadAuditExcel() {
       applySheetStyles(minorWs, minorData);
       XLSX.utils.book_append_sheet(wb, minorWs, sanitizeSheetName('Minor - ' + mr.name));
     }
+  }
+
+  // ── Christ College tab ──
+  if (AUDIT_STATE.ccEnabled && typeof CC_SCHOLAR_DATA !== 'undefined' && CC_SCHOLAR_DATA &&
+      typeof computeCCAudit === 'function' && typeof buildTranscriptPool === 'function') {
+    const pool = buildTranscriptPool(AUDIT_STATE.lastMatched, AUDIT_STATE.lastUnmatched);
+    const ccResult = computeCCAudit(pool);
+    const ccData = buildCCSheetData(ccResult);
+    const ccWs = XLSX.utils.aoa_to_sheet(ccData);
+    setColWidths(ccWs, ccData);
+    applySheetStyles(ccWs, ccData);
+    XLSX.utils.book_append_sheet(wb, ccWs, 'Christ College');
   }
 
   // Derive filename from student name extracted from transcript
