@@ -763,6 +763,149 @@ document.addEventListener('keydown', ev => {
 
 
 // ╔══════════════════════════════════════════════════════════════╗
+// ║  EXCEL EXPORT                                                ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+function downloadPlanExcel() {
+  if (!PLANNER_STATE.mergedPlan) return;
+  if (typeof XLSX === 'undefined') { alert('Excel library not loaded. Please reload the page.'); return; }
+
+  const wb = XLSX.utils.book_new();
+  const courses = PLANNER_STATE.mergedPlan.courses;
+  const stats = PLANNER_STATE.mergedPlan.stats;
+
+  // ── Styles ──
+  const headerStyle = {
+    font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 },
+    fill: { fgColor: { rgb: '4A2F1A' } },
+    alignment: { horizontal: 'center' },
+  };
+  const semHeaderStyle = {
+    font: { bold: true, sz: 11 },
+    fill: { fgColor: { rgb: 'F5B80A' } },
+  };
+  const originColors = {
+    shared:    { rgb: 'C6EFCE' },
+    primary:   { rgb: 'FFF2CC' },
+    secondary: { rgb: 'D6E4F0' },
+    minor:     { rgb: 'E8D5F5' },
+    cc:        { rgb: 'F5E6C8' },
+  };
+
+  // ── Build "Course Plan" sheet ──
+  const rows = [];
+
+  // Title row
+  const primaryLabel = PLANNER_PROGRAMS[PLANNER_STATE.primary] || PLANNER_STATE.primary;
+  let title = primaryLabel;
+  if (PLANNER_STATE.secondary) {
+    title += ' + ' + (PLANNER_PROGRAMS[PLANNER_STATE.secondary] || PLANNER_STATE.secondary);
+  }
+  rows.push([title + ' — Course Plan']);
+  rows.push([
+    'Total Credits: ' + stats.totalCredits,
+    'Semesters: ' + stats.semesters,
+    stats.hasSecondary ? 'Shared Courses: ' + stats.sharedCount : '',
+  ]);
+  rows.push([]); // blank row
+
+  // Header row
+  rows.push(['Semester', 'Code', 'Title', 'Credits', 'Origin']);
+  const headerRowIdx = 3;
+
+  // Group courses by semester
+  const maxSem = stats.semesters;
+  for (let sem = 1; sem <= maxSem; sem++) {
+    const semCourses = courses
+      .filter(c => c.semester === sem)
+      .sort((a, b) => a.code.localeCompare(b.code));
+    if (!semCourses.length) continue;
+
+    const { year, season } = getSemLabel(sem);
+    const semLabel = season + ', ' + year;
+    const semCredits = stats.semCredits[sem] || 0;
+
+    // Semester sub-header
+    rows.push([semLabel + ' (' + semCredits + ' cr)', '', '', '', '']);
+
+    for (const c of semCourses) {
+      const originLabel = c.origin === 'shared' ? 'Shared' :
+                          c.origin === 'primary' ? 'Primary' :
+                          c.origin === 'secondary' ? 'Secondary' :
+                          c.origin === 'minor' ? 'Minor' :
+                          c.origin === 'cc' ? 'Christ College' : '';
+      rows.push(['', c.code, c.title, c.credits, originLabel]);
+    }
+  }
+
+  // Minors summary
+  if (PLANNER_STATE.selectedMinors.length) {
+    rows.push([]);
+    rows.push(['Minors: ' + PLANNER_STATE.selectedMinors.map(k =>
+      MINORS_DATA[k]?.name || k
+    ).join(', ')]);
+  }
+  if (PLANNER_STATE.ccEnabled) {
+    rows.push(['Christ College Scholar: Yes']);
+  }
+
+  // Create worksheet
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Column widths
+  ws['!cols'] = [
+    { wch: 28 }, // Semester
+    { wch: 14 }, // Code
+    { wch: 38 }, // Title
+    { wch: 8 },  // Credits
+    { wch: 14 }, // Origin
+  ];
+
+  // Apply styles
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[addr]) continue;
+
+      // Title row
+      if (R === 0) {
+        ws[addr].s = { font: { bold: true, sz: 14 } };
+      }
+      // Header row
+      else if (R === headerRowIdx) {
+        ws[addr].s = headerStyle;
+      }
+      // Semester sub-header rows
+      else if (C === 0 && ws[addr].v && typeof ws[addr].v === 'string' && ws[addr].v.includes(' cr)')) {
+        ws[addr].s = semHeaderStyle;
+      }
+      // Course rows — color by origin
+      else if (C === 4 && ws[addr].v) {
+        const originKey = ws[addr].v.toLowerCase();
+        const color = originColors[originKey];
+        if (color) {
+          // Apply color to the entire row
+          for (let cc = 0; cc <= 4; cc++) {
+            const rowAddr = XLSX.utils.encode_cell({ r: R, c: cc });
+            if (ws[rowAddr]) {
+              ws[rowAddr].s = { fill: { fgColor: color } };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Course Plan');
+
+  // ── Filename ──
+  let fileName = primaryLabel.replace(/[^a-zA-Z0-9]/g, '') + '-Plan.xlsx';
+  XLSX.writeFile(wb, fileName);
+}
+
+
+// ╔══════════════════════════════════════════════════════════════╗
 // ║  REARRANGE SCHEDULE MODE                                    ║
 // ╚══════════════════════════════════════════════════════════════╝
 
