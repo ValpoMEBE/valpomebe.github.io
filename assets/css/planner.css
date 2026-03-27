@@ -418,42 +418,15 @@
 
 
 /* ── REQUIREMENTS PANEL ──────────────────────────────────── */
-/* Collapsible wrapper — contents use minor-audit-card styles */
+/* Uses minor-results-section + minor-audit-card styles (mirrored from transcript.css) */
 
-.planner-req-panel {
-  margin: .75rem 1.5rem;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 8px;
-  background: rgba(255,255,255,.03);
-  overflow: hidden;
+.minor-results-section {
+  margin-top: 2rem; padding: 0 1.5rem 1rem;
 }
-.req-panel-header {
-  display: flex; align-items: center; gap: .6rem;
-  padding: .6rem 1rem; cursor: pointer; transition: background .15s;
+.minor-results-title {
+  font-family: var(--font-display); font-size: 1rem;
+  color: var(--gold); margin-bottom: .75rem;
 }
-.req-panel-header:hover { background: rgba(255,255,255,.05); }
-.req-panel-title {
-  font-family: var(--font-display); font-size: .85rem;
-  font-weight: 600; color: var(--light-gray);
-}
-.req-panel-summary {
-  font-size: .75rem; color: #aaa; margin-left: auto;
-  display: flex; align-items: center; gap: .35rem;
-}
-.req-summary-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
-.req-dot-met   { background: var(--teal); }
-.req-dot-unmet { background: var(--orange); }
-.req-panel-arrow { font-size: .7rem; color: #888; }
-.req-panel-body {
-  padding: .25rem 1rem .75rem;
-  display: flex; flex-direction: column; gap: .5rem;
-}
-.req-section-title {
-  font-family: var(--font-display); font-size: .9rem;
-  color: var(--gold); margin-bottom: .5rem;
-}
-
-/* ── Minor-card styles (mirrored from transcript.css for planner page) ── */
 
 .minor-audit-card {
   background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);

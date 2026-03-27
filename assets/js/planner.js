@@ -1235,78 +1235,41 @@ function evaluateRequirementsPanel() {
 
 function renderRequirementsPanel(results) {
   const panel = document.getElementById('planner-req-panel');
-  panel.style.display = '';
+  const container = document.getElementById('planner-req-container');
+  if (!panel || !container) return;
 
-  // Compute overall summary
-  let totalMet = 0, totalReqs = 0;
+  container.innerHTML = '';
+  let hasCards = false;
 
+  // Primary major
   if (results.primary) {
-    totalMet += results.primary.metCount;
-    totalReqs += results.primary.totalReqs;
+    container.appendChild(renderMajorCard(results.primary));
+    hasCards = true;
   }
+
+  // Secondary major
   if (results.secondary) {
-    totalMet += results.secondary.metCount;
-    totalReqs += results.secondary.totalReqs;
+    container.appendChild(renderMajorCard(results.secondary));
+    hasCards = true;
   }
+
+  // Minors
   for (const m of results.minors) {
-    const met = m.requirements.filter(r => r.met).length;
-    totalMet += met;
-    totalReqs += m.requirements.length;
+    container.appendChild(
+      typeof createMinorCard === 'function' ? createMinorCard(m) : renderFallbackMinorCard(m)
+    );
+    hasCards = true;
   }
+
+  // CC Scholar
   if (results.cc) {
-    const met = results.cc.requirements.filter(r => r.met).length;
-    totalMet += met;
-    totalReqs += results.cc.requirements.length;
-  }
-
-  const summaryEl = document.getElementById('req-panel-summary');
-  const allMet = totalMet === totalReqs;
-  summaryEl.innerHTML =
-    '<span class="req-summary-dot ' + (allMet ? 'req-dot-met' : 'req-dot-unmet') + '"></span>' +
-    totalMet + ' / ' + totalReqs + ' met';
-
-  // Primary
-  const primaryEl = document.getElementById('req-primary-section');
-  primaryEl.innerHTML = '';
-  if (results.primary) {
-    primaryEl.appendChild(renderMajorCard(results.primary));
-  }
-
-  // Secondary
-  const secondaryEl = document.getElementById('req-secondary-section');
-  secondaryEl.innerHTML = '';
-  if (results.secondary) {
-    secondaryEl.style.display = '';
-    secondaryEl.appendChild(renderMajorCard(results.secondary));
-  } else {
-    secondaryEl.style.display = 'none';
-  }
-
-  // Minors — reuse createMinorCard from transcript-minor.js if available
-  const minorsEl = document.getElementById('req-minors-section');
-  minorsEl.innerHTML = '';
-  if (results.minors.length) {
-    minorsEl.style.display = '';
-    for (const m of results.minors) {
-      minorsEl.appendChild(
-        typeof createMinorCard === 'function' ? createMinorCard(m) : renderFallbackMinorCard(m)
-      );
-    }
-  } else {
-    minorsEl.style.display = 'none';
-  }
-
-  // CC — same card rendering as minors
-  const ccEl = document.getElementById('req-cc-section');
-  ccEl.innerHTML = '';
-  if (results.cc) {
-    ccEl.style.display = '';
-    ccEl.appendChild(
+    container.appendChild(
       typeof createMinorCard === 'function' ? createMinorCard(results.cc) : renderFallbackMinorCard(results.cc)
     );
-  } else {
-    ccEl.style.display = 'none';
+    hasCards = true;
   }
+
+  panel.style.display = hasCards ? '' : 'none';
 }
 
 // ── Major program card (uses minor-audit-card DOM structure) ──
@@ -1533,11 +1496,3 @@ function renderFallbackReqRow(req) {
   return row;
 }
 
-function toggleReqPanel() {
-  const body = document.getElementById('req-panel-body');
-  const arrow = document.getElementById('req-panel-arrow');
-  if (!body) return;
-  const visible = body.style.display !== 'none';
-  body.style.display = visible ? 'none' : '';
-  if (arrow) arrow.innerHTML = visible ? '&#9660;' : '&#9650;';
-}

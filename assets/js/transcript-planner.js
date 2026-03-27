@@ -1146,11 +1146,15 @@ function evaluateTPRequirements() {
   const container = document.getElementById('tp-req-container');
   if (!section || !container) return;
 
-  // Gather all courses: completed (from audit) + planned (remaining)
+  // Build set of all course IDs: completed + planned
+  const completedIds = buildCompletedIds();
+  const remaining = TP_STATE.remaining || [];
+  const planIds = new Set([...completedIds, ...remaining.map(c => c.id)]);
+
+  // Build pool for minor/CC evaluation: completed courses + planned courses
   const pool = [];
   const seen = new Set();
 
-  // Completed courses from the transcript (matched entries)
   const matched = AUDIT_STATE.lastMatched || [];
   for (const m of matched) {
     const status = typeof getCourseStatus === 'function' ? getCourseStatus(m.active?.grade) : 'completed';
@@ -1167,23 +1171,32 @@ function evaluateTPRequirements() {
     });
   }
 
-  // Planned remaining courses
-  const remaining = TP_STATE.remaining || [];
   for (const c of remaining) {
     if (seen.has(c.code)) continue;
     seen.add(c.code);
-    pool.push({
-      code: c.code,
-      credits: c.credits,
-      grade: null,
-      status: 'planned',
-    });
+    pool.push({ code: c.code, credits: c.credits, grade: null, status: 'planned' });
   }
 
   container.innerHTML = '';
   let hasCards = false;
 
-  // Minor evaluations
+  // Primary major
+  const primaryResult = evaluateTPMajorReqs(AUDIT_STATE.program, planIds);
+  if (primaryResult) {
+    container.appendChild(renderTPMajorCard(primaryResult));
+    hasCards = true;
+  }
+
+  // Secondary major (double major)
+  if (AUDIT_STATE.secondaryProgram && !TP_STATE.restricted) {
+    const secResult = evaluateTPMajorReqs(AUDIT_STATE.secondaryProgram, planIds);
+    if (secResult) {
+      container.appendChild(renderTPMajorCard(secResult));
+      hasCards = true;
+    }
+  }
+
+  // Minors
   const selectedMinors = AUDIT_STATE.selectedMinors || [];
   if (selectedMinors.length > 0 && typeof computeMinorAudit === 'function' && typeof MINORS_DATA !== 'undefined') {
     for (const minorKey of selectedMinors) {
@@ -1197,7 +1210,7 @@ function evaluateTPRequirements() {
     }
   }
 
-  // CC Scholar evaluation
+  // CC Scholar
   if (AUDIT_STATE.ccEnabled && typeof CC_SCHOLAR_DATA !== 'undefined' && CC_SCHOLAR_DATA && CC_SCHOLAR_DATA.requirements) {
     if (typeof computeMinorAudit === 'function') {
       const ccDef = Object.assign({}, CC_SCHOLAR_DATA);
@@ -1212,6 +1225,144 @@ function evaluateTPRequirements() {
   }
 
   section.style.display = hasCards ? '' : 'none';
+}
+
+// ── Major requirements evaluation for transcript planner ──
+
+function evaluateTPMajorReqs(program, planIds) {
+  const curriculumIds = COURSES_ARRAY
+    .filter(c => c.semesters && c.semesters[program])
+    .map(c => c.id);
+
+  const groups = (typeof ELECTIVE_GROUPS !== 'undefined' && ELECTIVE_GROUPS[program]) || [];
+  const groupedIds = new Set();
+  for (const g of groups) {
+    for (const id of g.ids) groupedIds.add(id);
+  }
+
+  const requiredIds = curriculumIds.filter(id => !groupedIds.has(id));
+  const requiredResults = [];
+  let metCount = 0;
+
+  for (const id of requiredIds) {
+    const course = COURSES[id];
+    const met = planIds.has(id);
+    if (met) metCount++;
+    requiredResults.push({ id, code: course ? course.code : id, title: course ? course.title : '', met });
+  }
+
+  const groupResults = [];
+  for (const g of groups) {
+    if (g.key === 'core1' || g.key === 'core2') continue;
+    const slotsInPlan = g.ids.filter(id => planIds.has(id)).length;
+    const totalSlots = g.ids.length;
+    const totalCredits = g.ids.reduce((s, id) => { const c = COURSES[id]; return s + (c ? c.credits : 3); }, 0);
+    const filledCredits = g.ids.filter(id => planIds.has(id)).reduce((s, id) => { const c = COURSES[id]; return s + (c ? c.credits : 3); }, 0);
+    const met = slotsInPlan === totalSlots;
+    if (met) metCount++;
+    groupResults.push({ key: g.key, label: g.label, slotsInPlan, totalSlots, filledCredits, totalCredits, met });
+  }
+
+  const label = (typeof ALL_PROGRAMS !== 'undefined' && ALL_PROGRAMS[program]) || program;
+  const totalReqs = requiredResults.length + groupResults.length;
+
+  return {
+    program, label, requiredCourses: requiredResults, electiveGroups: groupResults,
+    metCount, totalReqs, allMet: metCount === totalReqs,
+  };
+}
+
+// ── Render major card (same structure as planner.js renderMajorCard) ──
+
+function renderTPMajorCard(majorResult) {
+  const allMet = majorResult.allMet;
+  const card = document.createElement('div');
+  card.className = 'minor-audit-card' + (allMet ? ' minor-met' : '');
+
+  const header = document.createElement('div');
+  header.className = 'minor-card-header';
+  const statusIcon = document.createElement('span');
+  statusIcon.className = 'minor-status-icon ' + (allMet ? 'met' : 'unmet');
+  statusIcon.textContent = allMet ? '\u2713' : '\u25CB';
+  header.appendChild(statusIcon);
+  const title = document.createElement('span');
+  title.className = 'minor-card-title';
+  title.textContent = majorResult.label;
+  header.appendChild(title);
+  const tally = document.createElement('span');
+  tally.className = 'minor-card-tally';
+  tally.textContent = majorResult.metCount + ' / ' + majorResult.totalReqs;
+  header.appendChild(tally);
+  card.appendChild(header);
+
+  // Progress bar
+  const pct = majorResult.totalReqs > 0
+    ? Math.min(100, Math.round((majorResult.metCount / majorResult.totalReqs) * 100)) : 0;
+  const progressWrap = document.createElement('div');
+  progressWrap.className = 'minor-progress-wrap';
+  const progressBar = document.createElement('div');
+  progressBar.className = 'minor-progress-bar';
+  progressBar.style.width = pct + '%';
+  progressBar.classList.add(pct >= 100 ? 'full' : pct > 0 ? 'partial' : 'empty');
+  progressWrap.appendChild(progressBar);
+  card.appendChild(progressWrap);
+
+  // Missing courses
+  const missingCourses = majorResult.requiredCourses.filter(c => !c.met);
+  if (missingCourses.length > 0) {
+    const reqList = document.createElement('div');
+    reqList.className = 'minor-req-list';
+    const row = document.createElement('div');
+    row.className = 'minor-req-row unmet';
+    const icon = document.createElement('span');
+    icon.className = 'minor-req-icon unmet';
+    icon.textContent = '\u25CB';
+    row.appendChild(icon);
+    const label = document.createElement('span');
+    label.className = 'minor-req-label';
+    label.textContent = 'Missing Courses';
+    row.appendChild(label);
+    const detail = document.createElement('span');
+    detail.className = 'minor-req-detail';
+    detail.innerHTML = '<span class="minor-need">Need: ' + missingCourses.map(c => c.code).join(', ') + '</span>';
+    row.appendChild(detail);
+    reqList.appendChild(row);
+    card.appendChild(reqList);
+  }
+
+  // Elective groups
+  if (majorResult.electiveGroups.length > 0) {
+    const reqList = card.querySelector('.minor-req-list') || (() => {
+      const el = document.createElement('div');
+      el.className = 'minor-req-list';
+      card.appendChild(el);
+      return el;
+    })();
+    for (const g of majorResult.electiveGroups) {
+      const row = document.createElement('div');
+      row.className = 'minor-req-row ' + (g.met ? 'met' : 'unmet');
+      const icon = document.createElement('span');
+      icon.className = 'minor-req-icon ' + (g.met ? 'met' : 'unmet');
+      icon.textContent = g.met ? '\u2713' : '\u25CB';
+      row.appendChild(icon);
+      const label = document.createElement('span');
+      label.className = 'minor-req-label';
+      label.textContent = g.label;
+      row.appendChild(label);
+      const detail = document.createElement('span');
+      detail.className = 'minor-req-detail';
+      if (g.met) {
+        detail.innerHTML = '<span class="minor-course-chip">' + g.slotsInPlan + '/' + g.totalSlots + ' slots (' + g.filledCredits + ' cr)</span>';
+      } else {
+        detail.innerHTML = '<span class="minor-course-chip">' + g.slotsInPlan + '/' + g.totalSlots + ' slots</span>' +
+          '<span class="minor-need">' + (g.totalCredits - g.filledCredits) + ' cr needed</span>';
+      }
+      row.appendChild(detail);
+      reqList.appendChild(row);
+    }
+  }
+
+  return card;
 }
 
 function renderTPFallbackCard(result) {
