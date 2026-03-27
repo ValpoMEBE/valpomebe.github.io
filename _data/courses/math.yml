@@ -58,3 +58,129 @@
   coreqs:
   - MATH_260
   desc: First and higher-order ODEs, systems of ODEs, Laplace transforms, and engineering applications.
+
+# Additional Math courses for Math B.S. major
+- id: MATH_264
+  code: MATH 264
+  title: Linear Algebra
+  credits: 3
+  tags:
+  - math
+  prereqs:
+  - MATH_132
+  coreqs: []
+  desc: Vector spaces, linear transformations, eigenvalues, inner product spaces, and applications.
+
+- id: MATH_266
+  code: MATH 266
+  title: Transitions in Mathematics
+  credits: 2
+  tags:
+  - math
+  prereqs:
+  - MATH_132
+  coreqs: []
+  desc: Introduction to proof-writing and mathematical reasoning. Sets, relations, functions, and proof techniques.
+
+- id: MATH_299
+  code: MATH 299
+  title: Mathematics Colloquium II
+  credits: 1
+  tags:
+  - math
+  prereqs: []
+  coreqs: []
+  desc: Mathematics department colloquium series.
+
+- id: MATH_399
+  code: MATH 399
+  title: Mathematics Colloquium III
+  credits: 1
+  tags:
+  - math
+  prereqs: []
+  coreqs: []
+  desc: Mathematics department colloquium series.
+
+- id: MATH_499
+  code: MATH 499
+  title: Mathematics Colloquium IV
+  credits: 1
+  tags:
+  - math
+  prereqs: []
+  coreqs: []
+  desc: Mathematics department colloquium series.
+
+# Math B.S. elective placeholders
+- id: MATH_ELEC_400_1
+  code: Math Elective (400+)
+  title: Math Elective 400+ Level 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 'One of: MATH 421, 422, 451, 452, 453, 461, or 462.'
+  eligible:
+    - "MATH 421 – Combinatorics I"
+    - "MATH 422 – Combinatorics II"
+    - "MATH 451 – Analysis I"
+    - "MATH 452 – Analysis II"
+    - "MATH 453 – Topology"
+    - "MATH 461 – Abstract Algebra I"
+    - "MATH 462 – Abstract Algebra II"
+
+- id: MATH_ELEC_400_2
+  code: Math Elective (400+)
+  title: Math Elective 400+ Level 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 'One of: MATH 421, 422, 451, 452, 453, 461, or 462.'
+  eligible:
+    - "MATH 421 – Combinatorics I"
+    - "MATH 422 – Combinatorics II"
+    - "MATH 451 – Analysis I"
+    - "MATH 452 – Analysis II"
+    - "MATH 453 – Topology"
+    - "MATH 461 – Abstract Algebra I"
+    - "MATH 462 – Abstract Algebra II"
+
+- id: MATH_ELEC_270_1
+  code: Math Elective (270+)
+  title: MATH/STAT/DATA Elective 270+ 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from MATH, STAT, or DATA courses numbered 270+.
+  eligible:
+    - "Any MATH/STAT/DATA 270+ course"
+
+- id: MATH_ELEC_270_2
+  code: Math Elective (270+)
+  title: MATH/STAT/DATA Elective 270+ 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from MATH, STAT, or DATA courses numbered 270+.
+  eligible:
+    - "Any MATH/STAT/DATA 270+ course"
+
+- id: MATH_ELEC_270_3
+  code: Math Elective (270+)
+  title: MATH/STAT/DATA Elective 270+ 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 3 credits from MATH, STAT, or DATA courses numbered 270+.
+  eligible:
+    - "Any MATH/STAT/DATA 270+ course"

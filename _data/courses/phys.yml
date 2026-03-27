@@ -1,3 +1,6 @@
+# Physics & Astronomy courses
+# Sources: Undergraduate Catalog 2025-2026, Physics B.S. requirements (p.277-282)
+
 - id: PHYS_141
   code: PHYS 141
   title: Newtonian Mechanics
@@ -8,6 +11,7 @@
   coreqs:
   - MATH_131
   desc: 'Classical mechanics: kinematics, Newton''s laws, energy, momentum. Includes PHYS 141L (1 cr lab).'
+
 - id: PHYS_142
   code: PHYS 142
   title: Electricity, Magnetism & Waves
@@ -19,3 +23,285 @@
   coreqs:
   - MATH_132
   desc: Electrostatics, circuits, magnetism, optics, and waves.
+
+- id: PHYS_190
+  code: PHYS 190
+  title: First Year Physics & Astronomy Seminar
+  credits: 1
+  tags:
+  - physics
+  prereqs: []
+  coreqs: []
+  desc: Introduction to the physics and astronomy department, research opportunities, and career paths.
+
+- id: PHYS_243
+  code: PHYS 243
+  title: Modern Physics
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_142
+  - MATH_132
+  coreqs: []
+  desc: Special relativity, quantum mechanics, atomic and nuclear structure, solid-state physics.
+
+- id: PHYS_245
+  code: PHYS 245
+  title: Advanced Lab 1
+  credits: 1
+  tags:
+  - physics
+  - lab
+  prereqs:
+  - PHYS_243
+  coreqs: []
+  desc: Advanced laboratory experiments in physics.
+
+- id: PHYS_246
+  code: PHYS 246
+  title: Data Analysis in Physics & Astronomy
+  credits: 1
+  tags:
+  - physics
+  - computing
+  prereqs:
+  - PHYS_243
+  coreqs: []
+  desc: Statistical methods and data analysis techniques for physics and astronomy.
+
+- id: PHYS_250
+  code: PHYS 250
+  title: Mechanics
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_243
+  - MATH_253
+  coreqs: []
+  desc: Analytical mechanics including Lagrangian and Hamiltonian formulations, oscillations, and central force motion.
+
+- id: PHYS_314
+  code: PHYS 314
+  title: Writing in Physics and Astronomy
+  credits: 2
+  tags:
+  - physics
+  prereqs:
+  - PHYS_243
+  coreqs: []
+  desc: Scientific writing for physics and astronomy, including journal articles and research proposals.
+
+- id: PHYS_345
+  code: PHYS 345
+  title: Advanced Lab 2
+  credits: 1
+  tags:
+  - physics
+  - lab
+  prereqs:
+  - PHYS_245
+  coreqs: []
+  desc: Continuation of advanced laboratory experiments.
+
+- id: PHYS_360
+  code: PHYS 360
+  title: Thermal Physics
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_250
+  coreqs: []
+  desc: Thermodynamics and statistical mechanics.
+
+- id: PHYS_371
+  code: PHYS 371
+  title: Electromagnetic Fields
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_250
+  coreqs: []
+  desc: Electrostatics, magnetostatics, Maxwell's equations, electromagnetic waves.
+
+- id: PHYS_372
+  code: PHYS 372
+  title: Electromagnetic Waves & Physical Optics
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_371
+  coreqs: []
+  desc: Electromagnetic wave propagation, reflection, refraction, diffraction, and interference.
+
+- id: PHYS_381
+  code: PHYS 381
+  title: Advanced Mechanics
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_250
+  coreqs: []
+  desc: Advanced classical mechanics including rigid body dynamics, normal modes, and nonlinear systems.
+
+- id: PHYS_421
+  code: PHYS 421
+  title: Quantum Mechanics I
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_250
+  coreqs: []
+  desc: Wave-particle duality, Schrodinger equation, hydrogen atom, angular momentum, spin.
+
+- id: PHYS_422
+  code: PHYS 422
+  title: Quantum Mechanics II
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_421
+  coreqs: []
+  desc: Time-independent and time-dependent perturbation theory, scattering, identical particles.
+
+- id: PHYS_430
+  code: PHYS 430
+  title: Nuclear Physics
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_421
+  coreqs:
+  - PHYS_430L
+  desc: Nuclear structure, radioactive decay, nuclear reactions, particle physics.
+
+- id: PHYS_430L
+  code: PHYS 430L
+  title: Nuclear Physics Lab
+  credits: 1
+  tags:
+  - physics
+  - lab
+  prereqs: []
+  coreqs:
+  - PHYS_430
+  desc: Laboratory component for PHYS 430.
+
+- id: PHYS_440
+  code: PHYS 440
+  title: Condensed Matter Physics
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_421
+  coreqs: []
+  desc: Crystal structures, lattice vibrations, electronic properties, semiconductors, superconductivity.
+
+- id: PHYS_445
+  code: PHYS 445
+  title: Senior Research in Physics
+  credits: 1
+  tags:
+  - physics
+  prereqs: []
+  coreqs: []
+  desc: Independent research project under faculty supervision. Taken multiple semesters (2 cr total required).
+
+- id: PHYS_490
+  code: PHYS 490
+  title: The Scientific Endeavor
+  credits: 3
+  tags:
+  - physics
+  prereqs: []
+  coreqs: []
+  desc: Philosophy and methodology of science, ethics in research.
+
+- id: PHYS_499
+  code: PHYS 499
+  title: Physics Colloquium
+  credits: 0
+  tags:
+  - physics
+  prereqs: []
+  coreqs: []
+  desc: Weekly department colloquium series. Required each semester (0 cr).
+
+# Physics B.S. elective placeholder (4 cr from PHYS/ASTR 200+)
+- id: PHYS_ELEC_1
+  code: Physics Elective
+  title: PHYS/ASTR Elective (200+)
+  credits: 4
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 4 credits from PHYS or ASTR courses at the 200-level or higher.
+  eligible:
+    - "Any PHYS 200+ or ASTR 200+ course"
+
+# Astronomy courses
+- id: ASTR_101
+  code: ASTR 101
+  title: Astronomy
+  credits: 3
+  tags:
+  - physics
+  prereqs: []
+  coreqs: []
+  desc: Survey of the solar system, stars, galaxies, and cosmology.
+
+- id: ASTR_101L
+  code: ASTR 101L
+  title: Astronomy Laboratory
+  credits: 1
+  tags:
+  - physics
+  - lab
+  prereqs: []
+  coreqs:
+  - ASTR_101
+  desc: Laboratory component for ASTR 101.
+
+- id: ASTR_221
+  code: ASTR 221
+  title: Observational Astronomy
+  credits: 1
+  tags:
+  - physics
+  prereqs: []
+  coreqs: []
+  desc: Techniques of astronomical observation including telescopes, imaging, and data analysis.
+
+- id: ASTR_252
+  code: ASTR 252
+  title: Introduction to Stellar Astronomy
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_142
+  - MATH_132
+  coreqs: []
+  desc: Properties of stars, stellar evolution, binary systems, and stellar remnants.
+
+- id: ASTR_253
+  code: ASTR 253
+  title: Introduction to Galactic Astrophysics and Cosmology
+  credits: 3
+  tags:
+  - physics
+  prereqs:
+  - PHYS_142
+  - MATH_132
+  coreqs: []
+  desc: Galaxies, large-scale structure, and cosmology.

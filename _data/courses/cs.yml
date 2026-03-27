@@ -1,8 +1,28 @@
 # ════════════════════════════════════════════════════════════════
 # Computer Science (CS) — Course Catalog
-# Only courses listed as Computer Engineering elective options
 # Source: Undergraduate Catalog 2025-2026, pages 460-466
 # ════════════════════════════════════════════════════════════════
+
+- id: CS_157
+  code: CS 157
+  title: Algorithms and Programming
+  credits: 3
+  tags:
+  - computing
+  prereqs: []
+  coreqs: []
+  desc: Introduction to algorithm design and programming using a high-level language.
+
+- id: CS_158
+  code: CS 158
+  title: Algorithms and Abstract Data Types
+  credits: 3
+  tags:
+  - computing
+  prereqs:
+  - CS_157
+  coreqs: []
+  desc: Data structures, abstract data types, algorithm design and analysis.
 
 - id: CS_225
   code: CS 225
@@ -114,3 +134,120 @@
   - MATH_220
   coreqs: []
   desc: Limits of computation and analysis of algorithms. Chomsky hierarchy, automata and language models, uncomputable problems, and various design strategies.
+
+- id: CS_354
+  code: CS 354
+  title: Software Tools for the Profession
+  credits: 1
+  tags:
+  - computing
+  prereqs:
+  - CS_250
+  coreqs: []
+  desc: Software development tools including version control, build systems, and testing frameworks.
+
+- id: CS_356
+  code: CS 356
+  title: Software Design and Development
+  credits: 3
+  tags:
+  - computing
+  prereqs:
+  - CS_250
+  coreqs: []
+  desc: Software engineering principles, design patterns, and team-based software development.
+
+- id: CS_493
+  code: CS 493
+  title: Seminar in Professional Practices
+  credits: 2
+  tags:
+  - computing
+  prereqs: []
+  coreqs: []
+  desc: Professional practices, ethics, and career preparation in computing.
+
+# CS B.S. elective placeholders
+- id: CS_ELEC_200_1
+  code: CS Elective (200+)
+  title: CS Elective 200+ Level 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: CS or allowed elective course numbered 200 or above.
+  eligible:
+    - "Any CS 200+ course"
+
+- id: CS_ELEC_200_2
+  code: CS Elective (200+)
+  title: CS Elective 200+ Level 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: CS or allowed elective course numbered 200 or above.
+  eligible:
+    - "Any CS 200+ course"
+
+- id: CS_ELEC_200_3
+  code: CS Elective (200+)
+  title: CS Elective 200+ Level 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: CS or allowed elective course numbered 200 or above.
+  eligible:
+    - "Any CS 200+ course"
+
+- id: CS_ELEC_300_1
+  code: CS Elective (300+)
+  title: CS Elective 300+ Level 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: CS or allowed elective course numbered 300 or above.
+  eligible:
+    - "Any CS 300+ course"
+
+- id: CS_ELEC_300_2
+  code: CS Elective (300+)
+  title: CS Elective 300+ Level 2
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: CS or allowed elective course numbered 300 or above.
+  eligible:
+    - "Any CS 300+ course"
+
+- id: CS_ELEC_300_3
+  code: CS Elective (300+)
+  title: CS Elective 300+ Level 3
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: CS or allowed elective course numbered 300 or above.
+  eligible:
+    - "Any CS 300+ course"
+
+- id: CS_ELEC_300_4
+  code: CS Elective (300+)
+  title: CS Elective 300+ Level 4
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: CS or allowed elective course numbered 300 or above.
+  eligible:
+    - "Any CS 300+ course"

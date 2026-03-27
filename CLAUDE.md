@@ -107,6 +107,23 @@ Lab courses on transcripts are bundled with their lecture course in courses.yml 
 - `GE 100L` → `GE_100`
 - `CHEM 121L` → `CHEM_121`
 
+## Reading the Catalog PDF
+
+The reference document `ReferenceDocuments/Undergraduate Catalog 2025-2026.pdf` (1299 pages) is the source of truth for all curriculum data. The built-in PDF reader does NOT work on Windows (missing `pdftoppm`). Use Python with PyMuPDF (`fitz`) instead:
+
+```python
+import fitz
+doc = fitz.open('G:/GitHubProjects/valpomebe.github.io/ReferenceDocuments/Undergraduate Catalog 2025-2026.pdf')
+# Read specific pages (0-indexed)
+page = doc[276]  # page 277
+print(page.get_text())
+# Search for content
+for i in range(doc.page_count):
+    if 'Physics, B.S.' in doc[i].get_text():
+        print(f'Found on page {i+1}')
+        break
+```
+
 ## Conventions
 
 - No test framework — verify via dev server + browser

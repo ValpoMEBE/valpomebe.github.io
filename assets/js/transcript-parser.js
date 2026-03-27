@@ -75,6 +75,43 @@ const COURSE_LINE_RE = /^([A-Z]{2,4})\s+(\d{1,4}[A-Z]?)\s+(.+)/;
 const SKIP_RE = /^(Course Title|Hrs |------|.*Totals:|Cumulative|Page \d|Valparaiso University|AP |^\s*$)/i;
 const DATE_RE = /(\d{2}\/\d{2}\/\d{2})-(\d{2}\/\d{2}\/\d{2})/;
 
+// ── Student name extraction ─────────────────────────────────────
+// DataVU format:   line 2 = "Max R. Van Den Berg"
+// Colleague format: line 1 = "Academic Evaluation - For Max R. Van Den Berg (4065067)"
+function extractStudentName(lines) {
+  if (!lines || lines.length < 3) return null;
+
+  // Try Colleague format first (any of first 5 lines)
+  const colleagueRe = /Academic Evaluation\s*[-–—]\s*For\s+(.+?)\s*\(/i;
+  for (let i = 0; i < Math.min(5, lines.length); i++) {
+    const m = lines[i].trim().match(colleagueRe);
+    if (m) return _parseName(m[1].trim());
+  }
+
+  // Try DataVU format: line index 2 should be a plain name
+  const candidate = (lines[2] || '').trim();
+  if (candidate &&
+      !SKIP_RE.test(candidate) &&
+      !COURSE_LINE_RE.test(candidate) &&
+      !/^\d/.test(candidate) &&
+      !/Page \d/i.test(candidate) &&
+      /^[A-Z][a-z]/.test(candidate)) {
+    return _parseName(candidate);
+  }
+
+  return null;
+}
+
+function _parseName(fullName) {
+  const tokens = fullName.split(/\s+/);
+  if (tokens.length < 2) return null;
+  const firstName = tokens[0];
+  // Filter out middle initials (e.g., "R." or "R")
+  const rest = tokens.slice(1).filter(t => !(t.length <= 2 && /^[A-Z]\.?$/.test(t)));
+  const lastName = rest.join(' ') || tokens[tokens.length - 1];
+  return { firstName, lastName, fullName };
+}
+
 function parseTranscriptLines(lines) {
   const entries = [];
 

@@ -1,0 +1,37 @@
+# ════════════════════════════════════════════════════════════════
+# Mathematics B.S. — Semester Placements
+# Source: Undergraduate Catalog 2025-2026, p.229-231
+# 124 total credits, 35+ major credits
+# ════════════════════════════════════════════════════════════════
+
+_catalog_year: 2025
+
+# ── Semester 1 ── Freshman Fall ──
+MATH_131: 1
+CS_157: 1
+XS_101: 1
+
+# ── Semester 2 ── Freshman Spring ──
+MATH_132: 2
+DATA_240: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+MATH_253: 3
+MATH_264: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+MATH_266: 4
+MATH_299: 4
+
+# ── Semester 5 ── Junior Fall ──
+MATH_ELEC_270_1: 5
+MATH_ELEC_400_1: 5
+MATH_399: 5
+
+# ── Semester 6 ── Junior Spring ──
+MATH_ELEC_270_2: 6
+
+# ── Semester 7 ── Senior Fall ──
+MATH_ELEC_400_2: 7
+MATH_ELEC_270_3: 7
+MATH_499: 7

@@ -57,3 +57,101 @@
   - CHEM_221
   coreqs: []
   desc: Carbonyl chemistry, aromatic compounds, amines, and biomolecules.
+
+# Additional Chemistry courses for Chem B.S.
+- id: CHEM_199
+  code: CHEM 199
+  title: Chemistry Colloquium I
+  credits: 0
+  tags: [materials]
+  prereqs: []
+  coreqs: []
+  desc: Chemistry department colloquium series.
+
+- id: CHEM_230
+  code: CHEM 230
+  title: Quantitative Analysis
+  credits: 4
+  tags: [materials]
+  prereqs: [CHEM_122]
+  coreqs: []
+  desc: Gravimetric, volumetric, and instrumental analytical methods.
+
+- id: CHEM_299
+  code: CHEM 299
+  title: Chemistry Colloquium II
+  credits: 0
+  tags: [materials]
+  prereqs: []
+  coreqs: []
+  desc: Chemistry department colloquium series.
+
+- id: CHEM_311
+  code: CHEM 311
+  title: Elementary Physical Chemistry
+  credits: 4
+  tags: [materials]
+  prereqs: [CHEM_122, MATH_131]
+  coreqs: []
+  desc: Thermodynamics, kinetics, and quantum chemistry.
+
+- id: CHEM_315
+  code: CHEM 315
+  title: Biochemistry I
+  credits: 4
+  tags: [materials]
+  prereqs: [CHEM_222]
+  coreqs: []
+  desc: Structure and function of biological molecules. Includes CHEM 315L (1 cr lab).
+
+- id: CHEM_399
+  code: CHEM 399
+  title: Chemistry Colloquium III
+  credits: 0
+  tags: [materials]
+  prereqs: []
+  coreqs: []
+  desc: Chemistry department colloquium series.
+
+- id: CHEM_496
+  code: CHEM 496
+  title: Directed Research in Chemistry
+  credits: 1
+  tags: [materials]
+  prereqs: []
+  coreqs: []
+  desc: Independent research under faculty supervision.
+
+- id: CHEM_499
+  code: CHEM 499
+  title: Chemistry Colloquium IV
+  credits: 0
+  tags: [materials]
+  prereqs: []
+  coreqs: []
+  desc: Chemistry department colloquium series.
+
+# Chemistry B.S. elective placeholders
+- id: CHEM_ELEC_300_1
+  code: Chem Elective (300+)
+  title: Chemistry 300+ Elective 1
+  credits: 3
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 300 or 400 level Chemistry course.
+  eligible:
+    - "Any CHEM 300+ or 400+ course"
+
+- id: CHEM_ELEC_300_2
+  code: Chem Elective (300+)
+  title: Chemistry 300+ Elective 2
+  credits: 4
+  tags: []
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 300 or 400 level Chemistry course.
+  eligible:
+    - "Any CHEM 300+ or 400+ course"

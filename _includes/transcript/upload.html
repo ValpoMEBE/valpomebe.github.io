@@ -26,6 +26,20 @@
   </div>
 </div>
 
+<!-- Double Major selector — collapsible -->
+<div class="minor-controls-bar">
+  <button class="minor-toggle" onclick="toggleDoubleMajor()">
+    <span class="prog-label">Double Major (optional)</span>
+    <span class="minor-toggle-arrow" id="dbl-major-arrow">&#9660;</span>
+  </button>
+  <div id="dbl-major-tag" class="minor-tags"></div>
+  <div id="dbl-major-picker" class="dbl-major-picker" style="display:none;">
+    <div class="program-controls" id="dbl-major-buttons">
+      <!-- JS populates buttons from available programs -->
+    </div>
+  </div>
+</div>
+
 <!-- Minor selector — collapsible picker with tag pills -->
 <div class="minor-controls-bar">
   <button class="minor-toggle" onclick="toggleMinorPicker()">

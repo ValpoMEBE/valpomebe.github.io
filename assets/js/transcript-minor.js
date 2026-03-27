@@ -29,33 +29,27 @@ function applyDeptRenames(code) {
 function buildTranscriptPool(matched, unmatched) {
   const pool = [];
   const seen = new Set();
-  const poolByCode = {};
 
   for (const m of matched) {
     const status = getCourseStatus(m.active.grade);
     if (status === 'failed') continue;          // skip F grades
     const code = applyDeptRenames(m.code);
 
-    // Bundled labs (e.g. ECE 221L → ECE 221): add lab credits to parent entry
-    if (typeof CODE_ALIASES !== 'undefined' && CODE_ALIASES[code]) {
-      const parentCode = CODE_ALIASES[code].replace(/_/g, ' ');
-      if (parentCode !== code && poolByCode[parentCode]) {
-        poolByCode[parentCode].credits += m.active.credits || 0;
-        seen.add(code);
-        continue;
-      }
-    }
+    // No lab bundling — labs appear as separate pool entries so minor
+    // requirements can list them individually (e.g. PHYS 141L).
 
     if (seen.has(code)) continue;
     seen.add(code);
+    // IP courses (no grade) get 0 credits — they haven't been earned yet.
+    // Only use courseData credits as fallback for graded courses.
+    const isIP = !m.active.grade;
     const entry = {
       code,
-      credits: m.active.credits || (m.courseData ? m.courseData.credits : 3),
+      credits: isIP ? 0 : (m.active.credits || (m.courseData ? m.courseData.credits : 3)),
       grade: m.active.grade,
       status,
     };
     pool.push(entry);
-    poolByCode[code] = entry;
   }
 
   for (const u of (unmatched || [])) {
@@ -64,14 +58,14 @@ function buildTranscriptPool(matched, unmatched) {
     const code = applyDeptRenames(u.code);
     if (seen.has(code)) continue;
     seen.add(code);
+    const isIP = !u.active.grade;
     const entry = {
       code,
-      credits: u.active.credits || 3,
+      credits: isIP ? 0 : (u.active.credits || 3),
       grade: u.active.grade,
       status,
     };
     pool.push(entry);
-    poolByCode[code] = entry;
   }
   return pool;
 }
@@ -435,9 +429,14 @@ function checkAboveAndBeyond(reqResults, pool, majorUsedSet, otherAboveBeyondCod
   return { met: false, course: null };
 }
 
-function computeAllMinors(matched, unmatched, auditResult, selectedMinorIds, program) {
+function computeAllMinors(matched, unmatched, auditResult, selectedMinorIds, program, secondaryAuditResult) {
   const pool = buildTranscriptPool(matched, unmatched);
   const majorUsedSet = buildMajorUsedSet(auditResult, program, pool);
+  // If double major, merge secondary major's used set
+  if (secondaryAuditResult) {
+    const secUsed = buildMajorUsedSet(secondaryAuditResult, AUDIT_STATE.secondaryProgram, pool);
+    for (const code of secUsed) majorUsedSet.add(code);
+  }
   const otherAboveBeyondCodes = new Set();
   const results = [];
 
@@ -542,12 +541,23 @@ function rerunMinors() {
     AUDIT_STATE.lastCodeIndex,
     AUDIT_STATE.lastUnmatched
   );
+  // Build secondary audit result if double major is active
+  let secAudit = null;
+  if (AUDIT_STATE.secondaryProgram) {
+    secAudit = computeAudit(
+      AUDIT_STATE.lastMatched,
+      AUDIT_STATE.secondaryProgram,
+      AUDIT_STATE.lastCodeIndex,
+      AUDIT_STATE.lastUnmatched
+    );
+  }
   const minorResults = computeAllMinors(
     AUDIT_STATE.lastMatched,
     AUDIT_STATE.lastUnmatched,
     auditResult,
     selected,
-    AUDIT_STATE.program
+    AUDIT_STATE.program,
+    secAudit
   );
   renderMinorResults(minorResults);
 }
@@ -670,7 +680,7 @@ function createReqRow(req) {
       const gradeClass = f.grade ? getGradeClass(f.grade) : 'grade-ip';
       return '<span class="minor-course-chip">' + f.code +
         ' <span class="minor-grade ' + gradeClass + '">' + gradeTxt + '</span>' +
-        ' (' + f.credits + ' cr)</span>';
+        ' (' + (f.credits > 0 ? f.credits + ' cr' : '- cr') + ')</span>';
     }).join(' ');
     detail.innerHTML = chips;
   }

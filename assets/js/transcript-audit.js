@@ -7,6 +7,7 @@
 // ── State ──────────────────────────────────────────────────────
 let AUDIT_STATE = {
   program: 'ME',
+  secondaryProgram: null, // double major
   catalogYear: 2022,
   file: null,
   selectedMinors: [],
@@ -15,6 +16,25 @@ let AUDIT_STATE = {
   lastUnmatched: null,
   lastCodeIndex: null,
   lastEntries: null, // raw parsed entries for CSV export
+  lastSecondaryAuditResult: null, // double major audit
+  studentName: null, // extracted from transcript PDF
+};
+
+// All available programs for double major selection
+const ALL_PROGRAMS = {
+  ME:            'Mechanical Engineering',
+  BE_Biomech:    'BE – Biomechanical',
+  BE_Bioelec:    'BE – Bioelectrical',
+  BE_Biomed:     'BE – Biomedical',
+  CE:            'Civil Engineering',
+  CPE:           'Computer Engineering',
+  EE:            'Electrical Engineering',
+  ENE:           'Environmental Engineering',
+  Physics_BS:    'Physics B.S.',
+  Math_BS:       'Mathematics B.S.',
+  CS_BS:         'Computer Science B.S.',
+  Chemistry_BS:  'Chemistry B.S.',
+  Music_BA:      'Music B.A.',
 };
 
 // ── Course code aliases ──────────────────────────────────────────
@@ -184,6 +204,170 @@ const ELECTIVE_GROUPS = {
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
+    },
+  ],
+  CE: [
+    ...CORE_GROUPS,
+    THEO_GROUP,
+    {
+      key: 'ce_elec',
+      label: 'CE Electives',
+      ids: ['CE_ELEC_1', 'CE_ELEC_2', 'CE_ELEC_3'],
+      approvedLists: ['ce_electives'],
+      blanketDepts: [],
+    },
+    {
+      key: 'ce_wl',
+      label: 'WL / Diversity',
+      ids: ['CE_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: ['AAA'],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
+      key: 'ce_prof',
+      label: 'Prof. Elective',
+      ids: ['CE_PROF_ELEC'],
+      approvedLists: ['professional_electives'],
+      blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'],
+      maxCourses: 1,
+    },
+    {
+      key: 'ce_humssrs',
+      label: 'Hum / SS / RS',
+      ids: ['CE_HUM_1', 'CE_HUM_2'],
+      approvedLists: ['humanities', 'social_sciences'],
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
+    },
+  ],
+  CPE: [
+    ...CORE_GROUPS,
+    THEO_GROUP,
+    {
+      key: 'cpe_elec',
+      label: 'CPE Electives',
+      ids: ['CPE_ELEC_1', 'CPE_ELEC_2', 'CPE_ELEC_3', 'CPE_ELEC_4'],
+      approvedLists: ['cpe_electives'],
+      blanketDepts: [],
+    },
+    {
+      key: 'cpe_mathsci',
+      label: 'Math/Science Electives',
+      ids: ['CPE_MATHSCI_1', 'CPE_MATHSCI_2'],
+      approvedLists: [],
+      blanketDepts: ['MATH', 'PHYS', 'CHEM', 'BIO', 'ASTR', 'DATA'],
+    },
+    {
+      key: 'cpe_wl',
+      label: 'WL / Diversity',
+      ids: ['CPE_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: ['AAA'],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
+      key: 'cpe_prof',
+      label: 'Prof. Elective',
+      ids: ['CPE_PROF'],
+      approvedLists: ['professional_electives'],
+      blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'],
+      maxCourses: 1,
+    },
+    {
+      key: 'cpe_humssrs',
+      label: 'Hum / SS / RS',
+      ids: ['CPE_HUM_1', 'CPE_HUM_2'],
+      approvedLists: ['humanities', 'social_sciences'],
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
+    },
+  ],
+  EE: [
+    ...CORE_GROUPS,
+    THEO_GROUP,
+    {
+      key: 'ee_elec',
+      label: 'EE Electives',
+      ids: ['EE_ELEC_1', 'EE_ELEC_2', 'EE_ELEC_3', 'EE_ELEC_4', 'EE_ELEC_5', 'EE_ELEC_6'],
+      approvedLists: ['ee_electives'],
+      blanketDepts: [],
+    },
+    {
+      key: 'ee_mathsci',
+      label: 'Math/Science Electives',
+      ids: ['EE_MATHSCI_1', 'EE_MATHSCI_2', 'EE_MATHSCI_3'],
+      approvedLists: [],
+      blanketDepts: ['MATH', 'PHYS', 'CHEM', 'BIO', 'ASTR', 'DATA'],
+    },
+    {
+      key: 'ee_wl',
+      label: 'WL / Diversity',
+      ids: ['EE_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: ['AAA'],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
+      key: 'ee_prof',
+      label: 'Prof. Electives',
+      ids: ['EE_PROF_1', 'EE_PROF_2'],
+      approvedLists: ['professional_electives'],
+      blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'],
+    },
+    {
+      key: 'ee_humssrs',
+      label: 'Hum / SS / RS',
+      ids: ['EE_HUM_1', 'EE_HUM_2'],
+      approvedLists: ['humanities', 'social_sciences'],
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
+    },
+  ],
+  ENE: [
+    ...CORE_GROUPS,
+    THEO_GROUP,
+    {
+      key: 'ene_elec',
+      label: 'ENE Electives',
+      ids: ['ENE_ELEC_1', 'ENE_ELEC_2'],
+      approvedLists: ['ene_electives'],
+      blanketDepts: [],
+    },
+    {
+      key: 'ene_wl',
+      label: 'WL / Diversity',
+      ids: ['ENE_WL'],
+      approvedLists: ['world_languages', 'cultural_diversity'],
+      blanketDepts: ['AAA'],
+      checkWorldLang: true,
+      maxCourses: 1,
+    },
+    {
+      key: 'ene_prof',
+      label: 'Prof. Elective',
+      ids: ['ENE_PROF_ELEC'],
+      approvedLists: ['professional_electives'],
+      blanketDepts: ['ACC', 'ASTR', 'BIO', 'BLAW', 'FIN', 'MGT', 'MKT'],
+      maxCourses: 1,
+    },
+    {
+      key: 'ene_humssrs',
+      label: 'Hum / SS / RS',
+      ids: ['ENE_HUM_1', 'ENE_HUM_2'],
+      approvedLists: ['humanities', 'social_sciences'],
+      blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
+    },
+  ],
+  Physics_BS: [
+    ...CORE_GROUPS,
+    {
+      key: 'phys_elec',
+      label: 'Physics Electives',
+      ids: ['PHYS_ELEC_1'],
+      approvedLists: [],
+      blanketDepts: ['PHYS', 'ASTR'],
+      checkWorldLang: false,
     },
   ],
 };
@@ -907,6 +1091,86 @@ function renderUnmatched(unmatched) {
   }
 }
 
+// ── Secondary Major Rendering (Double Major) ──────────────────
+function renderSecondaryAudit(auditResult, unmatched, summary, primaryAudit) {
+  const section = document.getElementById('secondary-major-section');
+  if (!section) return;
+  section.style.display = '';
+
+  // Title
+  const title = document.getElementById('secondary-major-title');
+  if (title) title.textContent = 'Secondary Major: ' + getProgramLabel(AUDIT_STATE.secondaryProgram);
+
+  // Above-and-Beyond check
+  const aab = checkDoubleMajorAaB(primaryAudit, auditResult);
+  const aabEl = document.getElementById('secondary-aab');
+  if (aabEl) {
+    if (aab.met) {
+      aabEl.className = 'secondary-aab aab-met';
+      aabEl.innerHTML = 'Above &amp; Beyond: ' + aab.course + ' (' + aab.credits + ' cr)';
+    } else {
+      aabEl.className = 'secondary-aab aab-not-met';
+      aabEl.innerHTML = 'Above &amp; Beyond: Not met &mdash; needs 1 unique course (3+ cr, 200+)';
+    }
+  }
+
+  // Summary bar
+  const bar = document.getElementById('secondary-summary-bar');
+  if (bar) {
+    bar.innerHTML =
+      '<div class="summary-stat"><span class="stat-value">' + summary.creditsDone + '</span><span class="stat-label">Credits Done</span></div>' +
+      '<div class="summary-stat"><span class="stat-value">' + summary.creditsRemaining + '</span><span class="stat-label">Credits Left</span></div>' +
+      '<div class="summary-stat stat-progress"><span class="stat-value">' + summary.pct + '%</span><span class="stat-label">Progress</span></div>' +
+      '<div class="progress-bar-wrap"><div class="progress-bar" style="width:' + summary.pct + '%"></div></div>';
+  }
+
+  // Semester grid (reuse existing rendering helpers)
+  const { audit, groupCards, usedForGroups } = auditResult;
+  const grid = document.getElementById('secondary-audit-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  for (const sem of SEMESTERS) {
+    const courses = audit
+      .filter(c => c.semester === sem.s)
+      .sort((a, b) => (a.isPlaceholder ? 1 : 0) - (b.isPlaceholder ? 1 : 0));
+    const semGroupCards = groupCards.filter(g => g.semester === sem.s);
+    if (!courses.length && !semGroupCards.length) continue;
+
+    const col = document.createElement('div');
+    col.className = 'sem-col';
+    const header = document.createElement('div');
+    header.className = 'sem-header';
+    header.innerHTML =
+      '<div class="sem-year">' + sem.year + '</div>' +
+      '<div class="sem-name">' + sem.season + '</div>';
+    col.appendChild(header);
+
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'sem-cards';
+    for (const course of courses) cardsWrap.appendChild(createAuditCard(course));
+    for (const gc of semGroupCards) cardsWrap.appendChild(createGroupCard(gc));
+    col.appendChild(cardsWrap);
+    grid.appendChild(col);
+  }
+
+  // Unmatched for secondary
+  const remainingUnmatched = usedForGroups
+    ? unmatched.filter(u => !usedForGroups.has(u.code))
+    : unmatched;
+  const secUnmatchedSection = document.getElementById('secondary-unmatched-section');
+  const secUnmatchedList = document.getElementById('secondary-unmatched-list');
+  if (secUnmatchedSection && secUnmatchedList) {
+    // Don't show unmatched for secondary — primary already shows them
+    secUnmatchedSection.style.display = 'none';
+  }
+}
+
+function hideSecondaryAudit() {
+  const section = document.getElementById('secondary-major-section');
+  if (section) section.style.display = 'none';
+}
+
 // ── Build unlock index ──────────────────────────────────────────
 const UNLOCKS = {};
 for (const c of Object.values(COURSES)) {
@@ -1177,6 +1441,103 @@ function selectCatalogYear(year) {
   rerunAudit();
 }
 
+// ── Double Major ──────────────────────────────────────────────
+function toggleDoubleMajor() {
+  const picker = document.getElementById('dbl-major-picker');
+  const arrow = document.getElementById('dbl-major-arrow');
+  if (!picker) return;
+  const open = picker.style.display === 'none';
+  picker.style.display = open ? '' : 'none';
+  arrow.textContent = open ? '\u25B2' : '\u25BC';
+  if (open) populateDoubleMajorButtons();
+}
+
+function populateDoubleMajorButtons() {
+  const container = document.getElementById('dbl-major-buttons');
+  if (!container) return;
+  container.innerHTML = '';
+  for (const [key, label] of Object.entries(ALL_PROGRAMS)) {
+    if (key === AUDIT_STATE.program) continue; // can't double with self
+    // For BE tracks: skip the generic 'BE' selector
+    if (AUDIT_STATE.program.startsWith('BE_') && key.startsWith('BE_')) continue;
+    const btn = document.createElement('button');
+    btn.className = 'prog-btn' + (AUDIT_STATE.secondaryProgram === key ? ' active' : '');
+    btn.textContent = label;
+    btn.onclick = () => selectSecondaryProgram(key);
+    container.appendChild(btn);
+  }
+  // Add "None" button to clear
+  if (AUDIT_STATE.secondaryProgram) {
+    const noneBtn = document.createElement('button');
+    noneBtn.className = 'prog-btn';
+    noneBtn.textContent = 'Remove';
+    noneBtn.style.borderColor = '#f87171';
+    noneBtn.style.color = '#f87171';
+    noneBtn.onclick = () => selectSecondaryProgram(null);
+    container.appendChild(noneBtn);
+  }
+}
+
+function selectSecondaryProgram(prog) {
+  AUDIT_STATE.secondaryProgram = prog;
+  AUDIT_STATE.lastSecondaryAuditResult = null;
+
+  // Update tag display
+  const tagEl = document.getElementById('dbl-major-tag');
+  if (tagEl) {
+    tagEl.innerHTML = prog
+      ? '<span class="minor-tag">' + (ALL_PROGRAMS[prog] || prog) +
+        ' <button onclick="selectSecondaryProgram(null)">&times;</button></span>'
+      : '';
+  }
+
+  // Apply curriculum for secondary program
+  if (prog && typeof applyCurriculum === 'function') {
+    applyCurriculum(prog, AUDIT_STATE.catalogYear);
+  }
+
+  populateDoubleMajorButtons();
+  rerunAudit();
+}
+
+// ── Above-and-Beyond check for double major ───────────────────
+// Per Valpo catalog p.1080: each additional major requires at least one
+// course (3+ credits, 200+ level) above all coursework for the primary degree.
+function checkDoubleMajorAaB(primaryAudit, secondaryAudit) {
+  // Get all course IDs required by primary major
+  const primaryIds = new Set();
+  for (const c of primaryAudit.audit) {
+    primaryIds.add(c.id);
+  }
+  for (const gc of primaryAudit.groupCards) {
+    for (const id of gc.filledCourses.map(fc => {
+      // Map code back to ID if possible
+      const key = fc.code.replace(/\s+/g, '_').toUpperCase();
+      return COURSES[key] ? key : null;
+    }).filter(Boolean)) {
+      primaryIds.add(id);
+    }
+    // Also add the placeholder IDs
+    if (gc.ids) gc.ids.forEach(id => primaryIds.add(id));
+  }
+
+  // Find courses in secondary audit that are:
+  // 1. Completed or in-progress (not remaining)
+  // 2. 3+ credits
+  // 3. 200+ level
+  // 4. NOT in primary required list
+  for (const c of secondaryAudit.audit) {
+    if (c.status === 'remaining' || c.status === 'failed') continue;
+    if (primaryIds.has(c.id)) continue;
+    if ((c.credits || 0) < 3) continue;
+    const match = c.code.match(/\d+/);
+    if (!match || parseInt(match[0]) < 200) continue;
+    return { met: true, course: c.code, credits: c.credits };
+  }
+
+  return { met: false, course: null, credits: 0 };
+}
+
 // ── File handling ──────────────────────────────────────────────
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
@@ -1247,9 +1608,12 @@ async function parseTranscript() {
     if (AUDIT_STATE.file.name.endsWith('.csv')) {
       // Parse CSV file
       entries = await parseCSVTranscript(AUDIT_STATE.file);
+      AUDIT_STATE.studentName = null; // CSV has no name info
     } else {
       // 1. Extract text from PDF
       const lines = await extractTextFromPDF(AUDIT_STATE.file);
+      // 1b. Extract student name from header lines
+      AUDIT_STATE.studentName = extractStudentName(lines);
       // 2. Parse course entries
       entries = parseTranscriptLines(lines);
     }
@@ -1309,6 +1673,20 @@ function runAudit(matched, unmatched, codeIndex) {
   AUDIT_STATE.lastAuditResult = auditResult;
   renderAudit(auditResult, unmatched, summary);
 
+  // Secondary major audit (double major)
+  if (AUDIT_STATE.secondaryProgram) {
+    if (typeof applyCurriculum === 'function') {
+      applyCurriculum(AUDIT_STATE.secondaryProgram, AUDIT_STATE.catalogYear);
+    }
+    const secAudit = computeAudit(matched, AUDIT_STATE.secondaryProgram, codeIndex, unmatched);
+    const secSummary = computeSummary(secAudit, matched);
+    AUDIT_STATE.lastSecondaryAuditResult = secAudit;
+    renderSecondaryAudit(secAudit, unmatched, secSummary, auditResult);
+  } else {
+    AUDIT_STATE.lastSecondaryAuditResult = null;
+    hideSecondaryAudit();
+  }
+
   // Re-run minor audits if any are selected
   if (typeof rerunMinors === 'function') rerunMinors();
 }
@@ -1359,6 +1737,11 @@ function getProgramLabel(program) {
     'CPE': 'Computer Engineering',
     'EE': 'Electrical Engineering',
     'ENE': 'Environmental Engineering',
+    'Physics_BS': 'Physics B.S.',
+    'Math_BS': 'Mathematics B.S.',
+    'CS_BS': 'Computer Science B.S.',
+    'Chemistry_BS': 'Chemistry B.S.',
+    'Music_BA': 'Music B.A.',
   };
   return labels[program] || program;
 }
@@ -1524,7 +1907,7 @@ function buildMajorSheetData(auditResult, unmatched) {
       if (fcStatus === 'failed') continue;
       const prefix = !fc.grade ? '(In-Progress) ' : '';
       const gradeStr = fc.grade ? ' (' + fc.grade + ')' : '';
-      const crStr = ' (' + (fc.credits ? fc.credits + ' cr' : '? cr') + ')';
+      const crStr = ' (' + (fc.credits > 0 ? fc.credits + ' cr' : '- cr') + ')';
       row.push(prefix + fc.code + gradeStr + crStr);
     }
 
@@ -1577,7 +1960,10 @@ function buildMinorSheetData(minorResult) {
   rows.push(['Requirement', 'Status', 'Fulfilling Courses']);
 
   for (const req of minorResult.requirements) {
-    const status = req.met ? 'Fulfilled' : (req.creditsApplied > 0 ? 'Partially Fulfilled' : 'Unfulfilled');
+    const hasIP = req.filled && req.filled.some(fc => !fc.grade);
+    const status = req.met
+      ? (hasIP ? 'In Progress' : 'Fulfilled')
+      : (req.creditsApplied > 0 ? 'Partially Fulfilled' : 'Unfulfilled');
     const row = [req.label, status];
 
     for (const fc of req.filled) {
@@ -1585,7 +1971,7 @@ function buildMinorSheetData(minorResult) {
       if (fcStatus === 'failed') continue;
       const prefix = !fc.grade ? '(In-Progress) ' : '';
       const gradeStr = fc.grade ? ' (' + fc.grade + ')' : '';
-      const crStr = ' (' + (fc.credits ? fc.credits + ' cr' : '? cr') + ')';
+      const crStr = ' (' + (fc.credits > 0 ? fc.credits + ' cr' : '- cr') + ')';
       row.push(prefix + fc.code + gradeStr + crStr);
     }
 
@@ -1634,6 +2020,16 @@ function downloadAuditExcel() {
   applySheetStyles(majorWs, majorData);
   XLSX.utils.book_append_sheet(wb, majorWs, sanitizeSheetName('Major - ' + programLabel));
 
+  // ── Secondary major tab (double major) ──
+  if (AUDIT_STATE.secondaryProgram && AUDIT_STATE.lastSecondaryAuditResult) {
+    const secLabel = getProgramLabel(AUDIT_STATE.secondaryProgram);
+    const secData = buildMajorSheetData(AUDIT_STATE.lastSecondaryAuditResult, AUDIT_STATE.lastUnmatched);
+    const secWs = XLSX.utils.aoa_to_sheet(secData);
+    setColWidths(secWs, secData);
+    applySheetStyles(secWs, secData);
+    XLSX.utils.book_append_sheet(wb, secWs, sanitizeSheetName('Major - ' + secLabel));
+  }
+
   // ── Minor tabs ──
   const selected = AUDIT_STATE.selectedMinors || [];
   if (selected.length > 0 && typeof computeAllMinors === 'function') {
@@ -1659,7 +2055,12 @@ function downloadAuditExcel() {
     }
   }
 
-  XLSX.writeFile(wb, 'audit-summary.xlsx');
+  // Derive filename from student name extracted from transcript
+  let fileName = 'Audit-Summary.xlsx';
+  if (AUDIT_STATE.studentName && AUDIT_STATE.studentName.lastName) {
+    fileName = AUDIT_STATE.studentName.lastName.replace(/\s+/g, '') + '-Audit.xlsx';
+  }
+  XLSX.writeFile(wb, fileName);
 }
 
 function resetAudit() {
@@ -1672,6 +2073,9 @@ function resetAudit() {
   AUDIT_STATE.lastCodeIndex = null;
   AUDIT_STATE.lastEntries = null;
   AUDIT_STATE.lastAuditResult = null;
+  AUDIT_STATE.lastSecondaryAuditResult = null;
+  AUDIT_STATE.studentName = null;
+  hideSecondaryAudit();
   clearFile();
 }
 

@@ -1,0 +1,41 @@
+# ════════════════════════════════════════════════════════════════
+# Computer Science B.S. — Semester Placements
+# Source: Undergraduate Catalog 2025-2026, p.131-133
+# 124 total credits, 36+ major credits
+# ════════════════════════════════════════════════════════════════
+
+_catalog_year: 2025
+
+# ── Semester 1 ── Freshman Fall ──
+MATH_131: 1
+CS_157: 1
+XS_101: 1
+
+# ── Semester 2 ── Freshman Spring ──
+MATH_220: 2
+CS_158: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+CS_250: 3
+DATA_240: 3
+CS_ELEC_200_1: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+CS_354: 4
+CS_356: 4
+CS_ELEC_200_2: 4
+CS_ELEC_200_3: 4
+
+# ── Semester 5 ── Junior Fall ──
+CS_372: 5
+
+# ── Semester 6 ── Junior Spring ──
+CS_ELEC_300_1: 6
+CS_493: 6
+
+# ── Semester 7 ── Senior Fall ──
+CS_ELEC_300_2: 7
+CS_ELEC_300_3: 7
+
+# ── Semester 8 ── Senior Spring ──
+CS_ELEC_300_4: 8

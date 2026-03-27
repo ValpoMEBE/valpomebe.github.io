@@ -1,0 +1,284 @@
+# Music courses — for Music B.A. major
+# Source: Undergraduate Catalog 2025-2026, p.240-245
+
+- id: MUS_109
+  code: MUS 109
+  title: Musicianship I
+  credits: 2
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  desc: Ear training and sight singing fundamentals.
+
+- id: MUS_110
+  code: MUS 110
+  title: Musicianship II
+  credits: 2
+  tags: [music]
+  prereqs: [MUS_109]
+  coreqs: []
+  desc: Continuation of ear training and sight singing.
+
+- id: MUS_163
+  code: MUS 163
+  title: Music Theory I
+  credits: 3
+  tags: [music]
+  prereqs: []
+  coreqs: [MUS_109]
+  desc: Fundamentals of tonal harmony, voice leading, and analysis.
+
+- id: MUS_164
+  code: MUS 164
+  title: Music Theory II
+  credits: 3
+  tags: [music]
+  prereqs: [MUS_163]
+  coreqs: [MUS_110]
+  desc: Continuation of tonal harmony and analysis.
+
+- id: MUS_201
+  code: MUS 201
+  title: "Comparative Music: Elements and Expressions"
+  credits: 2
+  tags: [music]
+  prereqs: [MUS_164]
+  coreqs: []
+  desc: Study of music from diverse cultures and traditions.
+
+- id: MUS_209
+  code: MUS 209
+  title: Musicianship III
+  credits: 2
+  tags: [music]
+  prereqs: [MUS_110]
+  coreqs: []
+  desc: Advanced ear training and sight singing.
+
+- id: MUS_213
+  code: MUS 213
+  title: Basic Conducting
+  credits: 2
+  tags: [music]
+  prereqs: [MUS_164]
+  coreqs: []
+  desc: Fundamentals of conducting technique.
+
+- id: MUS_263
+  code: MUS 263
+  title: Music Theory III
+  credits: 3
+  tags: [music]
+  prereqs: [MUS_164]
+  coreqs: [MUS_209]
+  desc: Chromatic harmony, modulation, and formal analysis.
+
+- id: MUS_264
+  code: MUS 264
+  title: "Music Theory IV: Post-Tonal"
+  credits: 3
+  tags: [music]
+  prereqs: [MUS_263]
+  coreqs: []
+  desc: Post-tonal theory, set theory, serialism, and 20th/21st century techniques.
+
+- id: MUS_300
+  code: MUS 300
+  title: Keyboard Proficiency
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  desc: Keyboard proficiency exam requirement.
+
+- id: MUS_318
+  code: MUS 318
+  title: "Music History: Baroque to Early Romantic"
+  credits: 3
+  tags: [music]
+  prereqs: [MUS_164]
+  coreqs: []
+  desc: Music from the Baroque, Classical, and Early Romantic eras.
+
+- id: MUS_319
+  code: MUS 319
+  title: Music of the Late Romantic and Modern Eras
+  credits: 3
+  tags: [music]
+  prereqs: [MUS_164]
+  coreqs: []
+  desc: Music from the Late Romantic period through contemporary works.
+
+- id: MUS_400
+  code: MUS 400
+  title: Concert Attendance
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  desc: Required concert attendance throughout the program.
+
+- id: MUS_499
+  code: MUS 499
+  title: Music Colloquium
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  desc: Department colloquium series. Required each semester (0 cr).
+
+- id: MUAP_275
+  code: MUAP 275
+  title: Performance Level Proficiency II
+  credits: 0
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  desc: Performance proficiency exam requirement.
+
+# Placeholders for variable-credit performance requirements
+- id: MUAP_LESSONS_1
+  code: MUAP Lessons
+  title: Principal Performing Medium 1
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Applied lessons in principal performing medium (1 cr per semester, 6 semesters required).
+  eligible:
+    - "Any MUAP lesson course"
+
+- id: MUAP_LESSONS_2
+  code: MUAP Lessons
+  title: Principal Performing Medium 2
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Applied lessons in principal performing medium.
+  eligible:
+    - "Any MUAP lesson course"
+
+- id: MUAP_LESSONS_3
+  code: MUAP Lessons
+  title: Principal Performing Medium 3
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Applied lessons in principal performing medium.
+  eligible:
+    - "Any MUAP lesson course"
+
+- id: MUAP_LESSONS_4
+  code: MUAP Lessons
+  title: Principal Performing Medium 4
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Applied lessons in principal performing medium.
+  eligible:
+    - "Any MUAP lesson course"
+
+- id: MUAP_LESSONS_5
+  code: MUAP Lessons
+  title: Principal Performing Medium 5
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Applied lessons in principal performing medium.
+  eligible:
+    - "Any MUAP lesson course"
+
+- id: MUAP_LESSONS_6
+  code: MUAP Lessons
+  title: Principal Performing Medium 6
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Applied lessons in principal performing medium.
+  eligible:
+    - "Any MUAP lesson course"
+
+- id: MUEN_ENSEMBLE_1
+  code: MUEN Ensemble
+  title: Ensemble Participation 1
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Ensemble participation (1 cr per semester, 5 semesters required).
+  eligible:
+    - "Any MUEN ensemble course"
+
+- id: MUEN_ENSEMBLE_2
+  code: MUEN Ensemble
+  title: Ensemble Participation 2
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Ensemble participation.
+  eligible:
+    - "Any MUEN ensemble course"
+
+- id: MUEN_ENSEMBLE_3
+  code: MUEN Ensemble
+  title: Ensemble Participation 3
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Ensemble participation.
+  eligible:
+    - "Any MUEN ensemble course"
+
+- id: MUEN_ENSEMBLE_4
+  code: MUEN Ensemble
+  title: Ensemble Participation 4
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Ensemble participation.
+  eligible:
+    - "Any MUEN ensemble course"
+
+- id: MUEN_ENSEMBLE_5
+  code: MUEN Ensemble
+  title: Ensemble Participation 5
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: Ensemble participation.
+  eligible:
+    - "Any MUEN ensemble course"
+
+- id: MUS_CAPSTONE
+  code: Music Capstone
+  title: Music Capstone
+  credits: 1
+  tags: [music]
+  prereqs: []
+  coreqs: []
+  isPlaceholder: true
+  desc: 'Select one: MUS 404 (Recital), MUS 486 (Internship), or MUS 495 (Independent Study).'
+  eligible:
+    - "MUS 404 – Recital"
+    - "MUS 486 – Internship"
+    - "MUS 495 – Independent Study in Music"

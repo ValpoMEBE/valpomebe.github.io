@@ -1,0 +1,51 @@
+# ════════════════════════════════════════════════════════════════
+# Music B.A. — Semester Placements
+# Source: Undergraduate Catalog 2025-2026, p.242-245
+# 124 total credits, 40+ major credits
+# ════════════════════════════════════════════════════════════════
+
+_catalog_year: 2025
+
+# ── Semester 1 ── Freshman Fall ──
+MUS_163: 1
+MUS_109: 1
+MUEN_ENSEMBLE_1: 1
+MUAP_LESSONS_1: 1
+MUS_499: 1
+
+# ── Semester 2 ── Freshman Spring ──
+MUS_164: 2
+MUS_110: 2
+MUEN_ENSEMBLE_2: 2
+MUAP_LESSONS_2: 2
+MUS_300: 2
+XS_101: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+MUS_209: 3
+MUS_263: 3
+MUS_213: 3
+MUEN_ENSEMBLE_3: 3
+MUAP_LESSONS_3: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+MUS_201: 4
+MUS_264: 4
+MUEN_ENSEMBLE_4: 4
+MUAP_LESSONS_4: 4
+
+# ── Semester 5 ── Junior Fall ──
+MUS_318: 5
+MUAP_LESSONS_5: 5
+MUEN_ENSEMBLE_5: 5
+
+# ── Semester 6 ── Junior Spring ──
+MUS_319: 6
+MUAP_LESSONS_6: 6
+
+# ── Semester 7 ── Senior Fall ──
+MUS_400: 7
+
+# ── Semester 8 ── Senior Spring ──
+MUS_CAPSTONE: 8
+MUAP_275: 8

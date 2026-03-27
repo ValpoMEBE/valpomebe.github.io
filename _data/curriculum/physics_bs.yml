@@ -1,0 +1,52 @@
+# ════════════════════════════════════════════════════════════════
+# Physics B.S. — Semester Placements
+# Source: Undergraduate Catalog 2025-2026, p.281-282 (even year entry)
+# 124 total credits, 34+ major credits
+# ════════════════════════════════════════════════════════════════
+
+_catalog_year: 2025
+
+# ── Semester 1 ── Freshman Fall ──
+PHYS_141: 1
+PHYS_190: 1
+PHYS_499: 1
+MATH_131: 1
+
+# ── Semester 2 ── Freshman Spring ──
+PHYS_142: 2
+MATH_132: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+PHYS_243: 3
+MATH_253: 3
+CS_157: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+PHYS_245: 4
+PHYS_246: 4
+PHYS_250: 4
+MATH_260: 4
+MATH_270: 4
+
+# ── Semester 5 ── Junior Fall ──
+PHYS_345: 5
+PHYS_360: 5
+PHYS_371: 5
+PHYS_381: 5
+
+# ── Semester 6 ── Junior Spring ──
+PHYS_314: 6
+PHYS_372: 6
+PHYS_440: 6
+PHYS_490: 6
+
+# ── Semester 7 ── Senior Fall ──
+PHYS_421: 7
+PHYS_445: 7
+
+# ── Semester 8 ── Senior Spring ──
+PHYS_422: 8
+PHYS_430: 8
+PHYS_430L: 8
+ASTR_252: 8
+PHYS_ELEC_1: 8

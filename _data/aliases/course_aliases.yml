@@ -16,6 +16,10 @@
   to: "PHYS_142"
   note: "lab bundled"
 
+- from: "PHYS 430L"
+  to: "PHYS_430"
+  note: "lab bundled"
+
 - from: "CHEM 121L"
   to: "CHEM_121"
   note: "lab bundled"

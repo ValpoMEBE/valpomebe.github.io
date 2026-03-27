@@ -1,0 +1,40 @@
+# ════════════════════════════════════════════════════════════════
+# Chemistry B.S. — Semester Placements
+# Source: Undergraduate Catalog 2025-2026, p.110-112
+# 125 total credits, 33+ major credits
+# ════════════════════════════════════════════════════════════════
+
+_catalog_year: 2025
+
+# ── Semester 1 ── Freshman Fall ──
+CHEM_121: 1
+CHEM_199: 1
+
+# ── Semester 2 ── Freshman Spring ──
+CHEM_122: 2
+
+# ── Semester 3 ── Sophomore Fall ──
+CHEM_221: 3
+CHEM_299: 3
+MATH_131: 3
+
+# ── Semester 4 ── Sophomore Spring ──
+CHEM_222: 4
+CHEM_230: 4
+
+# ── Semester 5 ── Junior Fall ──
+CHEM_315: 5
+CHEM_399: 5
+PHYS_141: 5
+
+# ── Semester 6 ── Junior Spring ──
+CHEM_496: 6
+PHYS_142: 6
+
+# ── Semester 7 ── Senior Fall ──
+CHEM_311: 7
+CHEM_ELEC_300_1: 7
+
+# ── Semester 8 ── Senior Spring ──
+CHEM_499: 8
+CHEM_ELEC_300_2: 8

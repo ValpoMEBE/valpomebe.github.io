@@ -4,7 +4,7 @@ min_credits: 16
 requirements:
   - label: "Required Courses"
     type: required
-    courses: ["PHYS 141", "PHYS 142", "PHYS 243"]
+    courses: ["PHYS 141", "PHYS 141L", "PHYS 142", "PHYS 142L", "PHYS 243"]
 
   - label: "Experimental Elective"
     type: pick
