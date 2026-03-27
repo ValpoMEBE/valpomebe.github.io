@@ -26,11 +26,23 @@ layout: default
 
   // ── Christ College Scholar data ──────────────────────
   const CC_SCHOLAR_DATA = {{ site.data.cc_scholar | jsonify }};
+
+  // ── Stubs for transcript-minor.js compatibility ────
+  const DEPT_RENAMES = [];
+
+  // ── Non-engineering major requirements ──────────────
+  const MAJOR_REQS_DATA = {
+    {%- for pair in site.data.major_reqs -%}
+      {{ pair[0] | jsonify }}: {{ pair[1] | jsonify }}{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  };
 </script>
 
 {{ content }}
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script src="{{ '/assets/js/elective-groups.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/scheduling-utils.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/rearrange-engine.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/planner.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/transcript-minor.js' | relative_url }}"></script>

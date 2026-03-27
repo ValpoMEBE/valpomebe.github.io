@@ -100,6 +100,8 @@ function hidePlan() {
   document.getElementById('planner-legend').style.display = 'none';
   document.getElementById('planner-warning').style.display = 'none';
   document.getElementById('planner-overflow').style.display = 'none';
+  const reqPanel = document.getElementById('planner-req-panel');
+  if (reqPanel) reqPanel.style.display = 'none';
   closePlannerPanel();
 }
 
@@ -231,6 +233,7 @@ function generatePlan() {
   PLANNER_STATE.mergedPlan = { courses: rebalanced, stats };
 
   renderPlan(rebalanced, stats);
+  evaluateRequirementsPanel();
 }
 
 function mergeCourses(primaryCourses, secondaryCourses, primary, secondary) {
@@ -1055,6 +1058,7 @@ function exitRearrangeMode(save) {
   // Re-render normal plan
   if (PLANNER_STATE.mergedPlan) {
     renderPlan(PLANNER_STATE.mergedPlan.courses, PLANNER_STATE.mergedPlan.stats);
+    evaluateRequirementsPanel();
   }
 }
 
@@ -1064,4 +1068,380 @@ function toggleRearrangeMode() {
   } else {
     enterRearrangeMode();
   }
+}
+
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  REQUIREMENTS PANEL                                         ║
+// ║  Evaluates plan against program, minor, and CC requirements ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+// ── Build pool from plan courses (compatible with transcript-minor evaluators) ──
+
+function buildPlannerPool(courses) {
+  return courses.map(c => ({
+    code: c.code,
+    credits: c.credits,
+    grade: null,
+    status: 'planned',
+  }));
+}
+
+// ── Evaluate major program requirements ──
+
+function evaluateMajorReqs(program, planIds) {
+  // Get all curriculum course IDs for this program
+  const curriculumIds = COURSES_ARRAY
+    .filter(c => c.semesters && c.semesters[program])
+    .map(c => c.id);
+
+  // Get elective group IDs for this program
+  const groups = (typeof ELECTIVE_GROUPS !== 'undefined' && ELECTIVE_GROUPS[program]) || [];
+  const groupedIds = new Set();
+  for (const g of groups) {
+    for (const id of g.ids) groupedIds.add(id);
+  }
+
+  // Required (non-grouped) courses
+  const requiredIds = curriculumIds.filter(id => !groupedIds.has(id));
+  const requiredResults = [];
+  let metCount = 0;
+
+  for (const id of requiredIds) {
+    const course = COURSES[id];
+    const met = planIds.has(id);
+    if (met) metCount++;
+    requiredResults.push({
+      id,
+      code: course ? course.code : id,
+      title: course ? course.title : '',
+      met,
+    });
+  }
+
+  // Elective group summaries
+  const groupResults = [];
+  for (const g of groups) {
+    // Skip Core I/II — they're always in the plan as required courses
+    if (g.key === 'core1' || g.key === 'core2') continue;
+
+    const slotsInPlan = g.ids.filter(id => planIds.has(id)).length;
+    const totalSlots = g.ids.length;
+    const totalCredits = g.ids.reduce((s, id) => {
+      const c = COURSES[id];
+      return s + (c ? c.credits : 3);
+    }, 0);
+    const filledCredits = g.ids
+      .filter(id => planIds.has(id))
+      .reduce((s, id) => {
+        const c = COURSES[id];
+        return s + (c ? c.credits : 3);
+      }, 0);
+    const met = slotsInPlan === totalSlots;
+    if (met) metCount++;
+
+    groupResults.push({
+      key: g.key,
+      label: g.label,
+      slotsInPlan,
+      totalSlots,
+      filledCredits,
+      totalCredits,
+      met,
+    });
+  }
+
+  const totalReqs = requiredResults.length + groupResults.length;
+
+  return {
+    program,
+    label: PLANNER_PROGRAMS[program] || program,
+    requiredCourses: requiredResults,
+    electiveGroups: groupResults,
+    metCount,
+    totalReqs,
+    allMet: metCount === totalReqs,
+  };
+}
+
+// ── Evaluate minor requirements using shared evaluators ──
+
+function evaluateMinorReqs(minorKey, pool) {
+  const minorDef = MINORS_DATA[minorKey];
+  if (!minorDef || !minorDef.requirements) return null;
+
+  // computeMinorAudit is from transcript-minor.js
+  if (typeof computeMinorAudit !== 'function') return null;
+
+  return computeMinorAudit(pool, minorDef, new Set(), new Set());
+}
+
+// ── Evaluate CC Scholar requirements ──
+
+function evaluateCCReqs(pool) {
+  if (!CC_SCHOLAR_DATA || !CC_SCHOLAR_DATA.requirements) return null;
+
+  // CC has same format as minor definitions, so reuse computeMinorAudit
+  if (typeof computeMinorAudit !== 'function') return null;
+
+  return computeMinorAudit(pool, CC_SCHOLAR_DATA, new Set(), new Set());
+}
+
+// ── Main orchestrator ──
+
+function evaluateRequirementsPanel() {
+  const panel = document.getElementById('planner-req-panel');
+  if (!panel) return;
+
+  if (!PLANNER_STATE.mergedPlan || !PLANNER_STATE.primary) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  const courses = PLANNER_STATE.mergedPlan.courses;
+  const planIds = new Set(courses.map(c => c.id));
+  const pool = buildPlannerPool(courses);
+
+  const results = { primary: null, secondary: null, minors: [], cc: null };
+
+  // Primary program
+  results.primary = evaluateMajorReqs(PLANNER_STATE.primary, planIds);
+
+  // Secondary program
+  if (PLANNER_STATE.secondary) {
+    results.secondary = evaluateMajorReqs(PLANNER_STATE.secondary, planIds);
+  }
+
+  // Minors
+  for (const minorKey of PLANNER_STATE.selectedMinors) {
+    const minorResult = evaluateMinorReqs(minorKey, pool);
+    if (minorResult) results.minors.push(minorResult);
+  }
+
+  // CC Scholar
+  if (PLANNER_STATE.ccEnabled) {
+    results.cc = evaluateCCReqs(pool);
+  }
+
+  renderRequirementsPanel(results);
+}
+
+// ── Rendering ──
+
+function renderRequirementsPanel(results) {
+  const panel = document.getElementById('planner-req-panel');
+  panel.style.display = '';
+
+  // Compute overall summary
+  let totalMet = 0, totalReqs = 0;
+
+  if (results.primary) {
+    totalMet += results.primary.metCount;
+    totalReqs += results.primary.totalReqs;
+  }
+  if (results.secondary) {
+    totalMet += results.secondary.metCount;
+    totalReqs += results.secondary.totalReqs;
+  }
+  for (const m of results.minors) {
+    const met = m.requirements.filter(r => r.met).length;
+    totalMet += met;
+    totalReqs += m.requirements.length;
+  }
+  if (results.cc) {
+    const met = results.cc.requirements.filter(r => r.met).length;
+    totalMet += met;
+    totalReqs += results.cc.requirements.length;
+  }
+
+  const summaryEl = document.getElementById('req-panel-summary');
+  const allMet = totalMet === totalReqs;
+  summaryEl.innerHTML =
+    '<span class="req-summary-dot ' + (allMet ? 'req-dot-met' : 'req-dot-unmet') + '"></span>' +
+    totalMet + ' / ' + totalReqs + ' met';
+
+  // Primary
+  const primaryEl = document.getElementById('req-primary-section');
+  primaryEl.innerHTML = '';
+  if (results.primary) {
+    primaryEl.appendChild(renderMajorSection(results.primary));
+  }
+
+  // Secondary
+  const secondaryEl = document.getElementById('req-secondary-section');
+  secondaryEl.innerHTML = '';
+  if (results.secondary) {
+    secondaryEl.style.display = '';
+    secondaryEl.appendChild(renderMajorSection(results.secondary));
+  } else {
+    secondaryEl.style.display = 'none';
+  }
+
+  // Minors
+  const minorsEl = document.getElementById('req-minors-section');
+  minorsEl.innerHTML = '';
+  if (results.minors.length) {
+    minorsEl.style.display = '';
+    for (const m of results.minors) {
+      minorsEl.appendChild(renderMinorSection(m));
+    }
+  } else {
+    minorsEl.style.display = 'none';
+  }
+
+  // CC
+  const ccEl = document.getElementById('req-cc-section');
+  ccEl.innerHTML = '';
+  if (results.cc) {
+    ccEl.style.display = '';
+    ccEl.appendChild(renderMinorSection(results.cc));
+  } else {
+    ccEl.style.display = 'none';
+  }
+}
+
+function renderMajorSection(majorResult) {
+  const section = document.createElement('div');
+  section.className = 'req-card';
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'req-card-header';
+  const icon = majorResult.allMet ? '<span class="req-icon req-met">&#10003;</span>' : '<span class="req-icon req-unmet">&#9675;</span>';
+  header.innerHTML = icon +
+    '<span class="req-card-title">' + majorResult.label + '</span>' +
+    '<span class="req-card-count">' + majorResult.metCount + ' / ' + majorResult.totalReqs + '</span>';
+  section.appendChild(header);
+
+  // Required courses — only show missing ones to keep it concise
+  const missingCourses = majorResult.requiredCourses.filter(c => !c.met);
+  if (missingCourses.length > 0) {
+    const missingDiv = document.createElement('div');
+    missingDiv.className = 'req-missing-group';
+    missingDiv.innerHTML = '<span class="req-missing-label">Missing courses:</span>';
+    const chipWrap = document.createElement('div');
+    chipWrap.className = 'req-chip-wrap';
+    for (const c of missingCourses) {
+      const chip = document.createElement('span');
+      chip.className = 'req-chip req-chip-missing';
+      chip.textContent = c.code;
+      chipWrap.appendChild(chip);
+    }
+    missingDiv.appendChild(chipWrap);
+    section.appendChild(missingDiv);
+  }
+
+  // Elective groups
+  if (majorResult.electiveGroups.length > 0) {
+    const groupsDiv = document.createElement('div');
+    groupsDiv.className = 'req-groups';
+    for (const g of majorResult.electiveGroups) {
+      const row = document.createElement('div');
+      row.className = 'req-group-row';
+      const gIcon = g.met ? '<span class="req-icon-sm req-met">&#10003;</span>' : '<span class="req-icon-sm req-unmet">&#9675;</span>';
+      const pct = g.totalSlots > 0 ? Math.round((g.slotsInPlan / g.totalSlots) * 100) : 0;
+      row.innerHTML = gIcon +
+        '<span class="req-group-label">' + g.label + '</span>' +
+        '<span class="req-group-detail">' + g.slotsInPlan + '/' + g.totalSlots + ' slots &middot; ' + g.filledCredits + '/' + g.totalCredits + ' cr</span>' +
+        '<div class="req-progress"><div class="req-progress-bar" style="width:' + pct + '%"></div></div>';
+      groupsDiv.appendChild(row);
+    }
+    section.appendChild(groupsDiv);
+  }
+
+  return section;
+}
+
+function renderMinorSection(minorResult) {
+  const section = document.createElement('div');
+  section.className = 'req-card';
+
+  const metReqs = minorResult.requirements.filter(r => r.met).length;
+  const totalReqs = minorResult.requirements.length;
+  const allMet = metReqs === totalReqs;
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'req-card-header';
+  const icon = allMet ? '<span class="req-icon req-met">&#10003;</span>' : '<span class="req-icon req-unmet">&#9675;</span>';
+  const creditsInfo = minorResult.minCredits
+    ? ' <span class="req-card-credits">' + minorResult.totalApplied + ' / ' + minorResult.minCredits + ' cr</span>'
+    : '';
+  header.innerHTML = icon +
+    '<span class="req-card-title">' + minorResult.name + '</span>' +
+    creditsInfo +
+    '<span class="req-card-count">' + metReqs + ' / ' + totalReqs + '</span>';
+  section.appendChild(header);
+
+  // Each requirement
+  for (const req of minorResult.requirements) {
+    const row = document.createElement('div');
+    row.className = 'req-row';
+    const rIcon = req.met ? '<span class="req-icon-sm req-met">&#10003;</span>' : '<span class="req-icon-sm req-unmet">&#9675;</span>';
+    row.innerHTML = rIcon + '<span class="req-row-label">' + req.label + '</span>';
+
+    // Filled courses
+    if (req.filled && req.filled.length > 0) {
+      const chips = document.createElement('span');
+      chips.className = 'req-chip-wrap-inline';
+      for (const f of req.filled) {
+        const chip = document.createElement('span');
+        chip.className = 'req-chip req-chip-filled';
+        chip.textContent = f.code;
+        chips.appendChild(chip);
+      }
+      row.appendChild(chips);
+    }
+
+    // Missing info
+    if (!req.met) {
+      const missing = document.createElement('span');
+      missing.className = 'req-row-missing';
+      if (req.type === 'credits' && req.creditsNeeded) {
+        missing.textContent = (req.creditsNeeded - req.creditsApplied) + ' cr needed';
+      } else if (req.type === 'required' && req.missing && req.missing.length) {
+        missing.textContent = 'Need: ' + req.missing.join(', ');
+      } else if (req.type === 'pick' && req.needed) {
+        const have = req.filled ? req.filled.length : 0;
+        missing.textContent = (req.needed - have) + ' more needed';
+      } else if (req.type === 'repeat' && req.countNeeded) {
+        missing.textContent = (req.countNeeded - (req.countFilled || 0)) + ' more needed';
+      }
+      row.appendChild(missing);
+    }
+
+    section.appendChild(row);
+  }
+
+  // Above and beyond (for minors)
+  if (minorResult.aboveAndBeyond) {
+    const aab = minorResult.aboveAndBeyond;
+    const aabRow = document.createElement('div');
+    aabRow.className = 'req-row';
+    const aabIcon = aab.met ? '<span class="req-icon-sm req-met">&#10003;</span>' : '<span class="req-icon-sm req-unmet">&#9675;</span>';
+    aabRow.innerHTML = aabIcon + '<span class="req-row-label">Above &amp; Beyond</span>';
+    if (aab.met && aab.course) {
+      const chip = document.createElement('span');
+      chip.className = 'req-chip req-chip-filled';
+      chip.textContent = aab.course;
+      aabRow.appendChild(chip);
+    } else if (!aab.met) {
+      const missing = document.createElement('span');
+      missing.className = 'req-row-missing';
+      missing.textContent = 'Need 200+ level, 3+ cr course';
+      aabRow.appendChild(missing);
+    }
+    section.appendChild(aabRow);
+  }
+
+  return section;
+}
+
+function toggleReqPanel() {
+  const body = document.getElementById('req-panel-body');
+  const arrow = document.getElementById('req-panel-arrow');
+  if (!body) return;
+  const visible = body.style.display !== 'none';
+  body.style.display = visible ? 'none' : '';
+  if (arrow) arrow.innerHTML = visible ? '&#9660;' : '&#9650;';
 }

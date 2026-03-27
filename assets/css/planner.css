@@ -414,4 +414,214 @@
   .sem-col { flex: 0 0 150px; }
   .planner-panel-relations { grid-template-columns: 1fr; }
   .rearrange-controls { padding: .4rem .5rem; }
+  .req-card { padding: .6rem; }
+  .req-card-header { flex-wrap: wrap; }
+}
+
+
+/* ── REQUIREMENTS PANEL ──────────────────────────────────── */
+
+.planner-req-panel {
+  margin: .75rem 1.5rem;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(255,255,255,.03);
+  overflow: hidden;
+}
+
+.req-panel-header {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .6rem 1rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+.req-panel-header:hover {
+  background: rgba(255,255,255,.05);
+}
+
+.req-panel-title {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--light-gray);
+}
+
+.req-panel-summary {
+  font-size: .75rem;
+  color: #aaa;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.req-summary-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.req-dot-met   { background: #4caf50; }
+.req-dot-unmet { background: #ff9800; }
+
+.req-panel-arrow {
+  font-size: .7rem;
+  color: #888;
+  transition: transform .2s;
+}
+
+.req-panel-body {
+  padding: .25rem 1rem .75rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+/* ── Requirement cards ── */
+
+.req-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 6px;
+  padding: .6rem .8rem;
+}
+
+.req-card-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .4rem;
+}
+
+.req-card-title {
+  font-size: .8rem;
+  font-weight: 600;
+  color: #ddd;
+}
+
+.req-card-credits {
+  font-size: .7rem;
+  color: #aaa;
+}
+
+.req-card-count {
+  font-size: .7rem;
+  color: #999;
+  margin-left: auto;
+}
+
+/* ── Icons ── */
+
+.req-icon {
+  font-size: .85rem;
+  flex-shrink: 0;
+}
+.req-icon-sm {
+  font-size: .7rem;
+  flex-shrink: 0;
+}
+.req-met   { color: #4caf50; }
+.req-unmet { color: #ff9800; }
+
+/* ── Missing courses ── */
+
+.req-missing-group {
+  margin-top: .3rem;
+}
+.req-missing-label {
+  font-size: .7rem;
+  color: #999;
+  display: block;
+  margin-bottom: .2rem;
+}
+.req-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+.req-chip {
+  font-size: .65rem;
+  padding: .15rem .4rem;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.req-chip-missing {
+  background: rgba(255,152,0,.15);
+  color: #ff9800;
+  border: 1px solid rgba(255,152,0,.3);
+}
+.req-chip-filled {
+  background: rgba(76,175,80,.12);
+  color: #81c784;
+  border: 1px solid rgba(76,175,80,.25);
+}
+
+/* ── Elective group rows ── */
+
+.req-groups {
+  margin-top: .3rem;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+
+.req-group-row {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .72rem;
+}
+
+.req-group-label {
+  color: #ccc;
+  min-width: 100px;
+}
+
+.req-group-detail {
+  color: #999;
+  font-size: .65rem;
+  min-width: 90px;
+}
+
+.req-progress {
+  flex: 1;
+  max-width: 100px;
+  height: 4px;
+  background: rgba(255,255,255,.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.req-progress-bar {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width .3s;
+}
+
+/* ── Minor/CC requirement rows ── */
+
+.req-row {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .15rem 0;
+  font-size: .72rem;
+  flex-wrap: wrap;
+}
+
+.req-row-label {
+  color: #ccc;
+}
+
+.req-chip-wrap-inline {
+  display: inline-flex;
+  gap: .2rem;
+  flex-wrap: wrap;
+}
+
+.req-row-missing {
+  font-size: .65rem;
+  color: #ff9800;
+  font-style: italic;
 }
