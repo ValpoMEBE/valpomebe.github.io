@@ -8,6 +8,17 @@
 const MAX_CREDITS_PER_SEM = 18;
 const MAX_SEMESTERS = 16; // allow up to 8 years (16 semesters) for scheduling
 
+// Placeholder tier classification for smart scheduling
+const TECH_ELEC_KEYS = new Set(['me_elec', 'be_elec']);
+const GENED_KEYS = new Set(['me_humssrs', 'be_humsstheo', 'me_wl', 'be_wl', 'theo',
+                            'me_prof', 'core1', 'core2']);
+
+function getPlaceholderGroupKey(course) {
+  if (course.groupKey) return course.groupKey;
+  // Strip _plan or _plan_N suffix
+  return course.id.replace(/_plan(_\d+)?$/, '');
+}
+
 // ── Detect the student's next semester ───────────────────────
 // Finds the latest term on the transcript and returns
 // { startSem, season } for the next semester to plan.
@@ -72,17 +83,24 @@ function getRemainingCourses(auditResult, program) {
     const creditsNeeded = gc.totalCredits - gc.creditsFilled;
     if (creditsNeeded <= 0) continue;
 
-    remaining.push({
-      id: gc.key + '_plan',
-      code: gc.label,
-      title: gc.label,
-      credits: creditsNeeded,
-      prereqs: [],
-      coreqs: [],
-      offered: null,
-      isPlaceholder: true,
-      defaultSem: gc.semester,
-    });
+    // Split into individual 3-credit slots for better spreading
+    const slotSize = 3;
+    const numSlots = Math.ceil(creditsNeeded / slotSize);
+    for (let i = 0; i < numSlots; i++) {
+      const slotCredits = Math.min(slotSize, creditsNeeded - i * slotSize);
+      remaining.push({
+        id: gc.key + '_plan_' + i,
+        code: gc.label,
+        title: gc.label,
+        credits: slotCredits,
+        prereqs: [],
+        coreqs: [],
+        offered: null,
+        isPlaceholder: true,
+        defaultSem: gc.semester,
+        groupKey: gc.key,
+      });
+    }
   }
 
   return remaining;
@@ -94,10 +112,14 @@ function computeDescendants(courses) {
   const children = {};
 
   for (const c of courses) {
-    for (const p of c.prereqs) {
-      if (idSet.has(p)) {
-        if (!children[p]) children[p] = [];
-        children[p].push(c.id);
+    for (const entry of c.prereqs) {
+      // Prereqs can be strings (AND) or arrays (OR groups)
+      const pIds = Array.isArray(entry) ? entry : [entry];
+      for (const p of pIds) {
+        if (idSet.has(p)) {
+          if (!children[p]) children[p] = [];
+          children[p].push(c.id);
+        }
       }
     }
   }
@@ -220,25 +242,37 @@ function scheduleCourses(remainingCourses, startSem, program, matched) {
     // All members must be offerable this season
     if (!cluster.every(c => isOfferedIn(c, season))) return false;
 
+    // Helper: check if a single prereq ID is satisfied (completed or placed earlier)
+    function isPrereqSatisfied(p) {
+      if (completedIds.has(p)) return true;
+      if (placed[p] !== undefined && placed[p] < sem) return true;
+      // If prereq course isn't in this program's map, treat as satisfied
+      const prereqCourse = COURSES_ARRAY.find(x => x.id === p);
+      if (prereqCourse && (!prereqCourse.semesters || !prereqCourse.semesters[program])) return true;
+      return false;
+    }
+
     // All prereqs for all members must be satisfied
+    // Prereqs can be strings (AND) or arrays (OR groups — any one satisfies)
     const allPrereqsMet = cluster.every(c =>
-      c.prereqs.every(p => {
-        if (completedIds.has(p)) return true;
-        if (placed[p] !== undefined && placed[p] < sem) return true;
-        // If prereq course isn't in this program's map, treat as satisfied
-        const prereqCourse = COURSES_ARRAY.find(x => x.id === p);
-        if (prereqCourse && (!prereqCourse.semesters || !prereqCourse.semesters[program])) return true;
-        return false;
+      (c.prereqs || []).every(entry => {
+        if (Array.isArray(entry)) return entry.some(p => isPrereqSatisfied(p));
+        return isPrereqSatisfied(entry);
       })
     );
     if (!allPrereqsMet) return false;
 
     // Check coreq constraint: any coreq not in this cluster must already be done
+    // Coreqs can be strings (AND) or arrays (OR groups — any one satisfies)
     const clusterIds = new Set(cluster.map(c => c.id));
+    function isCoreqSatisfied(co) {
+      return clusterIds.has(co) || completedIds.has(co) || (placed[co] !== undefined && placed[co] <= sem);
+    }
     const externalCoreqsMet = cluster.every(c =>
-      c.coreqs.every(co =>
-        clusterIds.has(co) || completedIds.has(co) || (placed[co] !== undefined && placed[co] <= sem)
-      )
+      (c.coreqs || []).every(entry => {
+        if (Array.isArray(entry)) return entry.some(co => isCoreqSatisfied(co));
+        return isCoreqSatisfied(entry);
+      })
     );
     return externalCoreqsMet;
   }
@@ -279,25 +313,102 @@ function scheduleCourses(remainingCourses, startSem, program, matched) {
     if (requiredClusters.every(cl => cl.some(c => placed[c.id] !== undefined))) break;
   }
 
-  // Pass 2: Backfill placeholder/elective courses into remaining capacity
-  for (let sem = startSem; sem <= endSem; sem++) {
-    semCredits[sem] = semCredits[sem] || 0;
+  // Pass 2: Smart placeholder scheduling with tiers and spreading
 
-    const eligibleClusters = [];
-    for (const cluster of placeholderClusters) {
-      if (!isClusterEligible(cluster, sem)) continue;
-      const clusterCredits = cluster.reduce((sum, c) => sum + c.credits, 0);
-      eligibleClusters.push({ cluster, credits: clusterCredits });
+  // 2a: Classify placeholder clusters into tech electives vs gen-ed
+  const techElecClusters = [];
+  const genedClusters = [];
+  for (const cluster of placeholderClusters) {
+    const key = getPlaceholderGroupKey(cluster[0]);
+    if (TECH_ELEC_KEYS.has(key)) {
+      techElecClusters.push(cluster);
+    } else {
+      genedClusters.push(cluster);
     }
+  }
 
-    for (const { cluster, credits } of eligibleClusters) {
+  // 2b: Place tech electives with spreading (skip sophomore year unless no choice)
+  const techEligibleSems = [];
+  const techFallbackSems = []; // sophomore semesters as last resort
+  for (let sem = startSem; sem <= endSem; sem++) {
+    if (sem >= 3 && sem <= 4) {
+      techFallbackSems.push(sem);
+    } else {
+      techEligibleSems.push(sem);
+    }
+  }
+
+  let techIdx = 0;
+  for (const cluster of techElecClusters) {
+    const credits = cluster.reduce((s, c) => s + c.credits, 0);
+    let placedOk = false;
+
+    // Try preferred semesters first (round-robin for spreading)
+    for (let attempt = 0; attempt < techEligibleSems.length; attempt++) {
+      const sem = techEligibleSems[(techIdx + attempt) % techEligibleSems.length];
+      if (!isClusterEligible(cluster, sem)) continue;
+      semCredits[sem] = semCredits[sem] || 0;
       if (semCredits[sem] + credits <= MAX_CREDITS_PER_SEM) {
         for (const c of cluster) placed[c.id] = sem;
         semCredits[sem] += credits;
+        placedOk = true;
+        techIdx++;
+        break;
       }
     }
 
-    if (Object.keys(placed).length >= totalRemaining) break;
+    // Fallback: try sophomore semesters as last resort
+    if (!placedOk) {
+      for (const sem of techFallbackSems) {
+        if (!isClusterEligible(cluster, sem)) continue;
+        semCredits[sem] = semCredits[sem] || 0;
+        if (semCredits[sem] + credits <= MAX_CREDITS_PER_SEM) {
+          for (const c of cluster) placed[c.id] = sem;
+          semCredits[sem] += credits;
+          placedOk = true;
+          break;
+        }
+      }
+    }
+  }
+
+  // 2c: Place gen-ed placeholders with anti-clustering
+  // Prefer spreading gen-eds across semesters, but don't extend beyond 4 years
+  // Expected last semester: 8 for normal 4-year plan, or extend if starting late
+  const gradSem = startSem <= 8 ? 8 : startSem + 2;
+  const genedPerSem = {};
+  for (const cluster of genedClusters) {
+    const credits = cluster.reduce((s, c) => s + c.credits, 0);
+
+    // Build candidate semesters, preferring those within graduation timeline
+    const candidates = [];
+    for (let sem = startSem; sem <= endSem; sem++) {
+      if (!isClusterEligible(cluster, sem)) continue;
+      semCredits[sem] = semCredits[sem] || 0;
+      if (semCredits[sem] + credits <= MAX_CREDITS_PER_SEM) {
+        candidates.push(sem);
+      }
+    }
+    // Sort: avoid stacking gen-eds, but prefer staying within graduation timeline
+    candidates.sort((a, b) => {
+      // Strongly prefer semesters within expected graduation
+      const beyondA = a > gradSem ? 1 : 0;
+      const beyondB = b > gradSem ? 1 : 0;
+      if (beyondA !== beyondB) return beyondA - beyondB;
+      // Within timeline: prefer fewer gen-eds (anti-cluster)
+      const ga = genedPerSem[a] || 0;
+      const gb = genedPerSem[b] || 0;
+      if (ga !== gb) return ga - gb;
+      // Tiebreak: earliest semester
+      return a - b;
+    });
+
+    if (candidates.length > 0) {
+      const sem = candidates[0];
+      for (const c of cluster) placed[c.id] = sem;
+      semCredits[sem] += credits;
+      genedPerSem[sem] = (genedPerSem[sem] || 0) + 1;
+    }
   }
 
   // Collect unplaced courses
