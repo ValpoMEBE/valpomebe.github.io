@@ -1192,6 +1192,43 @@ function evaluateCCReqs(pool) {
   return result;
 }
 
+// ── Universal course substitutions applied to all major_reqs evaluations ──
+// These are shared across all programs (honors versions, CC equivalences, etc.)
+
+const UNIVERSAL_SUBSTITUTIONS = {
+  // Honors physics → standard
+  "PHYS 151":  "PHYS 141",
+  "PHYS 152":  "PHYS 142",
+  // CAPS: CHEM 121 covers CHEM 115
+  "CHEM 121":  "CHEM 115",
+  // CAPS: CC 300 covers GE 312
+  "CC 300":    "GE 312",
+  // KIN 101 → XS 101
+  "KIN 101":   "XS 101",
+  // Christ College first-year → VUE
+  "CC 110A+CC 110B+CC 110L": "VUE 101",
+  "CC 115A+CC 115B+CC 115L": "VUE 102",
+  // CORE courses → VUE
+  "CORE 110":  "VUE 101",
+  "CORE 120":  "VUE 102",
+};
+
+/** Deep-copy a major_reqs definition and merge UNIVERSAL_SUBSTITUTIONS
+ *  into every `type: required` entry that lists an affected course. */
+function applyUniversalSubs(def) {
+  const copy = JSON.parse(JSON.stringify(def));
+  for (const req of copy.requirements) {
+    if (req.type !== 'required' || !req.courses) continue;
+    const courseSet = new Set(req.courses);
+    for (const [from, to] of Object.entries(UNIVERSAL_SUBSTITUTIONS)) {
+      if (!courseSet.has(to)) continue; // only inject if the target course is in this req
+      if (!req.substitutions) req.substitutions = {};
+      if (!req.substitutions[from]) req.substitutions[from] = to;
+    }
+  }
+  return copy;
+}
+
 // ── Look up major_reqs by program ID (YAML keys are lowercase filenames) ──
 
 function findMajorReqs(programId) {
@@ -1225,7 +1262,7 @@ function evaluateRequirementsPanel() {
     if (!prog) continue;
     const majorDef = findMajorReqs(prog);
     if (majorDef && majorDef.requirements && typeof computeMinorAudit === 'function') {
-      results.majors.push(computeMinorAudit(pool, majorDef, new Set(), new Set()));
+      results.majors.push(computeMinorAudit(pool, applyUniversalSubs(majorDef), new Set(), new Set()));
     }
   }
 

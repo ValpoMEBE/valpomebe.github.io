@@ -1141,6 +1141,29 @@ document.addEventListener('keydown', (ev) => {
 // ║  Evaluates minor/CC requirements against the planned courses║
 // ╚══════════════════════════════════════════════════════════════╝
 
+// ── Universal course substitutions (shared with planner.js) ──
+
+const TP_UNIVERSAL_SUBS = {
+  "PHYS 151": "PHYS 141", "PHYS 152": "PHYS 142",
+  "CHEM 121": "CHEM 115", "CC 300": "GE 312", "KIN 101": "XS 101",
+  "CC 110A+CC 110B+CC 110L": "VUE 101", "CC 115A+CC 115B+CC 115L": "VUE 102",
+  "CORE 110": "VUE 101", "CORE 120": "VUE 102",
+};
+
+function applyTPUniversalSubs(def) {
+  const copy = JSON.parse(JSON.stringify(def));
+  for (const req of copy.requirements) {
+    if (req.type !== 'required' || !req.courses) continue;
+    const courseSet = new Set(req.courses);
+    for (const [from, to] of Object.entries(TP_UNIVERSAL_SUBS)) {
+      if (!courseSet.has(to)) continue;
+      if (!req.substitutions) req.substitutions = {};
+      if (!req.substitutions[from]) req.substitutions[from] = to;
+    }
+  }
+  return copy;
+}
+
 function findTPMajorReqs(programId) {
   if (typeof MAJOR_REQS_DATA === 'undefined') return null;
   if (MAJOR_REQS_DATA[programId]) return MAJOR_REQS_DATA[programId];
@@ -1196,7 +1219,7 @@ function evaluateTPRequirements() {
       if (TP_STATE.restricted && prog === AUDIT_STATE.secondaryProgram) continue;
       const majorDef = findTPMajorReqs(prog);
       if (!majorDef || !majorDef.requirements) continue;
-      const result = computeMinorAudit(pool, majorDef, new Set(), new Set());
+      const result = computeMinorAudit(pool, applyTPUniversalSubs(majorDef), new Set(), new Set());
       container.appendChild(
         typeof createMinorCard === 'function' ? createMinorCard(result) : renderTPFallbackCard(result)
       );
