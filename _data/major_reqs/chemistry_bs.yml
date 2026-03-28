@@ -1,0 +1,33 @@
+# Chemistry B.S. Requirements
+# Source: Undergraduate Catalog 2025-2026
+
+id: Chemistry_BS
+name: "Chemistry, B.S."
+card_type: major
+
+requirements:
+  - label: "Math & Physics"
+    type: required
+    courses: ["MATH 131", "PHYS 141", "PHYS 142"]
+
+  - label: "Chemistry Core"
+    type: required
+    courses:
+      - "CHEM 121"
+      - "CHEM 122"
+      - "CHEM 199"
+      - "CHEM 221"
+      - "CHEM 222"
+      - "CHEM 230"
+      - "CHEM 311"
+      - "CHEM 315"
+
+  - label: "Seminar & Research"
+    type: required
+    courses: ["CHEM 299", "CHEM 399", "CHEM 496", "CHEM 499"]
+
+  - label: "Chemistry Electives 300+ (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["CHEM"]
+    min_level: 300

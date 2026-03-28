@@ -4,6 +4,7 @@
 
 id: Music_BA
 name: "Music, B.A."
+card_type: major
 min_credits: 40
 
 requirements:

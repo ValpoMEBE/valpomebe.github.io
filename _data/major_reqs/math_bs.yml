@@ -1,0 +1,36 @@
+# Mathematics B.S. Requirements
+# Source: Undergraduate Catalog 2025-2026
+
+id: Math_BS
+name: "Mathematics, B.S."
+card_type: major
+
+requirements:
+  - label: "Core Mathematics"
+    type: required
+    courses:
+      - "MATH 131"
+      - "MATH 132"
+      - "MATH 253"
+      - "MATH 264"
+      - "MATH 266"
+
+  - label: "Supporting Courses"
+    type: required
+    courses: ["CS 157", "DATA 240", "XS 101"]
+
+  - label: "Seminar & Research"
+    type: required
+    courses: ["MATH 299", "MATH 399", "MATH 499"]
+
+  - label: "Math Electives 400+ (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["MATH"]
+    min_level: 400
+
+  - label: "Math Electives 270+ (9 cr)"
+    type: credits
+    credits: 9
+    depts: ["MATH"]
+    min_level: 270

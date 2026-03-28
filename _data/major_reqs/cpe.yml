@@ -1,0 +1,90 @@
+# Computer Engineering Requirements
+# Source: Undergraduate Catalog 2025-2026
+# Total: 128 credits
+
+id: CPE
+name: "Computer Engineering"
+card_type: major
+
+requirements:
+  - label: "Math & Science"
+    type: required
+    courses:
+      - "MATH 131"
+      - "MATH 132"
+      - "MATH 220"
+      - "MATH 253"
+      - "MATH 260"
+      - "MATH 270"
+      - "PHYS 141"
+      - "PHYS 142"
+      - "DATA 240"
+
+  - label: "Engineering Foundations"
+    type: required
+    courses: ["GE 100", "ECE 100"]
+
+  - label: "ECE Core"
+    type: required
+    courses:
+      - "ECE 211"
+      - "ECE 212"
+      - "ECE 221"
+      - "ECE 222"
+      - "ECE 251"
+      - "ECE 252"
+      - "ECE 263"
+
+  - label: "Advanced CPE"
+    type: required
+    courses:
+      - "ECE 322"
+      - "ECE 340"
+      - "ECE 360"
+      - "ECE 422"
+      - "ECE 424"
+      - "ECE 450"
+      - "ECE 452"
+
+  - label: "Engineering Decisions"
+    type: required
+    courses: ["GE 311", "GE 312"]
+
+  - label: "Capstone"
+    type: required
+    courses: ["GE 497", "GE 498"]
+
+  - label: "General Education"
+    type: required
+    courses: ["VUE 101", "VUE 102", "XS 101"]
+
+  - label: "Theology / Religion (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["THEO", "REL"]
+
+  - label: "CPE Technical Electives (12 cr)"
+    type: credits
+    credits: 12
+    depts: ["ECE", "CS"]
+    min_level: 300
+
+  - label: "Math/Science Electives (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["MATH", "PHYS", "CHEM", "BIO", "ASTR", "DATA"]
+
+  - label: "Professional Elective (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["ACC", "ASTR", "BIO", "BLAW", "FIN", "MGT", "MKT"]
+
+  - label: "Humanities / Social Science (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["HIST", "PHIL", "ECON", "POLS", "SOC", "CC"]
+
+  - label: "World Language / Diversity (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["SPAN", "FREN", "GERM", "CHIN", "JAPN", "KORE", "ASL", "GRK", "HEBR", "LAT"]

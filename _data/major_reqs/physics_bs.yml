@@ -1,0 +1,57 @@
+# Physics B.S. Requirements
+# Source: Undergraduate Catalog 2025-2026
+
+id: Physics_BS
+name: "Physics, B.S."
+card_type: major
+
+requirements:
+  - label: "Math"
+    type: required
+    courses:
+      - "MATH 131"
+      - "MATH 132"
+      - "MATH 253"
+      - "MATH 260"
+      - "MATH 270"
+
+  - label: "Supporting Courses"
+    type: required
+    courses: ["CS 157", "ASTR 252"]
+
+  - label: "Physics Core"
+    type: required
+    courses:
+      - "PHYS 141"
+      - "PHYS 142"
+      - "PHYS 190"
+      - "PHYS 243"
+      - "PHYS 245"
+      - "PHYS 246"
+      - "PHYS 250"
+
+  - label: "Advanced Physics"
+    type: required
+    courses:
+      - "PHYS 314"
+      - "PHYS 345"
+      - "PHYS 360"
+      - "PHYS 371"
+      - "PHYS 372"
+      - "PHYS 381"
+      - "PHYS 421"
+      - "PHYS 422"
+      - "PHYS 430"
+      - "PHYS 430L"
+      - "PHYS 440"
+      - "PHYS 445"
+
+  - label: "Colloquium & Research"
+    type: required
+    courses: ["PHYS 490", "PHYS 499"]
+
+  - label: "Physics Elective (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["PHYS", "ASTR"]
+    min_level: 200

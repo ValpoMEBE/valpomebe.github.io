@@ -505,6 +505,7 @@ function computeMinorAudit(pool, minorDef, majorUsedSet, otherAboveBeyondCodes) 
   // Check above-and-beyond
   const aab = checkAboveAndBeyond(results, pool, majorUsedSet, otherAboveBeyondCodes);
 
+  const isMajor = minorDef.card_type === 'major';
   return {
     minorId: minorDef.id,
     name: minorDef.name,
@@ -512,7 +513,8 @@ function computeMinorAudit(pool, minorDef, majorUsedSet, otherAboveBeyondCodes) 
     totalApplied,
     requirements: results,
     aboveAndBeyond: aab,
-    overallMet: allReqsMet && totalApplied >= minorDef.min_credits && aab.met,
+    cardType: minorDef.card_type || 'minor',
+    overallMet: allReqsMet && totalApplied >= (minorDef.min_credits || 0) && (isMajor || aab.met),
   };
 }
 
@@ -746,7 +748,7 @@ function createMinorCard(result) {
 
   const title = document.createElement('span');
   title.className = 'minor-card-title';
-  title.textContent = /Minor|Scholar/i.test(result.name) ? result.name : result.name + ' Minor';
+  title.textContent = /Minor|Scholar|Engineering|B\.S\.|B\.A\./i.test(result.name) ? result.name : result.name + ' Minor';
   header.appendChild(title);
 
   const tally = document.createElement('span');
@@ -777,23 +779,25 @@ function createMinorCard(result) {
 
   card.appendChild(reqList);
 
-  // Above-and-beyond row
-  const aabRow = document.createElement('div');
-  aabRow.className = 'minor-aab-row ' + (result.aboveAndBeyond.met ? 'met' : 'unmet');
-  const aabIcon = document.createElement('span');
-  aabIcon.className = 'minor-req-icon ' + (result.aboveAndBeyond.met ? 'met' : 'unmet');
-  aabIcon.textContent = result.aboveAndBeyond.met ? '\u2713' : '\u2717';
-  aabRow.appendChild(aabIcon);
+  // Above-and-beyond row (minors only, not majors)
+  if (result.cardType !== 'major') {
+    const aabRow = document.createElement('div');
+    aabRow.className = 'minor-aab-row ' + (result.aboveAndBeyond.met ? 'met' : 'unmet');
+    const aabIcon = document.createElement('span');
+    aabIcon.className = 'minor-req-icon ' + (result.aboveAndBeyond.met ? 'met' : 'unmet');
+    aabIcon.textContent = result.aboveAndBeyond.met ? '\u2713' : '\u2717';
+    aabRow.appendChild(aabIcon);
 
-  const aabText = document.createElement('span');
-  aabText.className = 'minor-aab-text';
-  if (result.aboveAndBeyond.met) {
-    aabText.textContent = 'Above & Beyond: ' + result.aboveAndBeyond.course;
-  } else {
-    aabText.textContent = 'Above & Beyond: need 1 course (200+, 3+ cr) not used for degree';
+    const aabText = document.createElement('span');
+    aabText.className = 'minor-aab-text';
+    if (result.aboveAndBeyond.met) {
+      aabText.textContent = 'Above & Beyond: ' + result.aboveAndBeyond.course;
+    } else {
+      aabText.textContent = 'Above & Beyond: need 1 course (200+, 3+ cr) not used for degree';
+    }
+    aabRow.appendChild(aabText);
+    card.appendChild(aabRow);
   }
-  aabRow.appendChild(aabText);
-  card.appendChild(aabRow);
 
   return card;
 }

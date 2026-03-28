@@ -1,0 +1,96 @@
+# Mechanical Engineering Requirements
+# Source: Undergraduate Catalog 2025-2026
+# Total: 126 credits
+
+id: ME
+name: "Mechanical Engineering"
+card_type: major
+
+requirements:
+  - label: "Math & Science"
+    type: required
+    courses:
+      - "MATH 131"
+      - "MATH 132"
+      - "MATH 253"
+      - "MATH 260"
+      - "MATH 270"
+      - "PHYS 141"
+      - "PHYS 142"
+      - "CHEM 115"
+      - "DATA 240"
+
+  - label: "Engineering Foundations"
+    type: required
+    courses:
+      - "GE 100"
+      - "GE 109"
+      - "ME 102"
+      - "ME 125"
+      - "ECE 281"
+
+  - label: "ME Core"
+    type: required
+    courses:
+      - "ME 201"
+      - "ME 209"
+      - "ME 215"
+      - "ME 251"
+      - "ME 252"
+      - "ME 261"
+      - "ME 270"
+
+  - label: "Advanced ME"
+    type: required
+    courses:
+      - "BE/ME 317"
+      - "ME 333"
+      - "ME 351"
+      - "ME 352"
+      - "ME 354"
+      - "ME 355"
+      - "ME 363"
+      - "ME 364"
+      - "ME 372"
+      - "ME 373"
+      - "ME 376"
+      - "ME 442"
+
+  - label: "Engineering Decisions"
+    type: required
+    courses: ["GE 311", "GE 312"]
+
+  - label: "Capstone"
+    type: required
+    courses: ["GE 497", "GE 498"]
+
+  - label: "General Education"
+    type: required
+    courses: ["VUE 101", "VUE 102", "XS 101"]
+
+  - label: "ME Technical Electives (12 cr)"
+    type: credits
+    credits: 12
+    depts: ["ME", "BE"]
+    min_level: 300
+    approved_extras: ["GE 190", "ECE 203"]
+
+  - label: "Humanities / Social Science (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["HIST", "PHIL", "ECON", "POLS", "SOC", "CC"]
+
+  - label: "Professional Elective (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["ACC", "ASTR", "BIO", "BLAW", "FIN", "MGT", "MKT"]
+
+  - label: "Theology / Religion (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["THEO", "REL"]
+
+  - label: "World Language / Diversity (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["SPAN", "FREN", "GERM", "CHIN", "JAPN", "KORE", "ASL", "GRK", "HEBR", "LAT"]

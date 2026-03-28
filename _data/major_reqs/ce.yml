@@ -1,0 +1,81 @@
+# Civil Engineering Requirements
+# Source: Undergraduate Catalog 2025-2026
+# Total: 122 credits
+
+id: CE
+name: "Civil Engineering"
+card_type: major
+
+requirements:
+  - label: "Math & Science"
+    type: required
+    courses:
+      - "MATH 131"
+      - "MATH 132"
+      - "MATH 253"
+      - "MATH 260"
+      - "MATH 270"
+      - "PHYS 141"
+      - "CHEM 115"
+      - "CHEM 116"
+      - "DATA 240"
+
+  - label: "Engineering Foundations"
+    type: required
+    courses: ["GE 100", "GE 109", "CE 151"]
+
+  - label: "CE Core"
+    type: required
+    courses:
+      - "CE 212"
+      - "CE 213"
+      - "CE 215"
+      - "CE 216"
+      - "CE 252"
+      - "CE 317"
+      - "CE 318"
+      - "CE 320"
+      - "CE 322"
+      - "CE 334"
+      - "CE 335"
+      - "CE 354"
+      - "CE 364"
+      - "CE 365"
+
+  - label: "Engineering Decisions"
+    type: required
+    courses: ["GE 311", "GE 312"]
+
+  - label: "Capstone"
+    type: required
+    courses: ["CE 493", "CE 494"]
+
+  - label: "General Education"
+    type: required
+    courses: ["VUE 101", "VUE 102", "XS 101"]
+
+  - label: "Theology / Religion (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["THEO", "REL"]
+
+  - label: "CE Technical Electives (9 cr)"
+    type: credits
+    credits: 9
+    depts: ["CE", "ENE"]
+    min_level: 300
+
+  - label: "Professional Elective (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["ACC", "ASTR", "BIO", "BLAW", "FIN", "MGT", "MKT"]
+
+  - label: "Humanities / Social Science (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["HIST", "PHIL", "ECON", "POLS", "SOC", "CC"]
+
+  - label: "World Language / Diversity (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["SPAN", "FREN", "GERM", "CHIN", "JAPN", "KORE", "ASL", "GRK", "HEBR", "LAT"]

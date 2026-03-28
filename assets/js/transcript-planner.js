@@ -1141,6 +1141,15 @@ document.addEventListener('keydown', (ev) => {
 // ║  Evaluates minor/CC requirements against the planned courses║
 // ╚══════════════════════════════════════════════════════════════╝
 
+function findTPMajorReqs(programId) {
+  if (typeof MAJOR_REQS_DATA === 'undefined') return null;
+  if (MAJOR_REQS_DATA[programId]) return MAJOR_REQS_DATA[programId];
+  for (const val of Object.values(MAJOR_REQS_DATA)) {
+    if (val.id === programId) return val;
+  }
+  return null;
+}
+
 function evaluateTPRequirements() {
   const section = document.getElementById('tp-req-section');
   const container = document.getElementById('tp-req-container');
@@ -1180,18 +1189,17 @@ function evaluateTPRequirements() {
   container.innerHTML = '';
   let hasCards = false;
 
-  // Primary major
-  const primaryResult = evaluateTPMajorReqs(AUDIT_STATE.program, planIds);
-  if (primaryResult) {
-    container.appendChild(renderTPMajorCard(primaryResult));
-    hasCards = true;
-  }
-
-  // Secondary major (double major)
-  if (AUDIT_STATE.secondaryProgram && !TP_STATE.restricted) {
-    const secResult = evaluateTPMajorReqs(AUDIT_STATE.secondaryProgram, planIds);
-    if (secResult) {
-      container.appendChild(renderTPMajorCard(secResult));
+  // Major programs
+  if (typeof computeMinorAudit === 'function' && typeof MAJOR_REQS_DATA !== 'undefined') {
+    for (const prog of [AUDIT_STATE.program, AUDIT_STATE.secondaryProgram]) {
+      if (!prog) continue;
+      if (TP_STATE.restricted && prog === AUDIT_STATE.secondaryProgram) continue;
+      const majorDef = findTPMajorReqs(prog);
+      if (!majorDef || !majorDef.requirements) continue;
+      const result = computeMinorAudit(pool, majorDef, new Set(), new Set());
+      container.appendChild(
+        typeof createMinorCard === 'function' ? createMinorCard(result) : renderTPFallbackCard(result)
+      );
       hasCards = true;
     }
   }

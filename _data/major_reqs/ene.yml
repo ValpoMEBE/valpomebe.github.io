@@ -1,0 +1,92 @@
+# Environmental Engineering Requirements
+# Source: Undergraduate Catalog 2025-2026
+# Total: 126 credits
+
+id: ENE
+name: "Environmental Engineering"
+card_type: major
+
+requirements:
+  - label: "Math & Science"
+    type: required
+    courses:
+      - "MATH 131"
+      - "MATH 132"
+      - "MATH 253"
+      - "MATH 260"
+      - "MATH 270"
+      - "PHYS 141"
+      - "CHEM 115"
+      - "CHEM 116"
+      - "CHEM 221"
+      - "DATA 240"
+
+  - label: "Biology"
+    type: required
+    courses: ["BIO 215"]
+
+  - label: "Engineering Foundations"
+    type: required
+    courses: ["GE 100", "GE 109", "CE 151"]
+
+  - label: "CE / ENE Core"
+    type: required
+    courses:
+      - "CE 213"
+      - "CE 215"
+      - "CE 281"
+      - "CE 334"
+      - "CE 335"
+      - "CE 351"
+      - "CE 364"
+      - "CE 365"
+      - "ME 270"
+
+  - label: "ENE Specialization"
+    type: required
+    courses:
+      - "ENE 210"
+      - "ENE 260"
+      - "ENE 310"
+      - "ENE 330"
+      - "ENE 360"
+      - "ENE 440"
+      - "ENE 450"
+
+  - label: "Engineering Decisions"
+    type: required
+    courses: ["GE 311", "GE 312"]
+
+  - label: "Capstone"
+    type: required
+    courses: ["CE 493", "CE 494"]
+
+  - label: "General Education"
+    type: required
+    courses: ["VUE 101", "VUE 102", "XS 101"]
+
+  - label: "Theology / Religion (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["THEO", "REL"]
+
+  - label: "ENE Technical Electives (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["ENE", "CE"]
+    min_level: 300
+
+  - label: "Professional Elective (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["ACC", "ASTR", "BIO", "BLAW", "FIN", "MGT", "MKT"]
+
+  - label: "Humanities / Social Science (6 cr)"
+    type: credits
+    credits: 6
+    depts: ["HIST", "PHIL", "ECON", "POLS", "SOC", "CC"]
+
+  - label: "World Language / Diversity (3 cr)"
+    type: credits
+    credits: 3
+    depts: ["SPAN", "FREN", "GERM", "CHIN", "JAPN", "KORE", "ASL", "GRK", "HEBR", "LAT"]

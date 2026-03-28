@@ -1,0 +1,37 @@
+# Computer Science B.S. Requirements
+# Source: Undergraduate Catalog 2025-2026
+
+id: CS_BS
+name: "Computer Science, B.S."
+card_type: major
+
+requirements:
+  - label: "Math & Statistics"
+    type: required
+    courses: ["MATH 131", "MATH 220", "DATA 240", "XS 101"]
+
+  - label: "CS Core"
+    type: required
+    courses:
+      - "CS 157"
+      - "CS 158"
+      - "CS 250"
+      - "CS 354"
+      - "CS 356"
+      - "CS 372"
+
+  - label: "Capstone"
+    type: required
+    courses: ["CS 493"]
+
+  - label: "CS Electives 300+ (12 cr)"
+    type: credits
+    credits: 12
+    depts: ["CS"]
+    min_level: 300
+
+  - label: "CS Electives 200+ (9 cr)"
+    type: credits
+    credits: 9
+    depts: ["CS"]
+    min_level: 200

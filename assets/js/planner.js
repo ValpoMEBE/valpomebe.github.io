@@ -1192,6 +1192,18 @@ function evaluateCCReqs(pool) {
   return result;
 }
 
+// ── Look up major_reqs by program ID (YAML keys are lowercase filenames) ──
+
+function findMajorReqs(programId) {
+  if (typeof MAJOR_REQS_DATA === 'undefined') return null;
+  // Try direct key match first, then search by id field
+  if (MAJOR_REQS_DATA[programId]) return MAJOR_REQS_DATA[programId];
+  for (const val of Object.values(MAJOR_REQS_DATA)) {
+    if (val.id === programId) return val;
+  }
+  return null;
+}
+
 // ── Main orchestrator ──
 
 function evaluateRequirementsPanel() {
@@ -1204,17 +1216,17 @@ function evaluateRequirementsPanel() {
   }
 
   const courses = PLANNER_STATE.mergedPlan.courses;
-  const planIds = new Set(courses.map(c => c.id));
   const pool = buildPlannerPool(courses);
 
-  const results = { primary: null, secondary: null, minors: [], cc: null };
+  const results = { majors: [], minors: [], cc: null };
 
-  // Primary program
-  results.primary = evaluateMajorReqs(PLANNER_STATE.primary, planIds);
-
-  // Secondary program
-  if (PLANNER_STATE.secondary) {
-    results.secondary = evaluateMajorReqs(PLANNER_STATE.secondary, planIds);
+  // Major programs
+  for (const prog of [PLANNER_STATE.primary, PLANNER_STATE.secondary]) {
+    if (!prog) continue;
+    const majorDef = findMajorReqs(prog);
+    if (majorDef && majorDef.requirements && typeof computeMinorAudit === 'function') {
+      results.majors.push(computeMinorAudit(pool, majorDef, new Set(), new Set()));
+    }
   }
 
   // Minors
@@ -1241,15 +1253,11 @@ function renderRequirementsPanel(results) {
   container.innerHTML = '';
   let hasCards = false;
 
-  // Primary major
-  if (results.primary) {
-    container.appendChild(renderMajorCard(results.primary));
-    hasCards = true;
-  }
-
-  // Secondary major
-  if (results.secondary) {
-    container.appendChild(renderMajorCard(results.secondary));
+  // Major programs
+  for (const m of results.majors) {
+    container.appendChild(
+      typeof createMinorCard === 'function' ? createMinorCard(m) : renderFallbackMinorCard(m)
+    );
     hasCards = true;
   }
 
