@@ -6,6 +6,26 @@
    ║  Requires: scheduling-utils.js, inject-courses.html globals  ║
    ╚══════════════════════════════════════════════════════════════╝ */
 
+// ── Placeholder equivalence map for dual-major deduplication ─
+// Maps program-specific placeholder IDs → canonical category so
+// mergeCourses() can recognise that e.g. ME_HUM_1 and BE_HUM_1
+// fulfil the same gen-ed requirement and should not be doubled.
+const PLACEHOLDER_EQUIV = {
+  // Hum / SS / RS  (all programs: 6 cr, 2 slots)
+  ME_HUM_1: 'humssrs', ME_HUM_2: 'humssrs',
+  BE_HUM_1: 'humssrs', BE_HUM_2: 'humssrs',
+  CE_HUM_1: 'humssrs', CE_HUM_2: 'humssrs',
+  CPE_HUM_1: 'humssrs', CPE_HUM_2: 'humssrs',
+  EE_HUM_1: 'humssrs', EE_HUM_2: 'humssrs',
+  ENE_HUM_1: 'humssrs', ENE_HUM_2: 'humssrs',
+  // WL / Diversity  (all programs: 3 cr, 1 slot)
+  ME_WL: 'wl', BE_WL: 'wl', CE_WL: 'wl',
+  CPE_WL: 'wl', EE_WL: 'wl', ENE_WL: 'wl',
+  // Prof. Elective  (ME/CE/CPE/ENE: 3 cr; EE: 6 cr)
+  ME_PROF: 'prof', CE_PROF_ELEC: 'prof', CPE_PROF: 'prof',
+  ENE_PROF_ELEC: 'prof', EE_PROF_1: 'prof', EE_PROF_2: 'prof',
+};
+
 // ── All available programs ───────────────────────────────────
 const PLANNER_PROGRAMS = {
   ME:            'Mechanical Engineering',
@@ -238,10 +258,13 @@ function generatePlan() {
 
 function mergeCourses(primaryCourses, secondaryCourses, primary, secondary) {
   const allIds = new Set();
+  const coveredCategories = new Set();
   const merged = [];
 
   for (const c of primaryCourses) {
     allIds.add(c.id);
+    const cat = PLACEHOLDER_EQUIV[c.id];
+    if (cat) coveredCategories.add(cat);
     const inSecondary = secondary && c.semesters && c.semesters[secondary];
     merged.push({
       id: c.id,
@@ -263,6 +286,9 @@ function mergeCourses(primaryCourses, secondaryCourses, primary, secondary) {
 
   for (const c of secondaryCourses) {
     if (allIds.has(c.id)) continue;
+    // Skip equivalent placeholders already covered by the primary program
+    const cat = PLACEHOLDER_EQUIV[c.id];
+    if (cat && coveredCategories.has(cat)) continue;
     allIds.add(c.id);
     merged.push({
       id: c.id,
