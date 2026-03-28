@@ -96,8 +96,8 @@ const ELECTIVE_GROUPS = {
       maxCourses: 1,
     },
     {
-      key: 'be_humsstheo',
-      label: 'Hum / SS / Theo',
+      key: 'be_humssrs',
+      label: 'Hum / SS / RS',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
@@ -123,8 +123,8 @@ const ELECTIVE_GROUPS = {
       maxCourses: 1,
     },
     {
-      key: 'be_humsstheo',
-      label: 'Hum / SS / Theo',
+      key: 'be_humssrs',
+      label: 'Hum / SS / RS',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],
@@ -150,8 +150,8 @@ const ELECTIVE_GROUPS = {
       maxCourses: 1,
     },
     {
-      key: 'be_humsstheo',
-      label: 'Hum / SS / Theo',
+      key: 'be_humssrs',
+      label: 'Hum / SS / RS',
       ids: ['BE_HUM_1', 'BE_HUM_2'],
       approvedLists: ['humanities', 'social_sciences'],
       blanketDepts: ['HIST', 'PHIL', 'ECON', 'POLS', 'SOC', 'CC'],

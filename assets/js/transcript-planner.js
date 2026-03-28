@@ -17,7 +17,7 @@ const MAX_SEMESTERS = 16; // allow up to 8 years (16 semesters) for scheduling
 
 // Placeholder tier classification for smart scheduling
 const TECH_ELEC_KEYS = new Set(['me_elec', 'be_elec']);
-const GENED_KEYS = new Set(['me_humssrs', 'be_humsstheo', 'me_wl', 'be_wl', 'theo',
+const GENED_KEYS = new Set(['me_humssrs', 'be_humssrs', 'me_wl', 'be_wl', 'theo',
                             'me_prof', 'core1', 'core2']);
 
 function getPlaceholderGroupKey(course) {

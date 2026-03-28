@@ -92,8 +92,8 @@
   offered: Fall
   desc: Structure-property relationships of biomaterials, biocompatibility, implants, and tissue engineering scaffolds.
 - id: BE_HUM_1
-  code: Hum/SS/Theo
-  title: Humanities / SS / Theo. Elective 1
+  code: Hum/SS/RS
+  title: Humanities / Social Sci. Elective 1
   credits: 3
   tags: []
   prereqs: []
@@ -157,8 +157,8 @@
   - ME 361–ME 369, ME 453–ME 467
   - BE 490, ME 490, BE 499, ME 499
 - id: BE_HUM_2
-  code: Hum/SS/Theo
-  title: Humanities / SS / Theo. Elective 2
+  code: Hum/SS/RS
+  title: Humanities / Social Sci. Elective 2
   credits: 3
   tags: []
   prereqs: []

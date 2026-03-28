@@ -116,9 +116,9 @@ Client-side PDF parsing using pdf.js. Uses y-coordinate bucketing to reconstruct
 ### Programs & Tracks
 
 - **ME** — Mechanical Engineering (126 credits, 12cr ME electives, 6cr Hum/SS/RS)
-- **BE_Biomech** — Bioengineering Biomechanical (126 credits, 6cr BE electives, 6cr Hum/SS/Theo)
-- **BE_Bioelec** — Bioengineering Bioelectrical (126 credits, 6cr BE electives, 6cr Hum/SS/Theo)
-- **BE_Biomed** — Bioengineering Biomedical (126 credits, 6cr BE electives, 6cr Hum/SS/Theo)
+- **BE_Biomech** — Bioengineering Biomechanical (126 credits, 6cr BE electives, 6cr Hum/SS/RS)
+- **BE_Bioelec** — Bioengineering Bioelectrical (126 credits, 6cr BE electives, 6cr Hum/SS/RS)
+- **BE_Biomed** — Bioengineering Biomedical (126 credits, 6cr BE electives, 6cr Hum/SS/RS)
 
 ### Lab Bundling
 
