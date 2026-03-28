@@ -1082,7 +1082,7 @@ function buildPlannerPool(courses) {
   return courses.map(c => ({
     code: c.code,
     credits: c.credits,
-    grade: null,
+    grade: '--',   // special marker: no grade badge in renderer
     status: 'planned',
   }));
 }
@@ -1261,9 +1261,17 @@ function evaluateRequirementsPanel() {
   for (const prog of [PLANNER_STATE.primary, PLANNER_STATE.secondary]) {
     if (!prog) continue;
     const majorDef = findMajorReqs(prog);
-    if (majorDef && majorDef.requirements && typeof computeMinorAudit === 'function') {
-      results.majors.push(computeMinorAudit(pool, applyUniversalSubs(majorDef), new Set(), new Set()));
+    if (!majorDef || !majorDef.requirements || typeof computeMinorAudit !== 'function') continue;
+
+    let def = applyUniversalSubs(majorDef);
+
+    // For secondary major: remove "General Education" — shared with primary, only list once
+    if (prog === PLANNER_STATE.secondary) {
+      def = JSON.parse(JSON.stringify(def));
+      def.requirements = def.requirements.filter(req => req.label !== 'General Education');
     }
+
+    results.majors.push(computeMinorAudit(pool, def, new Set(), new Set()));
   }
 
   // Minors

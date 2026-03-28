@@ -748,7 +748,8 @@ function createMinorCard(result) {
 
   const title = document.createElement('span');
   title.className = 'minor-card-title';
-  title.textContent = /Minor|Scholar|Engineering|B\.S\.|B\.A\./i.test(result.name) ? result.name : result.name + ' Minor';
+  title.textContent = result.cardType === 'major' || /Minor|Scholar/i.test(result.name)
+    ? result.name : result.name + ' Minor';
   header.appendChild(title);
 
   const tally = document.createElement('span');
@@ -823,8 +824,11 @@ function createReqRow(req) {
     const chips = req.filled.map(f => {
       const gradeTxt = f.grade || 'IP';
       const gradeClass = f.grade ? getGradeClass(f.grade) : 'grade-ip';
+      const gradeSpan = f.grade === '--'
+        ? '' // planner courses: no grade badge
+        : ' <span class="minor-grade ' + gradeClass + '">' + gradeTxt + '</span>';
       return '<span class="minor-course-chip">' + f.code +
-        ' <span class="minor-grade ' + gradeClass + '">' + gradeTxt + '</span>' +
+        gradeSpan +
         ' (' + (f.credits > 0 ? f.credits + ' cr' : '- cr') + ')</span>';
     }).join(' ');
     detail.innerHTML = chips;
