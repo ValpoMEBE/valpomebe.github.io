@@ -80,3 +80,15 @@
 - from: "KIN 101"
   to: "XS_101"
   note: "KIN 101 equivalent to XS 101"
+
+- from: "CORE 110"
+  to: "VUE_101"
+  note: "CORE 110 equivalent to VUE 101"
+
+- from: "CORE 120"
+  to: "VUE_101"
+  note: "CORE 120 equivalent to VUE 101"
+
+- from: "CORE 115"
+  to: "VUE_102"
+  note: "CORE 115 equivalent to VUE 102"

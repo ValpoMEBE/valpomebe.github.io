@@ -1147,7 +1147,7 @@ const TP_UNIVERSAL_SUBS = {
   "PHYS 151": "PHYS 141", "PHYS 152": "PHYS 142",
   "CHEM 121": "CHEM 115", "CC 300": "GE 312", "KIN 101": "XS 101",
   "CC 110A+CC 110B+CC 110L": "VUE 101", "CC 115A+CC 115B+CC 115L": "VUE 102",
-  "CORE 110": "VUE 101", "CORE 120": "VUE 102",
+  "CORE 110": "VUE 101", "CORE 120": "VUE 101", "CORE 115": "VUE 102",
 };
 
 function applyTPUniversalSubs(def) {

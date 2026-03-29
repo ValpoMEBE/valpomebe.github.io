@@ -1236,7 +1236,8 @@ const UNIVERSAL_SUBSTITUTIONS = {
   "CC 115A+CC 115B+CC 115L": "VUE 102",
   // CORE courses → VUE
   "CORE 110":  "VUE 101",
-  "CORE 120":  "VUE 102",
+  "CORE 120":  "VUE 101",
+  "CORE 115":  "VUE 102",
 };
 
 /** Deep-copy a major_reqs definition and merge UNIVERSAL_SUBSTITUTIONS
