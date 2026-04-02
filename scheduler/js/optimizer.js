@@ -416,6 +416,18 @@ function isValidAssignment(courseIdx, slotIdx, assignment, ctx) {
     }
   }
 
+  // H9. Two-day-a-week sections must be TR or after 3:30 PM
+  if (course.mode === '2x75') {
+    const isTR = courseDays.length === 2 && courseDays.includes(1) && courseDays.includes(3);
+    const isAfter330 = timeToMinutes(courseStart) >= timeToMinutes('15:30');
+    if (!isTR && !isAfter330) return false;
+  }
+
+  // H10. Four-day-a-week sections may not include both Tuesday and Thursday
+  if (course.mode === '4x50') {
+    if (courseDays.includes(1) && courseDays.includes(3)) return false;
+  }
+
   return true;
 }
 
@@ -601,13 +613,12 @@ function scoreFacultyPrefs(allAssigned, W, preferences) {
 }
 
 // S3: Single-section afternoon penalty
-// Single-section required courses scheduled after 2:30 PM make it harder
-// for students to fit them. Lighter penalty than before — UniTime uses
-// graduated penalties rather than a cliff.
+// Per Registrar: required single-section courses should not be scheduled
+// between 3:30 PM and 6:30 PM (co-curricular activities begin at 3:30).
 function scoreSingleSectionAfternoon(allAssigned, W, sectionCounts) {
   let penalty = 0;
-  const LATE_AFTERNOON = timeToMinutes('14:30');  // 2:30 PM
-  const EVENING = timeToMinutes('16:00');          // 4:00 PM
+  const CO_CURRICULAR = timeToMinutes('15:30');  // 3:30 PM
+  const EVENING = timeToMinutes('18:30');         // 6:30 PM
   for (const a of allAssigned) {
     if (a.isFrozen) continue;
     const cid = a.course.courseId;
@@ -617,10 +628,8 @@ function scoreSingleSectionAfternoon(allAssigned, W, sectionCounts) {
     const count = sectionCounts.get(cid) || 1;
     if (count > 1) continue;  // Multi-section courses: students have options
     const startMin = timeToMinutes(a.slot.startTime);
-    if (startMin >= EVENING) {
-      penalty += W.singleSectionAfternoon * 4;    // Strong: evening is bad
-    } else if (startMin >= LATE_AFTERNOON) {
-      penalty += W.singleSectionAfternoon * 2;    // Moderate: late afternoon is less ideal
+    if (startMin >= CO_CURRICULAR && startMin < EVENING) {
+      penalty += W.singleSectionAfternoon * 4;
     }
   }
   return penalty;
@@ -733,6 +742,41 @@ function scoreTimePref(allAssigned, W) {
   return penalty;
 }
 
+// S8: Prime-time distribution cap
+// Per Registrar: no more than 5% of a dept's sections at any single prime-time slot.
+// Penalizes clustering at popular times to spread courses across the day.
+function scorePrimeTimeDistribution(allAssigned, W) {
+  const PRIME_MWF = ['08:00','09:00','10:00','11:30','12:30','13:30'];
+  const PRIME_TR  = ['09:30','11:30','13:00'];
+
+  const counts = new Map();
+  let totalDeptSections = 0;
+
+  for (const a of allAssigned) {
+    if (a.isFrozen || a.course.isExternal) continue;
+    totalDeptSections++;
+    const startTime = a.slot.startTime;
+    const isMWF = a.slot.days.some(d => [0,2,4].includes(d));
+    const isTR  = a.slot.days.some(d => [1,3].includes(d));
+
+    if ((isMWF && PRIME_MWF.includes(startTime)) ||
+        (isTR && PRIME_TR.includes(startTime))) {
+      const key = `${startTime}_${isTR ? 'TR' : 'MWF'}`;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+  }
+
+  // 5% cap: for N sections, max per prime slot = ceil(N * 0.05), minimum 2
+  const cap = Math.max(2, Math.ceil(totalDeptSections * 0.05));
+  let penalty = 0;
+  for (const [, count] of counts) {
+    if (count > cap) {
+      penalty += W.distribution * (count - cap) * 3;
+    }
+  }
+  return penalty;
+}
+
 // Total score for an assignment (lower = better)
 // If decompose=true, returns { total, breakdown } instead of a number.
 function scoreAssignment(assignment, ctx, decompose) {
@@ -753,13 +797,14 @@ function scoreAssignment(assignment, ctx, decompose) {
   const pairs     = scorePairGroups(assignment, ctx.pairGroupMap, ctx.W);
   const labDay    = scoreLabLectureSameDay(allAssigned, ctx.W);
   const timePref  = scoreTimePref(allAssigned, ctx.W);
+  const distribution = scorePrimeTimeDistribution(allAssigned, ctx.W);
 
-  const total = unassignedPenalty + cohort + faculty + afternoon + backToBack + pairs + labDay + timePref;
+  const total = unassignedPenalty + cohort + faculty + afternoon + backToBack + pairs + labDay + timePref + distribution;
 
   if (decompose) {
     return {
       total,
-      breakdown: { unassigned: unassignedPenalty, cohort, faculty, afternoon, backToBack, pairs, labDay, timePref },
+      breakdown: { unassigned: unassignedPenalty, cohort, faculty, afternoon, backToBack, pairs, labDay, timePref, distribution },
     };
   }
   return total;
@@ -852,12 +897,10 @@ function courseScoreContribution(courseIdx, assignment, ctx) {
     const count = sectionCounts.get(course.courseId) || 1;
     if (count === 1) {
       const startMin = timeToMinutes(slot.startTime);
-      const EVENING = timeToMinutes('16:00');
-      const LATE_AFTERNOON = timeToMinutes('14:30');
-      if (startMin >= EVENING) {
+      const CO_CURRICULAR = timeToMinutes('15:30');
+      const EVENING = timeToMinutes('18:30');
+      if (startMin >= CO_CURRICULAR && startMin < EVENING) {
         penalty += W.singleSectionAfternoon * 4;
-      } else if (startMin >= LATE_AFTERNOON) {
-        penalty += W.singleSectionAfternoon * 2;
       }
     }
   }
@@ -921,6 +964,32 @@ function courseScoreContribution(courseIdx, assignment, ctx) {
     if (tp.startsWith('after ')) {
       const cutoff = timeToMinutes(normalizeTime(tp.slice(6)));
       if (startMin < cutoff) penalty += W.facultyPref * 4;
+    }
+  }
+
+  // S8 contribution: prime-time distribution (incremental approximation)
+  // Count how many other dept courses share this course's prime-time slot
+  if (!course.isExternal) {
+    const PRIME_MWF = ['08:00','09:00','10:00','11:30','12:30','13:30'];
+    const PRIME_TR  = ['09:30','11:30','13:00'];
+    const isMWF = slot.days.some(d => [0,2,4].includes(d));
+    const isTR  = slot.days.some(d => [1,3].includes(d));
+    const startTime = slot.startTime;
+    if ((isMWF && PRIME_MWF.includes(startTime)) || (isTR && PRIME_TR.includes(startTime))) {
+      let sameSlotCount = 1; // this course
+      for (const other of others) {
+        if (other.isFrozen || other.course.isExternal) continue;
+        if (other.slot.startTime === startTime) {
+          const otherMWF = other.slot.days.some(d => [0,2,4].includes(d));
+          const otherTR  = other.slot.days.some(d => [1,3].includes(d));
+          if ((isMWF && otherMWF) || (isTR && otherTR)) sameSlotCount++;
+        }
+      }
+      const totalDept = others.filter(o => !o.isFrozen && !o.course.isExternal).length + 1;
+      const cap = Math.max(2, Math.ceil(totalDept * 0.05));
+      if (sameSlotCount > cap) {
+        penalty += W.distribution * 3;
+      }
     }
   }
 
@@ -1125,6 +1194,18 @@ function isValidAgainstFixed(courseIdx, slotIdx, ctx) {
         return false;
       }
     }
+  }
+
+  // H9. Two-day-a-week sections must be TR or after 3:30 PM
+  if (course.mode === '2x75') {
+    const isTR = courseDays.length === 2 && courseDays.includes(1) && courseDays.includes(3);
+    const isAfter330 = timeToMinutes(courseStart) >= timeToMinutes('15:30');
+    if (!isTR && !isAfter330) return false;
+  }
+
+  // H10. Four-day-a-week sections may not include both Tuesday and Thursday
+  if (course.mode === '4x50') {
+    if (courseDays.includes(1) && courseDays.includes(3)) return false;
   }
 
   return true;
@@ -1373,6 +1454,7 @@ function optimizeSchedule(courses, frozen, slots, facultyPrefs, weights, seed) {
     singleSectionAfternoon:(weights && weights.singleSectionAfternoon)|| 5,
     backToBack:            (weights && weights.backToBack)            || 5,
     specialConstraints:    (weights && weights.specialConstraints)    || 5,
+    distribution:          (weights && weights.distribution)          || 7,
   };
 
   // ── Pre-compute frozen course time info ─────────────────────
@@ -1908,6 +1990,7 @@ function computeSuggestions(scheduled, frozen, slots, facultyPrefs, weights, tar
     singleSectionAfternoon:(weights && weights.singleSectionAfternoon)|| 5,
     backToBack:            (weights && weights.backToBack)            || 5,
     specialConstraints:    (weights && weights.specialConstraints)    || 5,
+    distribution:          (weights && weights.distribution)          || 7,
   };
 
   // ── Rebuild toAssign + locked from scheduled items ──────────

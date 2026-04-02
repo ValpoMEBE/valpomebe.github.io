@@ -1088,6 +1088,13 @@
   animation: flash-gold .8s ease-out;
 }
 
+/* ── Blocked/impossible moves ──────────────────────────────── */
+.move-option.blocked {
+  opacity: 0.4;
+  pointer-events: none;
+  text-decoration: line-through;
+}
+
 /* ── Print styles ───────────────────────────────────────────── */
 @media print {
   body { background: white; color: black; }

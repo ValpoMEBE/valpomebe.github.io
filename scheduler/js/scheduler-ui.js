@@ -85,6 +85,7 @@ function getWeights() {
     singleSectionAfternoon: parseInt(document.getElementById('weight-single-before230')?.value || '10', 10),
     backToBack:             parseInt(document.getElementById('weight-back-to-back')?.value || '6', 10),
     specialConstraints:     parseInt(document.getElementById('weight-special')?.value || '10', 10),
+    distribution:           parseInt(document.getElementById('weight-distribution')?.value || '7', 10),
   };
 }
 
@@ -795,6 +796,17 @@ function renderAnalysis() {
     `;
   }
 
+  // ── Score gauge ──
+  const scoreLabel = document.getElementById('score-label');
+  const scoreFill  = document.getElementById('score-gauge-fill');
+  if (scoreLabel && result.score != null) {
+    const score = result.score === -1 ? 0 : result.score;
+    scoreLabel.textContent = score;
+    // Gauge: 0 = 100%, 1000+ = 0%
+    const pct = Math.max(0, Math.min(100, 100 - (score / 10)));
+    if (scoreFill) scoreFill.style.width = pct + '%';
+  }
+
   // ── Constraint satisfaction report ──
   const reportEl = document.getElementById('constraint-cards');
   if (reportEl && result.constraintReport) {
@@ -828,7 +840,7 @@ function renderAnalysis() {
 
       <div class="constraint-card ${cr.singleSectionViolations.length === 0 ? 'satisfied' : 'violated'}">
         <div class="constraint-header">
-          <span class="constraint-name">Single-Section Before 2:30 PM</span>
+          <span class="constraint-name">Single-Section Not 3:30–6:30 PM</span>
           <span class="constraint-score">${cr.singleSectionViolations.length === 0 ? 'All clear' : `${cr.singleSectionViolations.length} violation(s)`}</span>
         </div>
         ${cr.singleSectionViolations.length > 0 ? `
@@ -958,7 +970,7 @@ function renderLoads() {
       );
       let totalPref = 0, maxPref = 0;
       for (const item of instrItems) {
-        const pVal = matchFacultyPrefForSlot(item.course, item.slot);
+        const pVal = matchFacultyPref(item.course, item.slot, STATE.facultyPrefs.preferences);
         totalPref += Math.max(0, pVal);
         maxPref += 3; // max possible per slot
       }
